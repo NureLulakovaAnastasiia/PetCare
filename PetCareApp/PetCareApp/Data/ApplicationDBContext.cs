@@ -11,6 +11,9 @@ namespace PetCareApp.Data
             
         }
 
+        public DbSet<Contacts> Contacts { get; set; }
+        public DbSet<Pet> Pets { get; set; }
+        public DbSet<Service> Services { get; set; }
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetCareApp.Data;
 
@@ -11,9 +12,11 @@ using PetCareApp.Data;
 namespace PetCareApp.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240821132003_AddServicesAndContactsTables")]
+    partial class AddServicesAndContactsTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,33 +237,6 @@ namespace PetCareApp.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("PetCareApp.Models.Break", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("DayOfWeek")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.ToTable("Break");
-                });
-
             modelBuilder.Entity("PetCareApp.Models.Contacts", b =>
                 {
                     b.Property<int>("Id")
@@ -332,33 +308,6 @@ namespace PetCareApp.Migrations
                     b.ToTable("Pets");
                 });
 
-            modelBuilder.Entity("PetCareApp.Models.Schedule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("DayOfWeek")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.ToTable("Schedule");
-                });
-
             modelBuilder.Entity("PetCareApp.Models.Service", b =>
                 {
                     b.Property<int>("Id")
@@ -366,9 +315,6 @@ namespace PetCareApp.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -404,8 +350,6 @@ namespace PetCareApp.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
 
                     b.ToTable("Services");
                 });
@@ -461,16 +405,6 @@ namespace PetCareApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PetCareApp.Models.Break", b =>
-                {
-                    b.HasOne("PetCareApp.Models.AppUser", "AppUser")
-                        .WithMany("Breaks")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("AppUser");
-                });
-
             modelBuilder.Entity("PetCareApp.Models.Contacts", b =>
                 {
                     b.HasOne("PetCareApp.Models.AppUser", "AppUser")
@@ -490,38 +424,12 @@ namespace PetCareApp.Migrations
                     b.Navigation("AppUser");
                 });
 
-            modelBuilder.Entity("PetCareApp.Models.Schedule", b =>
-                {
-                    b.HasOne("PetCareApp.Models.AppUser", "AppUser")
-                        .WithMany("Schedules")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("AppUser");
-                });
-
-            modelBuilder.Entity("PetCareApp.Models.Service", b =>
-                {
-                    b.HasOne("PetCareApp.Models.AppUser", "AppUser")
-                        .WithMany("Services")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("AppUser");
-                });
-
             modelBuilder.Entity("PetCareApp.Models.AppUser", b =>
                 {
-                    b.Navigation("Breaks");
-
                     b.Navigation("Contacts")
                         .IsRequired();
 
                     b.Navigation("Pets");
-
-                    b.Navigation("Schedules");
-
-                    b.Navigation("Services");
                 });
 #pragma warning restore 612, 618
         }
