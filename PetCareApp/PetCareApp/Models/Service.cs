@@ -14,16 +14,18 @@ namespace PetCareApp.Models
         [Range(0, 100000)]
         public float MinimumPrice { get; set; } = 0;
         [Range(0, 100000)]
-        public float MaxmumPrice { get; set; } = 0;
+        public float MaximumPrice { get; set; } = 0;
         public int RealTime { get; set; }  = 0;
         public bool IsFixedTime { get; set; } = false;
         public bool IsNearestTime { get; set; } = false;
         public int MinimumTime { get; set; } = 0;
-        public int MaxmumTime { get; set; } = 0;
+        public int MaximumTime { get; set; } = 0;
         public bool IsHidden { get; set; } = false;
 
         public string? AppUserId { get; set; }
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public AppUser? AppUser { get; set; }
+        public List<Question> Questions { get; set; } = new List<Question>();
+        public List<Record>? Records { get; set; } = new List<Record>();
     }
 }

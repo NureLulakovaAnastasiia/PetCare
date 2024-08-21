@@ -24,6 +24,7 @@ namespace PetCareApp.Models
         public string? AppUserId { get; set; }
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public AppUser? AppUser { get; set; }
+        public List<Record> Records { get; set; } = new List<Record>();
 
     }
 }

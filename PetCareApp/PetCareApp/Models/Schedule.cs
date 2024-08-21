@@ -7,6 +7,7 @@ namespace PetCareApp.Models
     {
         [Key]
         public int Id { get; set; }
+        [Range(0, 6)]
         public int? DayOfWeek { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
