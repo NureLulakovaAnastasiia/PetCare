@@ -17,10 +17,14 @@ namespace PetCareApp.Models
 
         public List<Pet> Pets { get; set; } = new List<Pet>();
         public Contacts Contacts { get; set; } = new Contacts();
+        public Organization? Organization { get; set; }
+        public OrganizationEmployee? OrganizationEmployee { get; set; }
         public List<Service> Services { get; set; } = new List<Service>();
         public List<Break> Breaks { get; set; } = new List<Break>();
         public List<Schedule> Schedules { get; set; } = new List<Schedule>();
         public List<Record> Records { get; set; } = new List<Record>();
+        public List<Review> Reviews { get; set; } = new List<Review>();
+        public List<Portfolio> Portfolios { get; set; } = new List<Portfolio>();
         public List<RecordCancel> RecordCancels { get; set; } = new List<RecordCancel>();
     }
 }

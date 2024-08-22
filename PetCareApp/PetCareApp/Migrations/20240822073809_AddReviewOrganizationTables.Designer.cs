@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetCareApp.Data;
 
@@ -11,9 +12,11 @@ using PetCareApp.Data;
 namespace PetCareApp.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240822073809_AddReviewOrganizationTables")]
+    partial class AddReviewOrganizationTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -297,7 +300,7 @@ namespace PetCareApp.Migrations
 
                     b.HasIndex("AppUserId");
 
-                    b.ToTable("Breaks");
+                    b.ToTable("Break");
                 });
 
             modelBuilder.Entity("PetCareApp.Models.Contacts", b =>
@@ -423,7 +426,7 @@ namespace PetCareApp.Migrations
 
                     b.HasIndex("AppUserId");
 
-                    b.ToTable("Pets");
+                    b.ToTable("Pet");
                 });
 
             modelBuilder.Entity("PetCareApp.Models.Portfolio", b =>
@@ -450,7 +453,7 @@ namespace PetCareApp.Migrations
 
                     b.HasIndex("AppUserId");
 
-                    b.ToTable("Portfolios");
+                    b.ToTable("Portfolio");
                 });
 
             modelBuilder.Entity("PetCareApp.Models.Question", b =>
