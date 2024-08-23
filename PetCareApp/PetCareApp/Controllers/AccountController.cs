@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using PetCareApp.Dtos;
+using PetCareApp.Interfaces;
 using PetCareApp.Models;
 
 namespace PetCareApp.Controllers
@@ -11,9 +12,11 @@ namespace PetCareApp.Controllers
     public class AccountController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
-        public AccountController(UserManager<AppUser> userManager)
+        private readonly ITokenService _tokenService;
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService)
         {
             _userManager = userManager;
+            _tokenService = tokenService;
         }
 
 
@@ -40,7 +43,14 @@ namespace PetCareApp.Controllers
                     var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
                     if (roleResult.Succeeded)
                     {
-                        return Ok("User created");
+                        Random generator = new Random();
+                        return Ok(new NewUserDto
+                        {
+                            FirstName = appUser.FirstName,
+                            Email = appUser.Email,
+                            token = _tokenService.CreateToken(appUser),
+                            checkNumber = generator.Next(0, 1000000).ToString("D6")
+                        });
                     }
                     else
                     {
