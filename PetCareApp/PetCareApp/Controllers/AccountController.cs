@@ -13,10 +13,15 @@ namespace PetCareApp.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
-        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService)
+        private readonly IUserService _userService;
+        private readonly SignInManager<AppUser> _signInManager;
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, 
+            IUserService userService, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _tokenService = tokenService;
+            _userService = userService;
+            _signInManager = signInManager;
         }
 
 
@@ -49,7 +54,7 @@ namespace PetCareApp.Controllers
                             FirstName = appUser.FirstName,
                             Email = appUser.Email,
                             token = _tokenService.CreateToken(appUser),
-                            checkNumber = generator.Next(0, 1000000).ToString("D6")
+                            //checkNumber = generator.Next(0, 1000000).ToString("D6")
                         });
                     }
                     else
@@ -68,5 +73,65 @@ namespace PetCareApp.Controllers
                 return StatusCode(500, ex);
             }
         }
+
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody]LoginDto loginDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var user = _userManager.Users.FirstOrDefault(x => x.Email == loginDto.Email);
+            if (user == null)
+            {
+                return Unauthorized("Invalid email");
+            }
+
+            var passwordCheck = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            if (!passwordCheck.Succeeded)
+            {
+                return Unauthorized("Username or password is incorrect");
+            }
+
+            return Ok(
+                new NewUserDto
+                {
+                    Email = loginDto.Email,
+                    token = _tokenService.CreateToken(user)
+                }
+            );
+        }
+
+        [HttpPost("sendEmail")]
+        public async Task<IActionResult> SendEmail([FromBody]  EmailConfirmationDto emailConfirm)
+        {
+            try
+            {
+                var checkUser = await _userManager.FindByEmailAsync(emailConfirm.Email);
+                if (checkUser != null)
+                {
+                    var res = _userService.SendEmail(emailConfirm);
+                    if(!String.Equals(res, "Success")) { 
+                        return StatusCode(500, res);
+                    }
+                }
+                else
+                {
+                    return Unauthorized("User is not found");
+                }
+                return Ok("Email was sent");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> SubmitEmail()
+        //{
+
+        //}
     }
 }
