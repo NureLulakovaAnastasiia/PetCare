@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using PetCareApp.Dtos;
@@ -163,6 +164,51 @@ namespace PetCareApp.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, ex);
+            }
+        }
+
+        [HttpPatch("changeRoleToMaster")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<IActionResult> ChangeRoleToMaster()
+        {
+            try
+            {
+                var email = User.Identity;
+                if (email == null)
+                {
+                    return StatusCode(500, "Cannot authorize user");
+                }
+                var user = await _userManager.FindByEmailAsync(email.Name);
+                if (user != null)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles.Contains("Master"))
+                    {
+                        return StatusCode(400, "User already has a master role");
+                    }
+                    else if (roles.Contains("User"))
+                    {
+                        var res = await _userManager.RemoveFromRoleAsync(user, "User");
+                        if (res.Succeeded)
+                        {
+                            res = await _userManager.AddToRoleAsync(user, "Master");
+                            if (res.Succeeded)
+                            {
+                                return Ok("User succesfully changed role to master");
+                            }
+
+                            return StatusCode(500, "Error during changing role");
+                        }
+
+                        return StatusCode(500, "User has no rights to change role");
+                    }
+                    return StatusCode(500, "User cannot change role");
+                }
+                return StatusCode(404, "User not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
     }
