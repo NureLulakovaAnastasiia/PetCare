@@ -17,12 +17,12 @@ namespace PetCareApp.Service
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 _configuration["JWT:SigningKey"]));
         }
-        public string CreateToken(AppUser user)
+        public string CreateToken(AppUser user, string role)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-               // new Claim(JwtRegisteredClaimNames.)
+                new Claim(ClaimTypes.Role, role)
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
@@ -41,6 +41,51 @@ namespace PetCareApp.Service
 
             return tokenHandler.WriteToken(token);
 
+        }
+
+
+        public ClaimsPrincipal? CheckToken(string token)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("Jwt:Key").Value));
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = key,
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+
+            ClaimsPrincipal principal;
+            try
+            {
+                principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+                return principal;
+            }
+            catch (SecurityTokenException)
+            {
+                return null;
+            }
+        }
+
+        public string GetTokenClaims(string token)
+        {
+            var principal = CheckToken(token);
+            if (principal == null)
+            {
+
+            }
+            var username = principal.Identity.Name;
+            var roles = principal.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value)
+                .ToList();
+            if (!roles.Any())
+            {
+                return string.Empty;
+            }
+
+            return roles[0];
         }
     }
 }

@@ -26,13 +26,20 @@ namespace PetCareApp.Controllers
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto, [FromQuery] string role)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
+                }
+
+                role = role.ToLower();
+
+                if (String.IsNullOrEmpty(role) || role == "admin")
+                {
+                    return BadRequest("Wrong role");
                 }
 
                 var appUser = new AppUser
@@ -45,7 +52,7 @@ namespace PetCareApp.Controllers
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
 
                 if (createdUser.Succeeded) {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+                    var roleResult = await _userManager.AddToRoleAsync(appUser, role);
                     if (roleResult.Succeeded)
                     {
                         Random generator = new Random();
@@ -53,7 +60,7 @@ namespace PetCareApp.Controllers
                         {
                             FirstName = appUser.FirstName,
                             Email = appUser.Email,
-                            token = _tokenService.CreateToken(appUser),
+                            token = _tokenService.CreateToken(appUser, ""),
                             //checkNumber = generator.Next(0, 1000000).ToString("D6")
                         });
                     }
@@ -93,12 +100,16 @@ namespace PetCareApp.Controllers
             {
                 return Unauthorized("Username or password is incorrect");
             }
-
+            var roles = await _userManager.GetRolesAsync(user);
+            if (!roles.Any())
+            {
+                return StatusCode(400, "Somethimg went wromg with your access");
+            }
             return Ok(
                 new NewUserDto
                 {
                     Email = loginDto.Email,
-                    token = _tokenService.CreateToken(user)
+                    token = _tokenService.CreateToken(user, roles[0])
                 }
             );
         }
@@ -109,7 +120,7 @@ namespace PetCareApp.Controllers
             try
             {
                 var checkUser = await _userManager.FindByEmailAsync(emailConfirm.Email);
-                if (checkUser != null)
+                if (checkUser != null && !checkUser.EmailConfirmed)
                 {
                     var res = _userService.SendEmail(emailConfirm);
                     if(!String.Equals(res, "Success")) { 
@@ -128,10 +139,31 @@ namespace PetCareApp.Controllers
             }
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> SubmitEmail()
-        //{
-
-        //}
+        [HttpPatch("confirmEmail")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] string email)
+        {
+            try
+            {
+                var checkUser = await _userManager.FindByEmailAsync(email);
+                if (checkUser != null && !checkUser.EmailConfirmed) 
+                {
+                   var res = _userService.SubmitEmail(email);
+                    if (int.TryParse(res, out int num))
+                    {
+                        return Ok("Email was confirmed");
+                    }
+                    return StatusCode(500, res);
+                }
+                else
+                {
+                    return Unauthorized("User is not found");
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
     }
 }
