@@ -23,6 +23,7 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 });
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMasterService, MasterService>();
 
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
@@ -101,6 +102,8 @@ builder.Services.AddAuthorization(options =>
        policy.RequireRole("Organization"));
 }
 );
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var app = builder.Build();
 
