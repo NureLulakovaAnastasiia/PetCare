@@ -69,6 +69,43 @@ namespace PetCareApp.Controllers
 
             return StatusCode(500, res);
         }
-        
+
+        [HttpPost("addQuestionary")]
+        [Authorize(Roles = "Master")]
+        public async Task<IActionResult> AddQuestionary(List<AddQuestionDto> questionaryDto, [FromQuery] int serviceId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _masterService.AddQuestionary(questionaryDto, serviceId);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+
+            return StatusCode(500, res);
+        }
+
+        [HttpPost("updateQuestionary")]
+        [Authorize(Roles = "Master")]
+        public async Task<IActionResult> UpdateQuestionary(List<UpdateQuestionDto> questionaryDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _masterService.UpdateQuestionary(questionaryDto);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+
+            return StatusCode(500, res);
+        }
+
+
     }
 }

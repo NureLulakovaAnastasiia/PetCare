@@ -28,35 +28,35 @@ namespace PetCareApp.Data
         public DbSet<OrganizationEmployee> OrganizationEmployees { get; set; }
         public DbSet<Portfolio> Portfolios { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-            List<IdentityRole> roles = new List<IdentityRole>
-                {
-                new IdentityRole
-                {
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name = "User",
-                    NormalizedName = "USER"
-                },
-                new IdentityRole
-                {
-                    Name = "Master",
-                    NormalizedName = "MASTER"
-                },
-                new IdentityRole
-                {
-                    Name = "Organization",
-                    NormalizedName = "ORGANIZATION"
-                }
-            };
+        //protected override void OnModelCreating(ModelBuilder builder)
+        //{
+        //    base.OnModelCreating(builder);
+        //    List<IdentityRole> roles = new List<IdentityRole>
+        //        {
+        //        new IdentityRole
+        //        {
+        //            Name = "Admin",
+        //            NormalizedName = "ADMIN"
+        //        },
+        //        new IdentityRole
+        //        {
+        //            Name = "User",
+        //            NormalizedName = "USER"
+        //        },
+        //        new IdentityRole
+        //        {
+        //            Name = "Master",
+        //            NormalizedName = "MASTER"
+        //        },
+        //        new IdentityRole
+        //        {
+        //            Name = "Organization",
+        //            NormalizedName = "ORGANIZATION"
+        //        }
+        //    };
 
-            builder.Entity<IdentityRole>().HasData(roles);
-        }
+        //    builder.Entity<IdentityRole>().HasData(roles);
+        //}
 
       
     }

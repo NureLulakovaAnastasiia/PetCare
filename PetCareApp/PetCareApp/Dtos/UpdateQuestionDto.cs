@@ -2,13 +2,17 @@
 
 namespace PetCareApp.Dtos
 {
-    public class AddQuestionDto : IQuestionDto<AddAnswerDto>
+    public class UpdateQuestionDto: IQuestionDto<UpdateAnswerDto>
     {
+        [Required]
+        public int Id { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required]
         public bool HasAnswerWithFixedTime { get; set; } = false;
         [Required]
-        public List<AddAnswerDto> Answers { get; set; }
+        public int ServiceId { get; set; }
+        [Required]
+        public List<UpdateAnswerDto> Answers { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using PetCareApp.Data;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
+using PetCareApp.Mappings;
 using PetCareApp.Models;
 
 namespace PetCareApp.Services
@@ -60,13 +61,19 @@ namespace PetCareApp.Services
                 {
                     return "Service is not found";
                 }
-                var checkRes = CheckQuestionary(questionary);
+                var checkRes = CheckQuestionary<AddQuestionDto, AddAnswerDto>(questionary);
                 if(!String.Equals(checkRes, "Success"))
                 {
                     return checkRes;
                 }
 
-                //mapping
+                var questionaryToAdd = QuestionMappings.MapAddQuestionList(questionary, serviceId);
+                if (questionaryToAdd != null)
+                {
+                    _dbContext.AddRange(questionaryToAdd);
+                    return _dbContext.SaveChanges().ToString();
+                }
+                return "Error during adding data";
             }
             catch (Exception ex)
             {
@@ -75,10 +82,13 @@ namespace PetCareApp.Services
 
 
         }
-        public string CheckQuestionary(List<AddQuestionDto> questionary)
+        
+        public string CheckQuestionary<TQuestion, TAnswer>(List<TQuestion> questionary)
+            where TQuestion : IQuestionDto<TAnswer>
+            where TAnswer : IAnswerDto
         {
             var fixedTimeQuestions = questionary.Where(x => x.HasAnswerWithFixedTime).ToList();
-            if (fixedTimeQuestions.Count > 1)
+            if (fixedTimeQuestions.Count() > 1)
             {
                 return "Questionary cannot have multiple questions with fixed time";
             }
@@ -102,7 +112,45 @@ namespace PetCareApp.Services
 
             return "Success";
         }
+        
+        public async Task<string> UpdateQuestionary(List<UpdateQuestionDto> questionary)
+        {
+            try
+            {
+                if (questionary.Count == 0)
+                {
+                    return "Cannot update questionary because its empty";
+                }
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User not found";
+                }
+                var service = _dbContext.Services.FirstOrDefault(s => s.Id == questionary[0].ServiceId);
+                if (service == null)
+                {
+                    return "Service is not found";
+                }
+                var checkRes = CheckQuestionary<UpdateQuestionDto, UpdateAnswerDto>(questionary);
+                if (!String.Equals(checkRes, "Success"))
+                {
+                    return checkRes;
+                }
 
+                var questionaryToAdd = QuestionMappings.MapUpdateQuestionList(questionary);
+                if (questionaryToAdd != null)
+                {
+                    _dbContext.UpdateRange(questionaryToAdd);
+                    return _dbContext.SaveChanges().ToString();
+                }
+                return "Error during adding data";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
 
         public async Task<string> AddService(AddServiceDto serviceDto)
         {
@@ -156,6 +204,6 @@ namespace PetCareApp.Services
             }
         }
 
-        
+       
     }
 }
