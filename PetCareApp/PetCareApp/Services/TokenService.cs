@@ -31,7 +31,7 @@ namespace PetCareApp.Service
             {
                 Subject = new ClaimsIdentity(claims),
                 Issuer = _configuration["JWT:Issuer"],
-                Expires = DateTime.UtcNow.AddMinutes(10),
+                Expires = DateTime.UtcNow.AddHours(4),
                 SigningCredentials = creds,
                 Audience = _configuration["JWT:Audience"]
             };

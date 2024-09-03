@@ -106,6 +106,21 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
+        [HttpPost("upsertSchedule")]
+        public async Task<IActionResult> UpsertSchedule(List<ScheduleDto> scheduleDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            var res = await _masterService.UpsertSchedule(scheduleDto);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok("Schedule was successfully added or updated!");
+            }
+
+            return StatusCode(500, res);
+        }
     }
 }

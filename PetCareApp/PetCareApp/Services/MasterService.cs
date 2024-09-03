@@ -92,7 +92,7 @@ namespace PetCareApp.Services
             {
                 return "Questionary cannot have multiple questions with fixed time";
             }
-            if (fixedTimeQuestions.Count > 0)
+            if (fixedTimeQuestions.Count > 0 && questionary.GetType() == typeof(List<AddQuestionDto>))
             {
                 var fixedAnswers = fixedTimeQuestions[0].Answers
                     .All(x => x.IsTimeFixed && (x.IsTimeMaximum || x.IsTimeMinimum || x.Time > 0));
@@ -204,6 +204,44 @@ namespace PetCareApp.Services
             }
         }
 
-       
+        public async Task<string> UpsertSchedule(List<ScheduleDto> scheduleDto)
+        {
+            if (scheduleDto.Count == 0)
+            {
+                return "Nothing to add or update";
+            }
+
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User not found";
+                }
+
+                var schedule = _mapper.Map<List<Schedule>>(scheduleDto);
+                if (schedule != null)
+                {
+                    foreach (var item in schedule)
+                    {
+                        item.AppUserId = user.Id;
+                        if(item.Id == 0)
+                        {
+                            _dbContext.Add(item);
+                        }
+                        else
+                        {
+                            _dbContext.Update(item);
+                        }
+                    }
+                    return _dbContext.SaveChanges().ToString();
+                }
+                return "Error during updating or inserting data";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }

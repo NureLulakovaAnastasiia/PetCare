@@ -9,8 +9,8 @@ namespace PetCareApp.Models
         public int Id { get; set; }
         [Range(0,6)]
         public int? DayOfWeek { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
 
         public string? AppUserId { get; set; }
         [DeleteBehavior(DeleteBehavior.Cascade)]
