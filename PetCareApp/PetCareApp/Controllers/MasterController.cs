@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
+using PetCareApp.Models;
 
 namespace PetCareApp.Controllers
 {
@@ -88,7 +89,7 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
-        [HttpPost("updateQuestionary")]
+        [HttpPut("updateQuestionary")]
         [Authorize(Roles = "Master")]
         public async Task<IActionResult> UpdateQuestionary(List<UpdateQuestionDto> questionaryDto)
         {
@@ -121,6 +122,29 @@ namespace PetCareApp.Controllers
             }
 
             return StatusCode(500, res);
+        }
+
+        [HttpPost("upsertBreaks")]
+        public async Task<IActionResult> UpsertBreaks(List<BreakDto> breakDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _masterService.UpsertBreaks(breakDto);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok("Breaks were successfully added or updated!");
+            }
+
+            return StatusCode(500, res);
+        }
+
+        [HttpGet("GetFreeTimeSlots")]
+        public List<TimeSlot> GetTimeSlots(string masterId)
+        {
+            return _masterService.getWorkTimeSlots(masterId);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using PetCareApp.Dtos;
+using PetCareApp.Models;
 
 namespace PetCareApp.Interfaces
 {
@@ -10,6 +11,7 @@ namespace PetCareApp.Interfaces
         public Task<string> AddService(AddServiceDto service);
 
         public Task<string> UpsertSchedule(List<ScheduleDto> schedule);
+        public Task<string> UpsertBreaks(List<BreakDto> breaks);
 
         public Task<string> AddQuestionary(List<AddQuestionDto> questionary, int serviceId);
         public Task<string> UpdateQuestionary(List<UpdateQuestionDto> questionary);
@@ -17,5 +19,7 @@ namespace PetCareApp.Interfaces
         public string CheckQuestionary<TQuestion, TAnswer>(List<TQuestion> questionary) 
             where TQuestion : IQuestionDto<TAnswer>
             where TAnswer : IAnswerDto;
+
+        public List<TimeSlot> getWorkTimeSlots(string masterId);
     }
 }

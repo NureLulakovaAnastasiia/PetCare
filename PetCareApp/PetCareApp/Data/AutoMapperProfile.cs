@@ -15,6 +15,7 @@ namespace PetCareApp.Data
             CreateMap<AddQuestionDto, Question>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers));
             CreateMap<ScheduleDto, Schedule>();
+            CreateMap<BreakDto, Break>();
         }
         
     }

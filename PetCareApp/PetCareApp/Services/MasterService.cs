@@ -12,10 +12,11 @@ namespace PetCareApp.Services
 {
     public class MasterService : BaseService, IMasterService
     {
-       
+
         private readonly IMapper _mapper;
         private readonly ApplicationDBContext _dbContext;
-
+        private int daysAhead = 10;
+        
         public MasterService(UserManager<AppUser> userManager, IMapper mapper, ApplicationDBContext context,
            IHttpContextAccessor httpContextAccessor) : base(userManager, httpContextAccessor)
         {
@@ -62,7 +63,7 @@ namespace PetCareApp.Services
                     return "Service is not found";
                 }
                 var checkRes = CheckQuestionary<AddQuestionDto, AddAnswerDto>(questionary);
-                if(!String.Equals(checkRes, "Success"))
+                if (!String.Equals(checkRes, "Success"))
                 {
                     return checkRes;
                 }
@@ -82,7 +83,7 @@ namespace PetCareApp.Services
 
 
         }
-        
+
         public string CheckQuestionary<TQuestion, TAnswer>(List<TQuestion> questionary)
             where TQuestion : IQuestionDto<TAnswer>
             where TAnswer : IAnswerDto
@@ -112,7 +113,7 @@ namespace PetCareApp.Services
 
             return "Success";
         }
-        
+
         public async Task<string> UpdateQuestionary(List<UpdateQuestionDto> questionary)
         {
             try
@@ -162,7 +163,7 @@ namespace PetCareApp.Services
                     return "User not found";
                 }
 
-                var service  = _mapper.Map<Models.Service>(serviceDto);
+                var service = _mapper.Map<Models.Service>(serviceDto);
                 if (service != null)
                 {
                     service.AppUserId = user.Id;
@@ -177,8 +178,6 @@ namespace PetCareApp.Services
                 return ex.Message;
             }
         }
-
-       
 
         public async Task<string> UpdateContacts(ContactsDto contacts)
         {
@@ -225,7 +224,7 @@ namespace PetCareApp.Services
                     foreach (var item in schedule)
                     {
                         item.AppUserId = user.Id;
-                        if(item.Id == 0)
+                        if (item.Id == 0)
                         {
                             _dbContext.Add(item);
                         }
@@ -242,6 +241,144 @@ namespace PetCareApp.Services
             {
                 return ex.Message;
             }
+        }
+
+        public async Task<string> UpsertBreaks(List<BreakDto> breaksDto)
+        {
+            if (breaksDto.Count == 0)
+            {
+                return "Nothing to add or update";
+            }
+
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User not found";
+                }
+
+                var breaks = _mapper.Map<List<Break>>(breaksDto);
+                if (breaks != null)
+                {
+                    foreach (var item in breaks)
+                    {
+                        item.AppUserId = user.Id;
+                        if (item.Id == 0)
+                        {
+                            _dbContext.Add(item);
+                        }
+                        else
+                        {
+                            _dbContext.Update(item);
+                        }
+                    }
+                    return _dbContext.SaveChanges().ToString();
+                }
+                return "Error during updating or inserting data";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public List<TimeSlot> getWorkTimeSlots(string masterId)
+        {
+            var timeSlots = new List<TimeSlot>();
+            var schedule = _dbContext.Schedules.Where(
+                x => x.AppUserId == masterId)
+                .OrderByDescending(x => x.Date)
+                .OrderBy(x => x.DayOfWeek)
+                .ToList();
+            var breaks = _dbContext.Breaks.Where(x => x.AppUserId == masterId).ToList();
+
+            if (schedule != null && schedule.Count() > 0)
+            {
+                foreach (var item in schedule)
+                {
+                    int dayOfWeek = 0;
+                    List<DateTime> dates = new List<DateTime>();
+                    if (item.DayOfWeek != null)
+                    {
+                        dates = GetClosestDatesByDayOfWeek(item.DayOfWeek.Value);
+                        
+                        if (timeSlots.Where(x=> dates.Contains(x.Date.Date)).Count() > 0)
+                        {
+                            continue;
+                        }
+                        dayOfWeek = item.DayOfWeek.Value;
+                    }
+                    else if (item.Date != null)
+                    {
+                        dates.Add(item.Date.Value);
+                        dayOfWeek = (int)item.Date.Value.DayOfWeek;
+                    }
+                    
+                    var dayBreaks = breaks.Where(x => x.DayOfWeek == dayOfWeek)
+                       .OrderBy(x => x.StartTime)
+                       .ToList();
+
+                    if (dayBreaks.Count() == 0)
+                    {
+                        foreach (var date in dates) { 
+                            timeSlots.Add(new TimeSlot
+                            {
+                                Date = date,
+                                StartTime = item.StartTime,
+                                EndTime = item.EndTime
+                            });
+                        }
+                    }
+                    else
+                    {
+                       
+                        foreach (var date in dates)
+                        {
+                            TimeSpan startTime = item.StartTime;
+                            for (int i = 0; i < dayBreaks.Count; i++)
+                            {
+                                timeSlots.Add(new TimeSlot
+                                {
+                                    Date = date,
+                                    StartTime = startTime,
+                                    EndTime = dayBreaks[i].StartTime
+                                });
+                                startTime = dayBreaks[i].EndTime;
+                            }
+                            timeSlots.Add(new TimeSlot
+                            {
+                                Date = date,
+                                StartTime = startTime,
+                                EndTime = item.EndTime
+                            });
+                        }
+                    }
+                }
+
+            }
+
+            return timeSlots.OrderBy(x => x.Date).ToList();
+        }
+
+        private List<DateTime> GetClosestDatesByDayOfWeek(int dayOfWeek)
+        {
+            var res = new List<DateTime>();
+            var now = DateTime.Today;
+            while(now <= DateTime.Today.AddDays(daysAhead))
+            {
+                if((int)now.DayOfWeek == dayOfWeek)
+                {
+                    res.Add(now);
+                    now = now.AddDays(7);
+                }
+                else
+                {
+                    now = now.AddDays(1);
+                }
+            }
+
+            return res;
         }
     }
 }
