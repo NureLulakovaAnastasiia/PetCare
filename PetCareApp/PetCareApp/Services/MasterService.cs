@@ -16,7 +16,8 @@ namespace PetCareApp.Services
         private readonly IMapper _mapper;
         private readonly ApplicationDBContext _dbContext;
         private int daysAhead = 10;
-        
+        private double serviceInterval = 10;
+
         public MasterService(UserManager<AppUser> userManager, IMapper mapper, ApplicationDBContext context,
            IHttpContextAccessor httpContextAccessor) : base(userManager, httpContextAccessor)
         {
@@ -283,7 +284,7 @@ namespace PetCareApp.Services
             }
         }
 
-        public List<TimeSlot> getWorkTimeSlots(string masterId)
+        public List<TimeSlot> GetWorkTimeSlots(string masterId)
         {
             var timeSlots = new List<TimeSlot>();
             var schedule = _dbContext.Schedules.Where(
@@ -379,6 +380,150 @@ namespace PetCareApp.Services
             }
 
             return res;
+        }
+
+        public async Task<string> MakeAppointment(RecordDto recordDto)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User not found";
+                }
+                if (recordDto.StartTime > recordDto.EndTime)
+                {
+                    return "Time interval is not correct";
+                }
+                var service = _dbContext.Services.FirstOrDefault(x => x.Id == recordDto.ServiceId);
+                if (service != null)
+                {
+                    if (CheckIfFreeTimeSlot(service.AppUserId, recordDto.StartTime, recordDto.EndTime))
+                    {
+                        var record = _mapper.Map<Record>(recordDto);
+                        if (record != null)
+                        {
+                            record.AppUserId = user.Id;
+                            _dbContext.Add(record);
+                            return _dbContext.SaveChanges().ToString();
+                        }
+                    }
+                    else
+                    {
+                        return $"Time from {recordDto.StartTime.ToString("HH:mm")}" +
+                            $" to {recordDto.EndTime.ToString("HH:mm")} of {recordDto.StartTime.ToString("ddd MMMM")} " +
+                            $"is already booked, choose another";
+                    }
+                }
+                return "Error during adding";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        private bool CheckIfFreeTimeSlot(string masterId, DateTime startTime, DateTime endTime)
+        {
+            var intersections = _dbContext.Records.Where(x => x.AppUserId == masterId 
+                                && x.StartTime > startTime  && x.EndTime < endTime 
+                                && x.Status != "Canceled").ToList();
+            if (intersections.Any())
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private List<TimeSlot> GetAllEmptySlots(string masterId)
+        {
+            var resSlots = new List<TimeSlot>();
+            var workSlots = GetWorkTimeSlots(masterId);
+            var masterServices = _dbContext.Services.Where(x => x.AppUserId == masterId).Select(x => x.Id).ToList();
+            if (!masterServices.Any())
+            {
+                return resSlots;
+            }
+            var records = _dbContext.Records
+                .Where(x => x.Status != "Canceled" && 
+                        masterServices.Contains((int)x.ServiceId)
+                        && x.StartTime > DateTime.Now)
+                .OrderBy(x => x.StartTime)
+                .ToList();
+
+            foreach (var slot in workSlots)
+            {
+                var slotServices = records
+                    .Where(x => x.StartTime.Date == slot.Date &&
+                    x.StartTime.TimeOfDay >= slot.StartTime &&
+                    x.EndTime.TimeOfDay <= slot.EndTime)
+                    .OrderBy (x => x.StartTime)
+                    .ToList();
+
+                if (slotServices.Count == 0)
+                {
+                    resSlots.Add(slot);
+                }
+                else
+                {
+                    var startTime = slot.StartTime;
+                    
+                    foreach (var service in slotServices)
+                    {
+                        if (startTime == service.StartTime.TimeOfDay)
+                        {
+                            startTime = service.EndTime.TimeOfDay;
+                            continue;
+                        }
+                            resSlots.Add(new TimeSlot
+                        {
+                            Date = slot.Date,
+                            StartTime = startTime,
+                            EndTime = service.StartTime.TimeOfDay
+                        });
+                        startTime = service.EndTime.TimeOfDay;
+                    }
+                    resSlots.Add(new TimeSlot
+                    {
+                        Date = slot.Date,
+                        StartTime = startTime,
+                        EndTime = slot.EndTime
+                    });
+                }
+            }
+
+            return resSlots;
+        }
+        public List<TimeSlot> GetFreeTimeSlots(string masterId, int time)
+        {
+            var resSlots = new List<TimeSlot>();
+            var workSlots = GetAllEmptySlots(masterId);
+            
+            if (!workSlots.Any())
+            {
+                return resSlots;
+            }
+            foreach (var slot in workSlots)
+            {
+                var startTime = slot.StartTime;
+                while (startTime < slot.EndTime)
+                {
+                    var endTime = startTime.Add(TimeSpan.FromMinutes((double)time));
+                    if(endTime > slot.EndTime)
+                    {
+                        break;
+                    }
+                    resSlots.Add(new TimeSlot
+                    {
+                        Date = slot.Date,
+                        StartTime = startTime,
+                        EndTime = endTime
+                    });
+
+                    startTime = startTime.Add(TimeSpan.FromMinutes((double)serviceInterval));
+                }
+            }
+            return resSlots;
         }
     }
 }

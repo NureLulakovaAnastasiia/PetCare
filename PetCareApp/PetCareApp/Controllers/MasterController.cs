@@ -142,9 +142,26 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("GetFreeTimeSlots")]
-        public List<TimeSlot> GetTimeSlots(string masterId)
+        public List<TimeSlot> GetTimeSlots(string masterId, int time)
         {
-            return _masterService.getWorkTimeSlots(masterId);
+            var workSlots = _masterService.GetFreeTimeSlots(masterId, time);
+            return workSlots;
+        }
+
+        [HttpPost("MakeAnAppointment")]
+        public async Task<IActionResult> MakeAnAppointment(RecordDto record)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var res = await _masterService.MakeAppointment(record);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+
+            return StatusCode(500, res);
         }
     }
 }
