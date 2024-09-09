@@ -21,9 +21,11 @@ namespace PetCareApp.Interfaces
             where TAnswer : IAnswerDto;
 
         public List<TimeSlot> GetWorkTimeSlots(string masterId);
-        public List<TimeSlot> GetFreeTimeSlots(string masterId, int time);
+        public List<TimeSlot> GetFreeTimeSlots(string masterId, int time, int serviceId);
 
-        public Task<string> MakeAppointment(RecordDto recordDto);   
-            
+        public Task<string> MakeAppointment(RecordDto recordDto);
+
+        public int AnalizeQuestionary(List<QuestionDto> questionary, int serviceId);
+        public string GetQuestionaryDescription(List<QuestionDto> questionary);
     }
 }

@@ -284,6 +284,7 @@ namespace PetCareApp.Services
             }
         }
 
+        //returns all working time slots (using schedule and breaks)
         public List<TimeSlot> GetWorkTimeSlots(string masterId)
         {
             var timeSlots = new List<TimeSlot>();
@@ -362,6 +363,7 @@ namespace PetCareApp.Services
             return timeSlots.OrderBy(x => x.Date).ToList();
         }
 
+        //return dates for N days ahead(variable daysAhead) for needed day of the week
         private List<DateTime> GetClosestDatesByDayOfWeek(int dayOfWeek)
         {
             var res = new List<DateTime>();
@@ -382,6 +384,7 @@ namespace PetCareApp.Services
             return res;
         }
 
+        //final stage of signing up to appointment
         public async Task<string> MakeAppointment(RecordDto recordDto)
         {
             try
@@ -423,6 +426,7 @@ namespace PetCareApp.Services
             }
         }
 
+        //check if there no other appointments at the same time
         private bool CheckIfFreeTimeSlot(string masterId, DateTime startTime, DateTime endTime)
         {
             var intersections = _dbContext.Records.Where(x => x.AppUserId == masterId 
@@ -435,6 +439,7 @@ namespace PetCareApp.Services
             return true;
         }
 
+        //adds to work time slots already signed records(appointments)
         private List<TimeSlot> GetAllEmptySlots(string masterId)
         {
             var resSlots = new List<TimeSlot>();
@@ -451,6 +456,7 @@ namespace PetCareApp.Services
                 .OrderBy(x => x.StartTime)
                 .ToList();
 
+            
             foreach (var slot in workSlots)
             {
                 var slotServices = records
@@ -494,17 +500,26 @@ namespace PetCareApp.Services
 
             return resSlots;
         }
-        public List<TimeSlot> GetFreeTimeSlots(string masterId, int time)
+
+        //creates slots for some amount of time from empty slots for some procedure
+        public List<TimeSlot> GetFreeTimeSlots(string masterId, int time, int serviceId)
         {
             var resSlots = new List<TimeSlot>();
             var workSlots = GetAllEmptySlots(masterId);
-            
+            var limitations = _dbContext.ServiceLimitations.Where(x => x.ServiceId == serviceId &&
+                                                                x.Date > DateTime.Now).ToList();
+            var limitDates = limitations.Select(x => x.Date).ToList();
+            var limitDayOfWeek = limitations.Select(x => x.DayOfWeek).ToList();
             if (!workSlots.Any())
             {
                 return resSlots;
             }
             foreach (var slot in workSlots)
             {
+                if(limitDates.Contains(slot.Date.Date) || limitDayOfWeek.Contains((int)slot.Date.DayOfWeek))
+                {
+                    continue;
+                }
                 var startTime = slot.StartTime;
                 while (startTime < slot.EndTime)
                 {
@@ -524,6 +539,48 @@ namespace PetCareApp.Services
                 }
             }
             return resSlots;
+        }
+
+        public int AnalizeQuestionary(List<QuestionDto> questionary, int serviceId)
+        {
+            var service = _dbContext.Services.FirstOrDefault(x => x.Id == serviceId);
+            if (service == null)
+            {
+                return 0;
+            }
+            int resTime = 0;
+            var fixedQuestion = questionary.FirstOrDefault(x => x.HasAnswerWithFixedTime);
+            if (fixedQuestion != null)
+            {
+                if (fixedQuestion.Answer.IsTimeMinimum)
+                {
+                    resTime = service.MinimumTime;
+                }else if(fixedQuestion.Answer.IsTimeMaximum) 
+                { 
+                    resTime = service.MaximumTime;
+                }
+                else
+                {
+                    resTime = fixedQuestion.Answer.Time;
+                }
+                questionary.Remove(fixedQuestion);
+            }
+
+            foreach (var question in questionary)
+            {
+                resTime += question.Answer.Time;
+            }
+            return resTime;
+        }
+
+        public string GetQuestionaryDescription(List<QuestionDto> questionary)
+        {
+            string res = "";
+            for (int i = 0; i < questionary.Count; i++)
+            {
+                res += $"{i + 1}. {questionary[i].Name} \n - {questionary[i].Answer.Text}";
+            }
+            return res;
         }
     }
 }

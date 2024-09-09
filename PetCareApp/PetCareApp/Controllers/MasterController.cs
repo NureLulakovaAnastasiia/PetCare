@@ -141,12 +141,12 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
-        [HttpGet("GetFreeTimeSlots")]
-        public List<TimeSlot> GetTimeSlots(string masterId, int time)
-        {
-            var workSlots = _masterService.GetFreeTimeSlots(masterId, time);
-            return workSlots;
-        }
+        //[HttpGet("GetFreeTimeSlots")]
+        //public List<TimeSlot> GetTimeSlots(string masterId, int time)
+        //{
+        //    var workSlots = _masterService.GetFreeTimeSlots(masterId, time);
+        //    return workSlots;
+        //}
 
         [HttpPost("MakeAnAppointment")]
         public async Task<IActionResult> MakeAnAppointment(RecordDto record)
@@ -163,5 +163,30 @@ namespace PetCareApp.Controllers
 
             return StatusCode(500, res);
         }
+
+        [HttpPost("analizeQuestionary")]
+        public IActionResult AnalizeQuestionaryGetSlots(List<QuestionDto> questionary, int serviceId, string masterId)
+        {
+            var descr = _masterService.GetQuestionaryDescription(questionary);
+            var time = _masterService.AnalizeQuestionary(questionary, serviceId);
+            if(time == 0)
+            {
+                return StatusCode(500, "Error during analizing questionary");
+            }
+            var slots = _masterService.GetFreeTimeSlots(masterId, time, serviceId);
+            if (!slots.Any())
+            {
+                return StatusCode(500, "Error during getting timeslots");
+            }
+            
+
+            return Ok(new QuestionaryAnalisysDto
+            {
+                Time = time,
+                Slots = slots,
+                Description = descr
+            });
+        }
+
     }
 }
