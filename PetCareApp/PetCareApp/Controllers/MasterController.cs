@@ -71,6 +71,39 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
+        [HttpPut("updateService")]
+        [Authorize(Roles = "Master")]
+        public IActionResult UpdateService(UpdateServiceDto service)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var res =  _masterService.UpdateService(service);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+
+            return StatusCode(500, res);
+        }
+
+        [HttpGet("getMasterServices")]
+        public IActionResult GetMasterServices(string masterId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var services = _masterService.GetServices(masterId);
+            if(services == null || services.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(services);
+        }
+
         [HttpPost("addQuestionary")]
         [Authorize(Roles = "Master")]
         public async Task<IActionResult> AddQuestionary(List<AddQuestionDto> questionaryDto, [FromQuery] int serviceId)

@@ -180,6 +180,48 @@ namespace PetCareApp.Services
             }
         }
 
+        public string UpdateService(UpdateServiceDto serviceDto)
+        {
+            try
+            {
+                var service = _mapper.Map<Models.Service>(serviceDto);
+                if (service != null)
+                {
+                    var res = _dbContext.Update(service);
+                    return _dbContext.SaveChanges().ToString();
+                }
+                return "Error during updating";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public List<GetServiceDto> GetServices(string masterId)
+        {
+            var res = new List<GetServiceDto>();
+            try
+            {
+                var masterExist = _dbContext.Users.Any(x => x.Id == masterId);
+                if (masterExist)
+                {
+                   var masterServices = _dbContext.Services
+                        .Where(x => x.AppUserId == masterId && !x.IsHidden)
+                        .Include(x => x.Reviews).ToList();
+                    
+                    if (masterServices.Count > 0)
+                    {
+                        res = _mapper.Map<List<GetServiceDto>>(masterServices);
+                    }
+                }
+                return res;
+            }
+            catch 
+            {
+                return res;
+            }
+        }
         public async Task<string> UpdateContacts(ContactsDto contacts)
         {
             try
@@ -565,6 +607,10 @@ namespace PetCareApp.Services
                 }
                 questionary.Remove(fixedQuestion);
             }
+            else
+            {
+                resTime = service.RealTime;
+            }
 
             foreach (var question in questionary)
             {
@@ -582,5 +628,7 @@ namespace PetCareApp.Services
             }
             return res;
         }
+
+        
     }
 }
