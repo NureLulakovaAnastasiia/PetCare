@@ -629,6 +629,32 @@ namespace PetCareApp.Services
             return res;
         }
 
-        
+        public async Task<string> MakeRequestToOrganization(int organizationId)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User not found";
+                }
+                var organization = _dbContext.Organizations.FirstOrDefault(x => x.Id == organizationId);
+                if (organization == null)
+                {
+                    return "No such organization";
+                }
+                _dbContext.Add(new RequestToOrganization
+                {
+                    AppUserId = user.Id,
+                    OrganizationId = organizationId
+                });
+                return _dbContext.SaveChanges().ToString();
+            } 
+            catch (Exception ex) 
+            {
+                return ex.Message;
+            }
+                
+        }
     }
 }

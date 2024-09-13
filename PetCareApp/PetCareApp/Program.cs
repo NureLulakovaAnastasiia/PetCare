@@ -24,6 +24,8 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMasterService, MasterService>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+
 
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>

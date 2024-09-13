@@ -27,6 +27,7 @@ namespace PetCareApp.Data
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationEmployee> OrganizationEmployees { get; set; }
         public DbSet<Portfolio> Portfolios { get; set; }
+        public DbSet<RequestToOrganization> RequestsToOrganization { get; set; }
 
         //protected override void OnModelCreating(ModelBuilder builder)
         //{
@@ -58,6 +59,6 @@ namespace PetCareApp.Data
         //    builder.Entity<IdentityRole>().HasData(roles);
         //}
 
-      
+
     }
 }

@@ -13,6 +13,7 @@ namespace PetCareApp.Models
         public int? OrganizationId { get; set; }
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public Organization? Organization { get; set; }
-
+        public DateTime? AcceptanceDate { get; set; }
+        public DateTime? DismissalDate { get; set; }
     }
 }

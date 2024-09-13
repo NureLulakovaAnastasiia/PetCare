@@ -10,8 +10,6 @@ namespace PetCareApp.Interfaces
 
         public Task<string> AddService(AddServiceDto service);
         public string UpdateService(UpdateServiceDto service);
-
-
         public List<GetServiceDto> GetServices(string masterId);
         public Task<string> UpsertSchedule(List<ScheduleDto> schedule);
         public Task<string> UpsertBreaks(List<BreakDto> breaks);
@@ -30,5 +28,7 @@ namespace PetCareApp.Interfaces
 
         public int AnalizeQuestionary(List<QuestionDto> questionary, int serviceId);
         public string GetQuestionaryDescription(List<QuestionDto> questionary);
+
+        public Task<string> MakeRequestToOrganization(int organizationId);
     }
 }

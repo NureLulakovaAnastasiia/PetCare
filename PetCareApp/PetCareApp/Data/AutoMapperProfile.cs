@@ -13,6 +13,7 @@ namespace PetCareApp.Data
             CreateMap<AddServiceDto, Models.Service>();
             CreateMap<UpdateServiceDto, Models.Service>();
             CreateMap<Models.Service, GetServiceDto>();
+            CreateMap<GetRequestDto, RequestToOrganization>();
             CreateMap<AddAnswerDto, Answer>();
             CreateMap<AddQuestionDto, Question>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers));

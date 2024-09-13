@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetCareApp.Data;
 
@@ -11,9 +12,11 @@ using PetCareApp.Data;
 namespace PetCareApp.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240913073534_AddDatesToOrganizationEmployee")]
+    partial class AddDatesToOrganizationEmployee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -570,36 +573,6 @@ namespace PetCareApp.Migrations
                     b.ToTable("RecordCancels");
                 });
 
-            modelBuilder.Entity("PetCareApp.Models.RequestToOrganization", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.ToTable("RequestsToOrganization");
-                });
-
             modelBuilder.Entity("PetCareApp.Models.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -942,21 +915,6 @@ namespace PetCareApp.Migrations
                     b.Navigation("AppUser");
 
                     b.Navigation("Record");
-                });
-
-            modelBuilder.Entity("PetCareApp.Models.RequestToOrganization", b =>
-                {
-                    b.HasOne("PetCareApp.Models.AppUser", "AppUser")
-                        .WithMany()
-                        .HasForeignKey("AppUserId");
-
-                    b.HasOne("PetCareApp.Models.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId");
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Organization");
                 });
 
             modelBuilder.Entity("PetCareApp.Models.Review", b =>

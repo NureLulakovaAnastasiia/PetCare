@@ -141,6 +141,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("upsertSchedule")]
+        [Authorize(Roles = "Master,Organization,Admin")]
         public async Task<IActionResult> UpsertSchedule(List<ScheduleDto> scheduleDto)
         {
             if (!ModelState.IsValid)
@@ -158,6 +159,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("upsertBreaks")]
+        [Authorize(Roles = "Master,Organization,Admin")]
         public async Task<IActionResult> UpsertBreaks(List<BreakDto> breakDto)
         {
             if (!ModelState.IsValid)
@@ -221,5 +223,16 @@ namespace PetCareApp.Controllers
             });
         }
 
+        [HttpPost("makeRequest")]
+        public async Task<IActionResult> MakeRequest(int organizationId)
+        {
+            var res = await _masterService.MakeRequestToOrganization(organizationId);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+
+            return StatusCode(500, res);
+        }
     }
 }
