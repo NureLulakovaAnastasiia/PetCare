@@ -176,12 +176,6 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
-        //[HttpGet("GetFreeTimeSlots")]
-        //public List<TimeSlot> GetTimeSlots(string masterId, int time)
-        //{
-        //    var workSlots = _masterService.GetFreeTimeSlots(masterId, time);
-        //    return workSlots;
-        //}
 
         [HttpPost("MakeAnAppointment")]
         public async Task<IActionResult> MakeAnAppointment(RecordDto record)

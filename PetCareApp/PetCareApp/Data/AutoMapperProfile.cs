@@ -20,6 +20,9 @@ namespace PetCareApp.Data
             CreateMap<ScheduleDto, Schedule>();
             CreateMap<BreakDto, Break>();
             CreateMap<RecordDto, Record>();
+            CreateMap<AddPortfolioDto, Portfolio>();
+            CreateMap<PortfolioDto, Portfolio>();
+            CreateMap<Portfolio, PortfolioDto>();
         }
         
     }
