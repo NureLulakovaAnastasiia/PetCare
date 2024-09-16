@@ -141,7 +141,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("upsertSchedule")]
-        [Authorize(Roles = "Master,Organization,Admin")]
+        [Authorize(Roles = "Master,Admin")]
         public async Task<IActionResult> UpsertSchedule(List<ScheduleDto> scheduleDto)
         {
             if (!ModelState.IsValid)
@@ -159,7 +159,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("upsertBreaks")]
-        [Authorize(Roles = "Master,Organization,Admin")]
+        [Authorize(Roles = "Master,Admin")]
         public async Task<IActionResult> UpsertBreaks(List<BreakDto> breakDto)
         {
             if (!ModelState.IsValid)
