@@ -228,5 +228,21 @@ namespace PetCareApp.Controllers
 
             return StatusCode(500, res);
         }
+
+        [HttpPost("CancelRecord")]
+        public async Task<IActionResult> CancelRecord(int recordId, string reason)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var res = await _masterService.CancelRecord(recordId, reason);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+            return StatusCode(500, res);
+        }
     }
 }

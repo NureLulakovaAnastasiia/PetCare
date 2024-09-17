@@ -30,5 +30,7 @@ namespace PetCareApp.Interfaces
         public string GetQuestionaryDescription(List<QuestionDto> questionary);
 
         public Task<string> MakeRequestToOrganization(int organizationId);
+
+        public Task<string> CancelRecord(int recordId, string reason);
     }
 }

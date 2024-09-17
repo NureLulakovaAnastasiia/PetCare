@@ -656,5 +656,43 @@ namespace PetCareApp.Services
             }
                 
         }
+
+        public async Task<string> CancelRecord(int recordId, string reason)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var record = _dbContext.Records.Where(x => x.Id == recordId).Include(x => x.Service).FirstOrDefault();
+                    if(record == null)
+                    {
+                        return "There is no such record";
+                    }
+                    if(record.Service.AppUserId == user.Id && 
+                        record.StartTime > DateTime.UtcNow 
+                        && record.Status == "Created") //check if right master cancels the record
+                    {
+                        record.Status = "Canceled";
+                        _dbContext.Update(record);
+                        _dbContext.Add(new RecordCancel
+                        {
+                            AppUserId = user.Id,
+                            RecordId = recordId,
+                            Reason = reason,
+                            Date = DateTime.UtcNow
+                        });
+                        _dbContext.SaveChanges();
+                    }
+                    return "You cannnot cancel this record";
+                }
+                return "You have no rights to cancel record";
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }

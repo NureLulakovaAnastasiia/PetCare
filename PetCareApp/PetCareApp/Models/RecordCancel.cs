@@ -7,7 +7,7 @@ namespace PetCareApp.Models
         public int Id { get; set; }
         public DateTime Date { get; set; } = DateTime.Now;
         public string Reason { get; set; } = string.Empty;
-        public string? AppUserId { get; set; }
+        public string? AppUserId { get; set; } //who canceled?
         public AppUser? AppUser { get; set; }
         public int? RecordId { get; set; }
         [DeleteBehavior(DeleteBehavior.Cascade)]

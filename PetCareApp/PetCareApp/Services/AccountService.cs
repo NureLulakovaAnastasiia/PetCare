@@ -9,13 +9,13 @@ using PetCareApp.Data;
 
 namespace PetCareApp.Services
 {
-    public class UserService : IUserService
+    public class AccountService : IAccountService
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDBContext _dBContext;
 
-        public UserService(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDBContext dBContext)
+        public AccountService(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDBContext dBContext)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -85,5 +85,6 @@ namespace PetCareApp.Services
                 return ex.Message;
             }
         }
+
     }
 }

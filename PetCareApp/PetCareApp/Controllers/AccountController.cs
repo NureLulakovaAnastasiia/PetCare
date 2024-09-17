@@ -14,10 +14,10 @@ namespace PetCareApp.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
-        private readonly IUserService _userService;
+        private readonly IAccountService _userService;
         private readonly SignInManager<AppUser> _signInManager;
         public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, 
-            IUserService userService, SignInManager<AppUser> signInManager)
+            IAccountService userService, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _tokenService = tokenService;

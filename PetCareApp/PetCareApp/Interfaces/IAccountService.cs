@@ -2,7 +2,7 @@
 
 namespace PetCareApp.Interfaces
 {
-    public interface IUserService
+    public interface IAccountService
     {
         string SendEmail(EmailConfirmationDto emailConfirmationDto);
 
