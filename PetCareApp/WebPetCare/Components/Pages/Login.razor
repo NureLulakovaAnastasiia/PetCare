@@ -1,5 +1,9 @@
 ﻿@page "/login"
 
+@inject IAuthorizationService authService
+
+
+
 <PageTitle>Login</PageTitle>
 <div class="col-12">
     <div class="form-custom-border  container-fluid col-md-8 col-lg-7 offset-md-3 pb-3 bg-body-secondary">
@@ -14,12 +18,12 @@
                 <div class="col-lg-3 col-2">
                     
                     </div>
-                <EditForm Model="LoginModel" FormName="LoginForm" class="col-lg-6 col-8 text-center">
+                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="LoginFunc" class="col-lg-6 col-8 text-center">
                     <div class="form-group py-2 text-center">
                         <h4>Email</h4>
                         <InputText class="form-control" @bind-Value="LoginModel.Email" />
                         <h4>Password</h4>
-                        <InputText  typeof="password" class="form-control" @bind-Value="LoginModel.Email" />
+                        <InputText  typeof="password" class="form-control" @bind-Value="LoginModel.Password" />
                     </div>
                     <button type="submit" class="btn btn-primary ">Login</button>
                 </EditForm>
@@ -42,10 +46,15 @@
 
     public LoginDto LoginModel { get; set; } = new LoginDto();
 
-    protected override async Task OnInitializedAsync()
+    public string error = "";
+
+    public async Task LoginFunc()
     {
-
+        var errorMessage = await authService.Login(LoginModel);
+        if (!String.IsNullOrEmpty(errorMessage))
+        {
+            error = errorMessage;
+        }
     }
-
 
 }

@@ -61,7 +61,7 @@ namespace PetCareApp.Controllers
                         {
                             FirstName = appUser.FirstName,
                             Email = appUser.Email,
-                            token = _tokenService.CreateToken(appUser, ""),
+                            Token = _tokenService.CreateToken(appUser, ""),
                             //checkNumber = generator.Next(0, 1000000).ToString("D6")
                         });
                     }
@@ -106,12 +106,24 @@ namespace PetCareApp.Controllers
             {
                 return StatusCode(400, "Somethimg went wromg with your access");
             }
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.Now.AddHours(7),  
+                Secure = true,  
+                SameSite = SameSiteMode.None,   
+            };
+
+
+            var newUser = new NewUserDto
+            {
+                Email = loginDto.Email,
+                Token = _tokenService.CreateToken(user, roles[0])
+            };
+            Response.Cookies.Append("token", newUser.Token, cookieOptions);
+            Response.Cookies.Append("email", newUser.Email, cookieOptions);
             return Ok(
-                new NewUserDto
-                {
-                    Email = loginDto.Email,
-                    token = _tokenService.CreateToken(user, roles[0])
-                }
+               newUser
             );
         }
 
