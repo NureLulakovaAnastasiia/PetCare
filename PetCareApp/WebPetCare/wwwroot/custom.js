@@ -1,11 +1,11 @@
-﻿window.localStorageSetItem = function (key, value) {
-    localStorage.setItem(key, value);
+﻿window.sessionStorageSetItem = function (key, value) {
+    sessionStorage.setItem(key, value);
 };
 
-window.localStorageGetItem = function (key) {
-    return localStorage.getItem(key);
+window.sessionStorageGetItem = function (key) {
+    return sessionStorage.getItem(key);
 };
 
-window.localStorageRemoveItem = function (key) {
-    localStorage.removeItem(key);
+window.sessionStorageRemoveItem = function (key) {
+    sessionStorage.removeItem(key);
 };

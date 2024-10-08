@@ -1,15 +1,43 @@
 ﻿@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
 
 <div class="page flex-column"> 
     <div>
-        <NavMenu />
+        <NavMenu @ref="navMenu" isLogged="@isAuthenticated" />
     </div>
-        
-    <main>
-
-        <article >
-            @Body
-        </article>
-    </main>
+        <CascadingValue Value="(Func<bool, Task>)UpdateAuthenticationStatus">
+            <main>
+                <article >
+                    @Body
+                </article>
+            </main>
+        </CascadingValue>
 </div>
 
+
+@code {
+    private bool isAuthenticated;
+    private NavMenu navMenu;
+
+    private async Task UpdateAuthenticationStatus(bool status)
+    {
+        isAuthenticated = status;
+        if (navMenu != null) 
+        {
+            await navMenu.UpdateNavMenuAsync(isAuthenticated);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
+            if (!string.IsNullOrEmpty(token))
+            {
+                await UpdateAuthenticationStatus(true);
+
+            }
+        }
+    }
+}

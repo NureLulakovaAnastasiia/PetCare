@@ -59,7 +59,7 @@ namespace PetCareApp.Controllers
                         Random generator = new Random();
                         return Ok(new NewUserDto
                         {
-                            FirstName = appUser.FirstName,
+                            Role = role,
                             Email = appUser.Email,
                             Token = _tokenService.CreateToken(appUser, ""),
                             //checkNumber = generator.Next(0, 1000000).ToString("D6")
@@ -106,22 +106,13 @@ namespace PetCareApp.Controllers
             {
                 return StatusCode(400, "Somethimg went wromg with your access");
             }
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = DateTime.Now.AddHours(7),  
-                Secure = true,  
-                SameSite = SameSiteMode.None,   
-            };
-
-
+          
             var newUser = new NewUserDto
             {
                 Email = loginDto.Email,
+                Role = roles.First(),
                 Token = _tokenService.CreateToken(user, roles[0])
             };
-            Response.Cookies.Append("token", newUser.Token, cookieOptions);
-            Response.Cookies.Append("email", newUser.Email, cookieOptions);
             return Ok(
                newUser
             );

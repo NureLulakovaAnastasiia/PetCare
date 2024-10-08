@@ -42,12 +42,13 @@ namespace WebPetCare.Components.Services
                     NewUserDto user = JsonSerializer.Deserialize<NewUserDto>(result, options);
                     if (user != null)
                     {
-                       await SetTokenAsync(user.Token);
+                       await SetStoreItemAsync(user.Token, "token");
+                       await SetStoreItemAsync(user.Role, "role");
                     }
                 }
                 else
                 {
-                    error = response.ToString();
+                    error = await response.Content.ReadAsStringAsync(); 
                 }
 
                 return error;
@@ -58,9 +59,9 @@ namespace WebPetCare.Components.Services
             }
         }
 
-        public async Task SetTokenAsync(string token)
+        public async Task SetStoreItemAsync(string token, string name)
         {
-            await _jsRuntime.InvokeVoidAsync("localStorageSetItem", "token", token);
+            await _jsRuntime.InvokeVoidAsync("sessionStorageSetItem",name, token);
         }
 
 

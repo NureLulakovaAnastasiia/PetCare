@@ -1,13 +1,15 @@
 ﻿@page "/login"
 
 @inject IAuthorizationService authService
-
+@inject NavigationManager Navigation
 
 
 <PageTitle>Login</PageTitle>
 <div class="col-12">
     <div class="form-custom-border  container-fluid col-md-8 col-lg-7 offset-md-3 pb-3 bg-body-secondary">
-
+        <div class="text-danger">
+            <p class="alert-primary">@error</p>
+        </div>
         @if (IsLogin)
         {
             <div class="text-center pt-4 bg-body-tertiary" style="box-shadow:0 1px 4px #6f9ea1; border-radius:12px">
@@ -44,6 +46,9 @@
 @code {
     private bool IsLogin = true;
 
+    [CascadingParameter] 
+    public Func<bool, Task> UpdateAuthenticationStatus { get; set; }
+
     public LoginDto LoginModel { get; set; } = new LoginDto();
 
     public string error = "";
@@ -54,6 +59,11 @@
         if (!String.IsNullOrEmpty(errorMessage))
         {
             error = errorMessage;
+        }
+        else
+        {
+            await UpdateAuthenticationStatus(true);
+            Navigation.NavigateTo("/");
         }
     }
 
