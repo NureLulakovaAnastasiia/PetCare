@@ -1,0 +1,74 @@
+﻿@inject IAuthorizationService authService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+
+<div class="d-flex flex-column m-2 p-2 align-items-center text-center">
+    <div>
+        <h3>Confirm Code</h3>
+    </div>
+    <div class="code-input-container">
+        @for (int i = 0; i < CodeLength; i++)
+        {
+            var localIndex = i;
+
+            <input type="text" maxlength="1" class="code-input"
+                   id="codeInput_@localIndex"
+                   value="@Code[localIndex]"
+                   @oninput="(e) => OnInput(e, localIndex)"
+                   @onkeydown="(e) => OnKeyDown(e, localIndex)" />
+        }
+    </div>
+
+    <button class="btn btn-primary mt-3" @onclick="SubmitEmail">Submit</button>
+</div>
+
+@code {
+    private string[] Code;
+    public int CodeLength { get; set; } = 6;
+    [Parameter]
+    public string realCode { get; set; } = "210437";
+
+    [Parameter]
+    public string email { get; set; } = "nast@gmail.com";
+
+    [CascadingParameter]
+    public Func<bool, Task> UpdateAuthenticationStatus { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Code = new string[CodeLength];
+    }
+
+    private async Task OnInput(ChangeEventArgs e, int index)
+    {
+        Code[index] = e.Value?.ToString();
+
+        if (!string.IsNullOrEmpty(Code[index]) && index < CodeLength - 1)
+        {
+            await JSRuntime.InvokeVoidAsync("focusNextInput", $"codeInput_{index + 1}");
+        }
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e, int index)
+    {
+        if (e.Key == "Backspace" && index > 0 && string.IsNullOrEmpty(Code[index]))
+        {
+            await JSRuntime.InvokeVoidAsync("focusNextInput", $"codeInput_{index - 1}");
+        }
+    }
+
+    public async Task SubmitEmail()
+    {
+        if (String.Equals("210437", String.Join("", Code)))
+        {
+            var res = await authService.ConfirmEmail(email);
+            if (res)
+            {
+                await UpdateAuthenticationStatus(true);
+                Navigation.NavigateTo("/");
+            }
+        }
+    }
+
+}

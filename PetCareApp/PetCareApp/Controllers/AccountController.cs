@@ -56,13 +56,12 @@ namespace PetCareApp.Controllers
                     var roleResult = await _userManager.AddToRoleAsync(appUser, role);
                     if (roleResult.Succeeded)
                     {
-                        Random generator = new Random();
+                       
                         return Ok(new NewUserDto
                         {
                             Role = role,
                             Email = appUser.Email,
                             Token = _tokenService.CreateToken(appUser, ""),
-                            //checkNumber = generator.Next(0, 1000000).ToString("D6")
                         });
                     }
                     else

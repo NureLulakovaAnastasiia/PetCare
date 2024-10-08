@@ -5,7 +5,7 @@ VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetCareApp", "PetCareApp\PetCareApp.csproj", "{2ADD6DF3-68DF-4A77-BE42-AF0D7B0B8B41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPetCare", "WebPetCare\WebPetCare.csproj", "{31612A8D-81E6-4BE4-8CA0-7D25D5907EC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebPetCare", "WebPetCare\WebPetCare.csproj", "{31612A8D-81E6-4BE4-8CA0-7D25D5907EC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

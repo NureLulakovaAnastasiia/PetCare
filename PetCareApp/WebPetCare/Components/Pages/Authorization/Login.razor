@@ -1,0 +1,153 @@
+﻿@page "/login"
+
+@inject IAuthorizationService authService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+
+
+<PageTitle>Login</PageTitle>
+
+
+<div class="col-12">
+
+    <div class="form-custom-border container-fluid col-md-8 col-lg-7 offset-md-3 pb-3 bg-body-secondary">
+        <div class="text-danger">
+            <p class="alert-primary">@error</p>
+        </div>
+
+        @if (!IsCode)
+        {
+            <div class="tab-container mb-3">
+                <div class="tab @(IsLogin ? "active" : "")" @onclick="() => SelectTab(true)">
+                Login
+            </div>
+            <div @onclick="() => SelectTab(false)" class="tab @(IsLogin ? "" : "active")">
+                Sign Up
+            </div>
+        </div>
+        }
+
+        <div class="d-flex flex-row mx-2 px-2 align-items-end">
+            <div class="col-2 col-lg-1">
+            </div>
+            @if (IsLogin)
+            {
+               
+                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="LoginFunc" class="col-lg-10 col-9 text-center">
+                    <div class="form-group py-2 text-center">
+                        <h5>Email</h5>
+                        <InputText class="form-control" @bind-Value="LoginModel.Email" />
+                        <h5>Password</h5>
+                        <InputText typeof="password" class="form-control" @bind-Value="LoginModel.Password" />
+                    </div>
+                    <button type="submit" class="btn btn-primary ">Login</button>
+                </EditForm>
+                <div class="col-lg-3 ps-4 ps-lg-6">
+                    <img src="Images/dog.png" style="max-width: 100%; height: auto" />
+                </div>
+            }
+            else if(!IsLogin && !IsCode)
+            {
+
+                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="RegisterFunc" class="col-lg-7 col-9 text-center">
+                    <div class="form-group py-2 text-center">
+                        <h5>First Name</h5>
+                        <InputText class="form-control" @bind-Value="RegisterModel.FirstName" />
+                        <h5>Last Name</h5>
+                        <InputText class="form-control" @bind-Value="RegisterModel.LastName" />
+                        <h5>Email</h5>
+                        <InputText class="form-control" @bind-Value="RegisterModel.Email" />
+                        <InputRadioGroup @bind-Value="role">
+                            @foreach (var Erole in Enum.GetValues<Roles>())
+                            {
+                                <div>
+                                    <label>
+                                        <InputRadio Value="@Erole.ToString()" />
+                                        @Erole
+                                    </label>
+                                </div>
+                            }
+                        </InputRadioGroup>
+                        <h5>Password</h5>
+                        <InputText typeof="password" class="form-control" @bind-Value="RegisterModel.Password" />
+                    </div>
+                    <button type="submit" class="btn btn-primary ">Register</button>
+                </EditForm>
+                <div class="col-lg-1 col-3 ps-4 ps-lg-6">
+                    <img src="Images/dog.png" style="max-width: 100%; height: auto" />
+                </div>
+            }
+            @if (IsCode)
+            {
+               <_EmailSubmit realCode="realCode"/>
+            }
+        </div>
+
+    </div>
+</div>
+
+
+@code {
+    private bool IsLogin { get; set; } = false;
+    private bool IsCode { get; set; } = true;
+
+    [CascadingParameter]
+    public Func<bool, Task> UpdateAuthenticationStatus { get; set; }
+
+    public LoginDto LoginModel { get; set; } = new LoginDto();
+
+    public RegisterDto RegisterModel { get; set; } = new RegisterDto();
+
+    public string realCode { get; set; }
+    public string role = "User";
+    public string error = "";
+
+    public enum Roles
+    {
+        User,
+        Organization
+
+    }
+
+    public async Task LoginFunc()
+    {
+        var errorMessage = await authService.Login(LoginModel);
+        if (!String.IsNullOrEmpty(errorMessage))
+        {
+            error = errorMessage;
+        }
+        else
+        {
+            await UpdateAuthenticationStatus(true);
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    public async Task RegisterFunc()
+    {
+        var result = await authService.Register(RegisterModel, role);
+        if (!String.IsNullOrEmpty(result.Error))
+        {
+            error = result.Error;
+        }
+        else
+        {
+            realCode = result.Result;
+            if (String.IsNullOrEmpty(realCode))
+            {
+                error = "Something went wrong"; //generate new?
+            }
+            else
+            {
+                IsCode = true;
+            }
+
+        }
+    }
+
+    private void SelectTab(bool loginSelected)
+    {
+        IsLogin = loginSelected;
+    }
+}

@@ -9,3 +9,10 @@ window.sessionStorageGetItem = function (key) {
 window.sessionStorageRemoveItem = function (key) {
     sessionStorage.removeItem(key);
 };
+
+window.focusNextInput = function (elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.focus();
+    }
+};
