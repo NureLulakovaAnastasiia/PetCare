@@ -5,6 +5,7 @@ using System.Text.Json;
 using Azure;
 using System.Net.Http;
 using Microsoft.JSInterop;
+using System.Net;
 
 namespace WebPetCare.Components.Services
 {
@@ -20,8 +21,9 @@ namespace WebPetCare.Components.Services
             _jsRuntime = jsRuntime;
         }
 
-        public async Task<string> Login(LoginDto loginDto)
+        public async Task<ResultData> Login(LoginDto loginDto)
         {
+            var res = new ResultData();
             JsonSerializerOptions options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -48,15 +50,24 @@ namespace WebPetCare.Components.Services
                 }
                 else
                 {
+                    if (response.StatusCode == HttpStatusCode.Forbidden)
+                    {
+                        res.StatusCode = 403;
+                        var emailRes = await SendEmail(loginDto.Email);
+                        res.Result = emailRes.Result;
+                        res.Error += $"\n{emailRes.Error}";
+
+                    }
                     error = await response.Content.ReadAsStringAsync(); 
                 }
 
-                return error;
+                res.Error = error;
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                res.Error = ex.Message;
             }
+            return res;
         }
 
         public async Task<ResultData> Register(RegisterDto registerDto, string role)
@@ -101,9 +112,8 @@ namespace WebPetCare.Components.Services
 
         private async Task<ResultData> SendEmail(string email)
         {
-            Random generator = new Random();
             var result = new ResultData();
-            var randomNum = generator.Next(0, 1000000).ToString("D6");
+            var randomNum = GenerateCode();
             var data = new EmailConfirmationDto { Email = email , checkNumber = randomNum };
 
             JsonSerializerOptions options = new JsonSerializerOptions
@@ -131,6 +141,12 @@ namespace WebPetCare.Components.Services
                 result.Error = ex.Message;
             }
             return result;
+        }
+
+        private string GenerateCode()
+        {
+            Random generator = new Random();
+            return generator.Next(0, 1000000).ToString("D6");
         }
 
         public async Task<bool> ConfirmEmail(string email)
@@ -177,5 +193,6 @@ namespace WebPetCare.Components.Services
     {
         public string Result { get; set; }
         public string Error { get; set; }
+        public int? StatusCode { get; set; }
     }
 }

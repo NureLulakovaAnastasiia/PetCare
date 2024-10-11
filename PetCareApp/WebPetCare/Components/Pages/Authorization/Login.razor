@@ -80,7 +80,7 @@
             }
             @if (IsCode)
             {
-               <_EmailSubmit realCode="realCode"/>
+               <_EmailSubmit realCode="@realCode" email="@Email"/>
             }
         </div>
 
@@ -89,8 +89,8 @@
 
 
 @code {
-    private bool IsLogin { get; set; } = false;
-    private bool IsCode { get; set; } = true;
+    private bool IsLogin { get; set; } = true;
+    private bool IsCode { get; set; } = false;
 
     [CascadingParameter]
     public Func<bool, Task> UpdateAuthenticationStatus { get; set; }
@@ -103,6 +103,22 @@
     public string role = "User";
     public string error = "";
 
+    public string Email
+    {
+        get
+        {
+            if(LoginModel.Email != null)
+            {
+                return LoginModel.Email;
+            }
+            else if (RegisterModel.Email != null)
+            {
+                return RegisterModel.Email;
+            }
+            return "";
+        }
+    }
+
     public enum Roles
     {
         User,
@@ -112,10 +128,15 @@
 
     public async Task LoginFunc()
     {
-        var errorMessage = await authService.Login(LoginModel);
-        if (!String.IsNullOrEmpty(errorMessage))
+        var result = await authService.Login(LoginModel);
+        if (!String.IsNullOrEmpty(result.Error))
         {
-            error = errorMessage;
+            error = result.Error;
+            if(result.StatusCode != null && result.StatusCode == 403)
+            {
+                realCode = result.Result;
+                CheckForCode();
+            }
         }
         else
         {
@@ -134,15 +155,20 @@
         else
         {
             realCode = result.Result;
-            if (String.IsNullOrEmpty(realCode))
-            {
-                error = "Something went wrong"; //generate new?
-            }
-            else
-            {
-                IsCode = true;
-            }
+            CheckForCode();
+        }
+    }
 
+    private void CheckForCode()
+    {
+        if (String.IsNullOrEmpty(realCode))
+        {
+            error = "Something went wrong"; //generate new?
+        }
+        else
+        {
+            IsLogin = false;
+            IsCode = true;
         }
     }
 

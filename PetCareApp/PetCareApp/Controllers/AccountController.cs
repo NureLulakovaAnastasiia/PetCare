@@ -105,7 +105,10 @@ namespace PetCareApp.Controllers
             {
                 return StatusCode(400, "Somethimg went wromg with your access");
             }
-          
+            if (!user.EmailConfirmed)
+            {
+                return StatusCode(403, "You should confirm your email");
+            }
             var newUser = new NewUserDto
             {
                 Email = loginDto.Email,
