@@ -1,5 +1,5 @@
 ﻿using PetCareApp.Dtos;
-using WebPetCare.Components.Services;
+using WebPetCare.Services;
 
 namespace WebPetCare.Components.IServices
 {

@@ -1,4 +1,4 @@
-﻿namespace WebPetCare.Components.Services
+﻿namespace WebPetCare.Services
 {
     public class BaseService
     {

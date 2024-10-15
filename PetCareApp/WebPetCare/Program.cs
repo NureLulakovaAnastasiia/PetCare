@@ -1,7 +1,7 @@
 using PetCareApp.Models;
 using WebPetCare.Components;
 using WebPetCare.Components.IServices;
-using WebPetCare.Components.Services;
+using WebPetCare.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

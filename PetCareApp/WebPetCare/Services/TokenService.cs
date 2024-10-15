@@ -2,9 +2,9 @@
 using WebPetCare.Components.IServices;
 
 
-namespace WebPetCare.Components.Services
+namespace WebPetCare.Services
 {
-    public class TokenService: ITokenService
+    public class TokenService : ITokenService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 

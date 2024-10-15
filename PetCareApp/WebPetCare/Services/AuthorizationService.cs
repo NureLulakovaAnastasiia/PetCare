@@ -7,7 +7,7 @@ using System.Net.Http;
 using Microsoft.JSInterop;
 using System.Net;
 
-namespace WebPetCare.Components.Services
+namespace WebPetCare.Services
 {
     public class AuthorizationService : BaseService, IAuthorizationService
     {
@@ -30,7 +30,7 @@ namespace WebPetCare.Components.Services
             };
             string json = JsonSerializer.Serialize(loginDto, options);
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            string error = String.Empty;
+            string error = string.Empty;
             try
             {
                 string fullUrl = $"{_apiUrl}/api/account/Login";
@@ -44,8 +44,8 @@ namespace WebPetCare.Components.Services
                     NewUserDto user = JsonSerializer.Deserialize<NewUserDto>(result, options);
                     if (user != null)
                     {
-                       await SetStoreItemAsync(user.Token, "token");
-                       await SetStoreItemAsync(user.Role, "role");
+                        await SetStoreItemAsync(user.Token, "token");
+                        await SetStoreItemAsync(user.Role, "role");
                     }
                 }
                 else
@@ -58,7 +58,7 @@ namespace WebPetCare.Components.Services
                         res.Error += $"\n{emailRes.Error}";
 
                     }
-                    error = await response.Content.ReadAsStringAsync(); 
+                    error = await response.Content.ReadAsStringAsync();
                 }
 
                 res.Error = error;
@@ -114,7 +114,7 @@ namespace WebPetCare.Components.Services
         {
             var result = new ResultData();
             var randomNum = GenerateCode();
-            var data = new EmailConfirmationDto { Email = email , checkNumber = randomNum };
+            var data = new EmailConfirmationDto { Email = email, checkNumber = randomNum };
 
             JsonSerializerOptions options = new JsonSerializerOptions
             {
@@ -181,11 +181,11 @@ namespace WebPetCare.Components.Services
 
         public async Task SetStoreItemAsync(string token, string name)
         {
-            await _jsRuntime.InvokeVoidAsync("sessionStorageSetItem",name, token);
+            await _jsRuntime.InvokeVoidAsync("sessionStorageSetItem", name, token);
         }
 
 
-        
+
 
     }
 
