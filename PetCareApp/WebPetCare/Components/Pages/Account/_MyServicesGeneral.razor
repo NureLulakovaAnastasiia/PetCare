@@ -1,0 +1,38 @@
+﻿
+
+<div class="d-flex justify-content-center mt-4">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            <div class="row text-center">
+
+                <h3 class="col-8 offset-2"><b>My services</b></h3>
+                <button class="btn col-2 btn-func"><i class="bi bi-plus-circle"></i>     Add</button>
+            </div>
+            <hr />
+
+
+            <div class="d-flex flex-row ">
+                @for (int i = 1; i <= 3; i++)
+                {
+                    <div class="card m-3 p-3">
+                        <div class="">
+                            <h4 class=""><b>Grooming</b></h4>
+                        </div>
+                        <hr class="mt-0 pt-0 text-center" />
+                        <div class="text-start">
+                            <p>Price: 30 - 70$</p>
+                            <p>Reviews: 23</p>
+                        </div>
+                        <button class="btn btn-success" style="background-color: #8de3af;">More</button>
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+}
