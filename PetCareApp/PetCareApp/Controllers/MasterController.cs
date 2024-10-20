@@ -88,7 +88,7 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
-        [HttpGet("getMasterServices")]
+        [HttpGet("getMasterServices")] // fix to have no parameter
         public IActionResult GetMasterServices(string masterId)
         {
             if (!ModelState.IsValid)
@@ -102,6 +102,22 @@ namespace PetCareApp.Controllers
                 return NotFound();
             }
             return Ok(services);
+        }
+
+        [HttpGet("getMasterGeneralData")]
+        public async Task<IActionResult> GetMasterGeneralData()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await _masterService.GetGeneralMasterData();
+            if (data == null || String.IsNullOrEmpty(data.FirstName))
+            {
+                return NotFound();
+            }
+            return Ok(data);
         }
 
         [HttpPost("addQuestionary")]

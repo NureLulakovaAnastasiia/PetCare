@@ -1,6 +1,7 @@
+using Microsoft.JSInterop;
 using PetCareApp.Models;
 using WebPetCare.Components;
-using WebPetCare.Components.IServices;
+using WebPetCare.IServices;
 using WebPetCare.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,10 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
-builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddHttpClient();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -33,12 +35,12 @@ else
 {
     app.UseDeveloperExceptionPage();
 }
-
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+app.UseRouting();
 app.UseAntiforgery();
- 
+
 
 app.UseSession();
 

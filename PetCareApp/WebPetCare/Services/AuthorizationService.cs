@@ -1,11 +1,11 @@
-﻿using WebPetCare.Components.IServices;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using PetCareApp.Dtos;
 using System.Text.Json;
 using Azure;
 using System.Net.Http;
 using Microsoft.JSInterop;
 using System.Net;
+using WebPetCare.IServices;
 
 namespace WebPetCare.Services
 {
@@ -15,7 +15,7 @@ namespace WebPetCare.Services
         private readonly IJSRuntime _jsRuntime;
         public AuthorizationService(HttpClient httpClient, IConfiguration configuration
             , IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime)
-        : base(httpClient, configuration)
+        : base(httpClient, configuration, jsRuntime)
         {
             _httpContextAccessor = httpContextAccessor;
             _jsRuntime = jsRuntime;
@@ -184,12 +184,9 @@ namespace WebPetCare.Services
             await _jsRuntime.InvokeVoidAsync("sessionStorageSetItem", name, token);
         }
 
-
-
-
     }
 
-    public class ResultData
+    public class ResultData //remake to use result generic class
     {
         public string Result { get; set; }
         public string Error { get; set; }

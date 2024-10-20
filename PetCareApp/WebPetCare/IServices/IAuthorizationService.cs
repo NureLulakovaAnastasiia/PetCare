@@ -1,7 +1,7 @@
 ﻿using PetCareApp.Dtos;
 using WebPetCare.Services;
 
-namespace WebPetCare.Components.IServices
+namespace WebPetCare.IServices
 {
     public interface IAuthorizationService
     {

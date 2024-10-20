@@ -1,4 +1,7 @@
 ﻿@page "/account"
+@using WebPetCare.IServices
+@inject IUserService userService
+
 <PageTitle>Account</PageTitle>
 
 <div class="container align-items-center">
@@ -10,12 +13,32 @@
         <button class="btn col-lg-2 me-3 btn-nav">Reviews</button>
     </div>
 
-    <_GeneralAccount></_GeneralAccount>
+    <_GeneralAccount masterData="@masterData"></_GeneralAccount>
     <_MyServicesGeneral></_MyServicesGeneral>
 
 </div>
 
 
 @code {
+    public GetGeneralMasterDto masterData { get; set; }
 
+    public string Error { get; set; } = "";
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            
+            var res = await userService.getGeneralMasterData();
+            if (res.IsSuccess)
+            {
+                masterData = res.Data;
+            }
+            else
+            {
+                Error = res.ErrorMessage;
+            }
+            StateHasChanged();
+        }
+    }
 }

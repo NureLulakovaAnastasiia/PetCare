@@ -1,25 +1,31 @@
-﻿using WebPetCare.Components.IServices;
+﻿using WebPetCare.IServices;
 
 namespace WebPetCare.Services
 {
     public class JwtMiddleware
     {
-        private readonly ITokenService _tokenService;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly RequestDelegate _next;
 
-        public JwtMiddleware(ITokenService tokenService)
+        public JwtMiddleware(IServiceProvider serviceProvider, RequestDelegate next)
         {
-            _tokenService = tokenService;
+            _serviceProvider = serviceProvider;
+            _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public async Task InvokeAsync(HttpContext context)
         {
-            var token = _tokenService.GetToken();
-            if (!string.IsNullOrEmpty(token))
+            Console.WriteLine("Middleware is working");
+            using (var scope = _serviceProvider.CreateScope())
             {
-                context.Request.Headers["Authorization"] = "Bearer " + token;
+                var tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
+                var token = await tokenService.GetToken();
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Request.Headers["Authorization"] = "Bearer " + token;
+                }
             }
-
-            await next(context);
+            await _next(context);
         }
     }
 }

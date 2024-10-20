@@ -32,5 +32,7 @@ namespace PetCareApp.Interfaces
         public Task<string> MakeRequestToOrganization(int organizationId);
 
         public Task<string> CancelRecord(int recordId, string reason);
+
+        public Task<GetGeneralMasterDto> GetGeneralMasterData();
     }
 }

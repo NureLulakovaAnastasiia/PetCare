@@ -694,5 +694,33 @@ namespace PetCareApp.Services
                 return ex.Message;
             }
         }
+
+
+        public async Task<GetGeneralMasterDto> GetGeneralMasterData()
+        {
+            var res = new GetGeneralMasterDto();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var userData = _dbContext.Users.Where(x => x.Id == user.Id)
+                        .Include(x => x.Services)
+                        .Include(x => x.Contacts)
+                        .FirstOrDefault();
+                    if (userData != null)
+                    {
+                        res.Contacts = _mapper.Map<GetContactsDto>(userData.Contacts);
+                        res.Services = _mapper.Map<List<GetServiceDto>>(userData.Services);
+                        res.FirstName = user.FirstName;
+                        res.LastName = user.LastName;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            return res;
+        }
     }
 }

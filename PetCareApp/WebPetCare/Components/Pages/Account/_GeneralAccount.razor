@@ -10,22 +10,23 @@
            
             <hr />
             <div class="text-start">
+                @if(masterData != null){
                 <div class="row col-lg-12 m-3">
                     <div class="col-4 ms-4 mb-4 me-5">
                         <h4>Last Name</h4>
-                        <h2 class="text-primary"><b>Lulakova</b></h2>
+                        <h2 class="text-primary"><b>@masterData.LastName</b></h2>
                     </div>
 
                     <div class="col-4 ms-4 mb-4 me-5">
                         <h4>First Name</h4>
-                        <h2 class="text-primary"><b>Anastasiia</b></h2>
+                            <h2 class="text-primary"><b>@masterData.FirstName</b></h2>
                     </div>
                 </div>
 
                 <div class="row col-lg-12 m-3">
                     <div class="col-4 ms-4 mb-4 me-5">
                         <h4>City</h4>
-                        <h2 class="text-primary"><b>Kyiv</b></h2>
+                            <h2 class="text-primary"><b>@(masterData.Contacts.City != null ? masterData.Contacts.City : " - ")</b></h2>
                     </div>
 
                     <div class="col-6 ms-4 mb-4 me-5">
@@ -45,6 +46,9 @@
                         <h2 class="text-primary"><b>nast@gmail.com</b></h2>
                     </div>
                 </div>
+                }else{
+                    <h3>There is no data to display</h3>
+                }
             </div>
         </div>
     </div>
@@ -52,5 +56,6 @@
 
 
 @code {
-
+    [Parameter]
+    public GetGeneralMasterDto masterData { get; set; }
 }

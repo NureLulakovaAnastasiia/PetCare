@@ -1,33 +1,31 @@
-﻿using System.Net.Http.Headers;
-using WebPetCare.Components.IServices;
+﻿using Microsoft.JSInterop;
+using PetCareApp.Services;
+using System.Net.Http.Headers;
+using WebPetCare.IServices;
 
 
 namespace WebPetCare.Services
 {
-    public class TokenService : ITokenService
+    public class TokenService :BaseService, ITokenService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public TokenService(IHttpContextAccessor httpContextAccessor)
+       
+        public TokenService(IHttpContextAccessor httpContextAccessor, HttpClient httpClient, 
+            IConfiguration configuration, IJSRuntime jSRuntime): base(httpClient, configuration, jSRuntime)
         {
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string? GetToken()
+        public async Task<string?> GetToken()
         {
-            var context = _httpContextAccessor.HttpContext;
-            if (context != null && context.Request.Cookies.ContainsKey("token"))
-            {
-                return context.Request.Cookies["token"];
-            }
-
-            return null;
+            var token = await GetStoreItemAsync("token");
+            return token;
         }
 
-        public HttpClient CreateHttpClient()
+        public async Task<HttpClient> CreateHttpClient()
         {
             var client = new HttpClient();
-            var token = GetToken();
+            var token = await GetToken();
             if (!string.IsNullOrEmpty(token))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -35,5 +33,7 @@ namespace WebPetCare.Services
 
             return client;
         }
+
+        
     }
 }
