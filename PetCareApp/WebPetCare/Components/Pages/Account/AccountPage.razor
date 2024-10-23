@@ -13,22 +13,25 @@
         <button class="btn col-lg-2 me-3 btn-nav">Reviews</button>
     </div>
 
-    <_GeneralAccount masterData="@masterData"></_GeneralAccount>
-    <_MyServicesGeneral></_MyServicesGeneral>
+   
+        <_GeneralAccount masterData="masterData"></_GeneralAccount>
+    
+    <_MyServicesGeneral services="@masterData.Services"></_MyServicesGeneral>
 
 </div>
 
 
 @code {
-    public GetGeneralMasterDto masterData { get; set; }
+    public GetGeneralMasterDto masterData { get; set; } = new GetGeneralMasterDto();
 
     public string Error { get; set; } = "";
+
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            
+
             var res = await userService.getGeneralMasterData();
             if (res.IsSuccess)
             {
@@ -41,4 +44,5 @@
             StateHasChanged();
         }
     }
+
 }

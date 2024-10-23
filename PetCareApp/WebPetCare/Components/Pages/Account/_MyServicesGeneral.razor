@@ -12,21 +12,30 @@
 
 
             <div class="d-flex flex-row ">
-                @for (int i = 1; i <= 3; i++)
+                @for (int i = 0; i < services.Count; i++)
                 {
+                    @if (i == 3)
+                    {
+                        break;
+                    }
                     <div class="card m-3 p-3">
                         <div class="">
-                            <h4 class=""><b>Grooming</b></h4>
+                            <h4 class=""><b>@services[i].Name</b></h4>
                         </div>
                         <hr class="mt-0 pt-0 text-center" />
                         <div class="text-start">
-                            <p>Price: 30 - 70$</p>
-                            <p>Reviews: 23</p>
+                            <p>Price: @services[i].MinimumPrice - @services[i].MaximumPrice</p>
+                            <p>Reviews: @services[i].Reviews.Count</p>
                         </div>
                         <button class="btn btn-success" style="background-color: #8de3af;">More</button>
                     </div>
+                    
                 }
-
+                @if(services.Count() == 0){
+                    <div class="text-center">
+                        <p>No services available</p>
+                        </div>
+                }
             </div>
 
         </div>
@@ -34,5 +43,6 @@
 </div>
 
 @code {
-
+    [Parameter]
+    public List<GetServiceDto> services { get; set; } = new List<GetServiceDto>();
 }

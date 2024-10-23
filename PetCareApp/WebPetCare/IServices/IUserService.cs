@@ -6,5 +6,7 @@ namespace WebPetCare.IServices
     public interface IUserService
     {
         public Task<Result<GetGeneralMasterDto>> getGeneralMasterData();
+
+        public Task<string> UpdateGeneralMasterData(GetGeneralMasterDto dto);
     }
 }

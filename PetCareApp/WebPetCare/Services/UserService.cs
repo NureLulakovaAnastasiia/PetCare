@@ -53,5 +53,40 @@ namespace WebPetCare.Services
 
             return res;
         }
+
+        public async Task<string> UpdateGeneralMasterData(GetGeneralMasterDto dto)
+        {
+            var res = "";
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(dto, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            string error = string.Empty;
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Master/updateMasterGeneralData";
+
+                HttpResponseMessage response = await _httpClient.PatchAsync(fullUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+
+                res = error;
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
     }
 }

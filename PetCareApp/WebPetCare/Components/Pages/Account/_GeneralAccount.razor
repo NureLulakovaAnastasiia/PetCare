@@ -1,55 +1,81 @@
-﻿
+﻿@inject IUserService userService
+@inject IJSRuntime _JSRuntime
+
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border bg-body-secondary p-3 ">
-            <div class="row text-center">
-
-                <h3 class="col-8 offset-2"><b>About me</b></h3>
-                <button class="btn col-2 btn-func"><i class="bi bi-pencil-fill"></i>   Edit</button>
-            </div>
-           
-            <hr />
-            <div class="text-start">
-                @if(masterData != null){
-                <div class="row col-lg-12 m-3">
-                    <div class="col-4 ms-4 mb-4 me-5">
-                        <h4>Last Name</h4>
-                        <h2 class="text-primary"><b>@masterData.LastName</b></h2>
+                @if (!IsEdit)
+                {
+                    <div class="row text-center">
+                        <h3 class="col-8 offset-2"><b>About me</b></h3>
+                        <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
                     </div>
-
-                    <div class="col-4 ms-4 mb-4 me-5">
-                        <h4>First Name</h4>
-                            <h2 class="text-primary"><b>@masterData.FirstName</b></h2>
-                    </div>
-                </div>
-
-                <div class="row col-lg-12 m-3">
-                    <div class="col-4 ms-4 mb-4 me-5">
-                        <h4>City</h4>
-                            <h2 class="text-primary"><b>@(masterData.Contacts.City != null ? masterData.Contacts.City : " - ")</b></h2>
-                    </div>
-
-                    <div class="col-6 ms-4 mb-4 me-5">
-                        <h4>Address</h4>
-                        <h2 class="text-primary"><b>str. Peremogy, 34A</b></h2>
-                    </div>
-                </div>
-
-                <div class="row col-lg-12 m-3">
-                    <div class="col-4 ms-4 mb-4 me-5">
-                        <h4>Phone</h4>
-                        <h2 class="text-primary"><b>353465657</b></h2>
-                    </div>
-
-                    <div class="col-5 ms-4 mb-4 me-5">
-                        <h4>Email</h4>
-                        <h2 class="text-primary"><b>nast@gmail.com</b></h2>
-                    </div>
-                </div>
-                }else{
-                    <h3>There is no data to display</h3>
                 }
-            </div>
+
+            <form method="post" @onsubmit="UpdateMasterData">
+                @if (IsEdit)
+                {
+                    <div class="row text-center">
+                        <h3 class="col-6 offset-3"><b>About me</b></h3>
+                        <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
+                        <button type="submit" class="btn col-2 btn-func-success">Save</button>
+                    </div>
+                }
+           
+                <hr />
+            
+                <div class="text-start">
+                    @if(masterData != null){
+                    <div class="row col-lg-12 m-3">
+                        <div class="col-4 ms-4 mb-4 me-5">
+                            <h4>Last Name</h4>
+                            <InputText @bind-Value="masterData.LastName" placeholder="@masterData.LastName" 
+                            class="input-text-style" disabled="@(!IsEdit)" />
+                        </div>
+
+                        <div class="col-4 ms-4 mb-4 me-5">
+                            <h4>First Name</h4>
+                            <InputText @bind-Value="masterData.FirstName" placeholder="@masterData.FirstName"
+                                        class="input-text-style" disabled="@(!IsEdit)" />
+                        </div>
+                    </div>
+
+                    <div class="row col-lg-12 m-3">
+                        <div class="col-4 ms-4 mb-4 me-5">
+                            <h4>City</h4>
+                            <InputText @bind-Value="masterData.Contacts.City" 
+                            placeholder="@(masterData.Contacts.City != null ? masterData.Contacts.City : " - ")"
+                                    class="input-text-style" disabled="@(!IsEdit)" />
+                        </div>
+
+                        <div class="col-6 ms-4 mb-4 me-5">
+                            <h4>Address</h4>
+                            <InputText @bind-Value="masterData.Contacts.Address" 
+                            placeholder="@(masterData.Contacts.Address != null ? masterData.Contacts.Address : " - ")"
+                                        class="input-text-style" disabled="@(!IsEdit)" />
+                        </div>
+                    </div>
+
+                    <div class="row col-lg-12 m-3">
+                        <div class="col-4 ms-4 mb-4 me-5">
+                            <h4>Phone</h4>
+                            <InputText @bind-Value="masterData.Contacts.Phone"
+                                        placeholder="@(masterData.Contacts.Phone != null ? masterData.Contacts.Phone : " - ")"
+                                        class="input-text-style" disabled="@(!IsEdit)" />
+                        </div>
+
+                        <div class="col-5 ms-4 mb-4 me-5">
+                            <h4>Email</h4>
+                            <InputText @bind-Value="masterData.Email"
+                                        placeholder="@masterData.Email"
+                                        class="input-text-style" disabled />
+                        </div>
+                    </div>
+                    }else{
+                        <h3>There is no data to display</h3>
+                    }
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -57,5 +83,47 @@
 
 @code {
     [Parameter]
-    public GetGeneralMasterDto masterData { get; set; }
+    public GetGeneralMasterDto masterData { get; set; } = new GetGeneralMasterDto();
+    private GetGeneralMasterDto initialMasterData { get; set; } = new GetGeneralMasterDto();
+    public bool IsEdit = false;
+
+    private void OnButtonClick()
+    {
+        IsEdit = !IsEdit;
+        FillInitialData();
+    }
+
+
+    private void CancelEdit()
+    {
+        masterData.FirstName = initialMasterData.FirstName;
+        masterData.LastName = initialMasterData.LastName;
+        masterData.Contacts = new GetContactsDto(initialMasterData.Contacts);
+        OnButtonClick();
+    }
+
+    private async void UpdateMasterData()
+    {
+        var res = await userService.UpdateGeneralMasterData(masterData);
+        if (String.IsNullOrEmpty(res))
+        {
+            //await _JSRuntime.InvokeVoidAsync("showToastr", "success", "Data updated and saved successfully!");
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Data updated and saved successfully!", "Success");
+            OnButtonClick();
+            StateHasChanged();
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+
+        }
+    }
+
+    private void FillInitialData()
+    {
+        initialMasterData = new GetGeneralMasterDto(masterData);
+        initialMasterData.Contacts = new GetContactsDto(masterData.Contacts);
+    }
+
+    
 }

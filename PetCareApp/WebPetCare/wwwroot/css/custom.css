@@ -37,7 +37,7 @@
     --bs-gray-700: #fff;
     --bs-gray-800: #444b40;
     --bs-gray-900: #212529;
-    --bs-primary: #378dfc;
+    --bs-primary: #22bfb0;
     --bs-secondary: #edd3d1;
     --bs-success: #64e396;
     --bs-info: #5b62f4;
@@ -471,11 +471,38 @@ table {
     transition: border-color 0.3s;
 }
 
-    .code-input:focus {
-        border-color: #3498db;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    }
+.code-input:focus {
+    border-color: #3498db;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
 
+.input-text-style {
+    border: none;
+    background-color: rgba(0, 0, 0, 0.05);
+    font-size: 1.7rem;
+    font-weight: bold;
+    color: rgba(var(--bs-primary-rgb)) !important;
+    padding: 0.25em;
+    margin: 0;
+    box-shadow: none;
+    outline: none;
+    text-align: left;
+    border-radius: 15px;
+}
+
+.input-text-style:focus {
+    outline: none; 
+    border: none;
+}
+
+.input-text-style::placeholder {
+    color: rgba(39, 193, 167, 0.7); 
+}
+
+.input-text-style:disabled {
+    background-color: rgba(0, 0, 0, 0); 
+    color: rgba(39, 193, 167, 0.5); 
+}
 
 form-container {
     padding: 20px;
@@ -3195,6 +3222,28 @@ textarea.form-control-lg {
     max-width: 5em;
 }
 
+.btn-func-success {
+    background-color: #57d488 !important;
+    padding: 0.3rem !important;
+    border-radius: 15px;
+    max-width: 5em;
+}
+
+    .btn-func-success:hover {
+        background-color: #35cc70 !important;
+    }
+
+.btn-func-danger {
+    background-color: #ff6a4d !important;
+    padding: 0.3rem !important;
+    border-radius: 15px;
+    max-width: 5em;
+}
+
+.btn-func-danger:hover {
+    background-color: #e83410 !important;
+}
+
 .btn-primary {
     --bs-btn-color: #fff;
     --bs-btn-bg: #edd3d1;
@@ -5026,6 +5075,8 @@ textarea.form-control-lg {
   top: -1px;
 }
 
+
+
 .alert {
   --bs-alert-bg: transparent;
   --bs-alert-padding-x: 1rem;
@@ -5571,6 +5622,9 @@ textarea.form-control-lg {
 [data-bs-theme=dark] .btn-close {
   filter: var(--bs-btn-close-white-filter);
 }
+
+
+
 
 .toast {
   --bs-toast-zindex: 1090;

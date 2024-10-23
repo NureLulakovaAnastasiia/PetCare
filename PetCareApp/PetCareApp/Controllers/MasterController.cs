@@ -120,6 +120,22 @@ namespace PetCareApp.Controllers
             return Ok(data);
         }
 
+        [HttpPatch("updateMasterGeneralData")]
+        public async Task<IActionResult> UpdateMasterGeneralData([FromBody] GetGeneralMasterDto masterData)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await _masterService.UpdateGeneralMasterData(masterData);
+            if (!String.IsNullOrEmpty(data))
+            {
+                return StatusCode(500, data);
+            }
+            return Ok();
+        }
+
         [HttpPost("addQuestionary")]
         [Authorize(Roles = "Master")]
         public async Task<IActionResult> AddQuestionary(List<AddQuestionDto> questionaryDto, [FromQuery] int serviceId)
@@ -260,5 +276,7 @@ namespace PetCareApp.Controllers
             }
             return StatusCode(500, res);
         }
+
+
     }
 }

@@ -714,6 +714,7 @@ namespace PetCareApp.Services
                         res.Services = _mapper.Map<List<GetServiceDto>>(userData.Services);
                         res.FirstName = user.FirstName;
                         res.LastName = user.LastName;
+                        res.Email = user.Email != null ? user.Email : "";
                     }
                 }
             }
@@ -721,6 +722,30 @@ namespace PetCareApp.Services
             {
             }
             return res;
+        }
+
+        public async Task<string> UpdateGeneralMasterData(GetGeneralMasterDto masterData)
+        {
+            var res = "";
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    user.FirstName = !String.IsNullOrEmpty(masterData.FirstName) ? masterData.FirstName : user.FirstName;
+                    user.LastName = !String.IsNullOrEmpty(masterData.LastName) ? masterData.LastName : user.LastName;
+                    _dbContext.Update(user);
+                    var contacts = _mapper.Map<Contacts>(masterData.Contacts);
+                    contacts.AppUserId = user.Id;
+                    _dbContext.Update(contacts);
+                    _dbContext.SaveChanges();
+                }
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
     }
 }

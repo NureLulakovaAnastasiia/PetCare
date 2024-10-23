@@ -34,5 +34,6 @@ namespace PetCareApp.Interfaces
         public Task<string> CancelRecord(int recordId, string reason);
 
         public Task<GetGeneralMasterDto> GetGeneralMasterData();
+        public Task<string> UpdateGeneralMasterData(GetGeneralMasterDto masterData);
     }
 }
