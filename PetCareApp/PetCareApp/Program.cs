@@ -26,6 +26,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IMasterService, MasterService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IPortfolioService, PortfolioService>();
+builder.Services.AddScoped<IServiceApiService, ServiceApiService>();
 
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>

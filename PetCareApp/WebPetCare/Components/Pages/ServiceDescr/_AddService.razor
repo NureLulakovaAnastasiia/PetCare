@@ -1,0 +1,66 @@
+﻿
+
+<form method="post" @onsubmit="FinishCreation">
+    <div class=" m-4 align-content-center text-center">
+        <div class="col-12 mb-2 ms-3">
+            <div class="m-2 p-2">
+                <h4>Name</h4>
+                <InputText @bind-Value="serviceDto.Name"
+                           class="input-text-style col-12"></InputText>
+            </div>
+            <div class="m-2 p-2">
+                <h4>Description</h4>
+                <InputTextArea @bind-Value="serviceDto.Description"
+                               class="input-textarea-style col-12"></InputTextArea>
+            </div>
+        </div>
+
+        <div class="row col-12 justify-content-around  text-center">
+            <div class="col-4 m-1">
+                <h4>Minimum Price, UAN</h4>
+                <InputNumber @bind-Value="@serviceDto.MinimumPrice" class="input-text-style col-7"></InputNumber>
+            </div>
+            <div class="col-4 m-1">
+                <h4>Maximum Price, UAN</h4>
+                <InputNumber @bind-Value="@serviceDto.MaximumPrice" class="input-text-style col-7"></InputNumber>
+            </div>
+        </div>
+
+        <div class="row col-12 mt-3 justify-content-around text-center">
+            <div class="col-3 m-1">
+                <h4>Time, min</h4>
+                <InputNumber @bind-Value="@serviceDto.RealTime" class="input-text-style col-7"></InputNumber>
+            </div>
+            <div class="col-3 m-1">
+                <h4>Minimum Time, min</h4>
+                <InputNumber @bind-Value="@serviceDto.MinimumTime" class="input-text-style col-7"></InputNumber>
+            </div>
+            <div class="col-3 m-1">
+                <h4>Maximum Time, min</h4>
+                <InputNumber @bind-Value="@serviceDto.MaximumTime" class="input-text-style col-7"></InputNumber>
+            </div>
+        </div>
+        
+            <button type="submit" class="btn col-2 btn-func-success mt-3" style="font-size: 1.5em">Save</button>
+            
+    </div>
+</form>
+
+@code {
+    [Parameter]
+    public AddServiceDto serviceDto { get; set; }
+
+
+    [Parameter]
+    public EventCallback OnFinishCreation { get; set; }
+
+    private async Task FinishCreation()
+    {
+        if (OnFinishCreation.HasDelegate)
+        {
+            await OnFinishCreation.InvokeAsync();
+        }
+    }
+
+
+}

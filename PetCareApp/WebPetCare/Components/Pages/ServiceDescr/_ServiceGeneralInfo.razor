@@ -1,0 +1,121 @@
+﻿@inject IServiceService _service
+@inject IJSRuntime _JSRuntime
+
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            @if (serviceDto != null)
+            {
+            @if (!IsEdit)
+            {
+                <div class="row text-center">
+                    <h3 class="col-8 offset-2"><b>Service Details</b></h3>
+                    <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                </div>
+            }
+
+                <form method="post" @onsubmit="UpdateService">
+                @if (IsEdit)
+                {
+                    <div class="row text-center">
+                            <h3 class="col-6 offset-3"><b>Service Details</b></h3>
+                        <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
+                        <button type="submit" class="btn col-2 btn-func-success">Save</button>
+                    </div>
+                }
+
+                <hr />
+
+                <div class="text-start m-4 align-content-center">
+                        <div class="row col-12 mb-2 ms-3">
+                            <div class="col-10">
+                                    <div class="m-2 p-2">
+                                        <h4>Name</h4>
+                                        <InputText @bind-Value="serviceDto.Name"
+                                                       placeholder="@(serviceDto.Name != null ? serviceDto.Name : "No name")"
+                                                       disabled=" @(!IsEdit)" class="input-text-style col-12"></InputText>
+                                    </div>
+                                    <div class="m-2 p-2">
+                                        <h4>Description</h4>
+                                        <InputTextArea @bind-Value="serviceDto.Description"
+                                                       placeholder="@(serviceDto.Description != null ? serviceDto.Description : " ")"
+                                                       disabled=" @(!IsEdit)" class="input-textarea-style col-12"></InputTextArea>
+                                    </div>
+                              </div>
+                            <div class="col-2">
+                                <buttton class="btn">Questionary</buttton>
+                                </div>
+                        </div>
+
+                        <div class="row col-12 justify-content-around">
+                            <div class="col-3 m-1">
+                                <h4>Minimum Price, UAN</h4>
+                                <InputNumber @bind-Value="@serviceDto.MinimumPrice" class="input-text-style col-7"
+                                disabled=" @(!IsEdit)"></InputNumber>
+                            </div>
+                            <div class="col-3 m-1">
+                                <h4>Maximum Price, UAN</h4>
+                                <InputNumber @bind-Value="@serviceDto.MaximumPrice" class="input-text-style col-7" 
+                                disabled=" @(!IsEdit)"></InputNumber>
+                            </div>
+                            <div class="col-3 m-1">
+                                <h4>Time, min</h4>
+                                <InputNumber @bind-Value="@serviceDto.RealTime" class="input-text-style col-7"
+                                disabled=" @(!IsEdit)"></InputNumber>
+                            </div>
+                        </div>
+                    
+                </div>
+            </form>
+            }
+            else
+            {
+                <h3>There is no data to display</h3>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    [Parameter]
+    public GetServiceDto serviceDto { get; set; } = new GetServiceDto();
+    private GetServiceDto initialServiceDto = new GetServiceDto();
+    public bool IsEdit = false;
+
+
+    private void OnButtonClick()
+    {
+        IsEdit = !IsEdit;
+        FillInitialData();
+    }
+
+    private void CancelEdit(MouseEventArgs e)
+    {
+        serviceDto = new GetServiceDto(initialServiceDto);
+        IsEdit = !IsEdit;
+    }
+
+    private async void UpdateService()
+    {
+        var res = await _service.UpdateService(serviceDto);
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Data updated and saved successfully!", "Success");
+            OnButtonClick();
+            StateHasChanged();
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+
+        }
+    }
+    private void FillInitialData()
+    {
+        initialServiceDto = new GetServiceDto(serviceDto);
+    }
+}

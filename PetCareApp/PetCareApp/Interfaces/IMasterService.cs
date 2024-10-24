@@ -6,11 +6,7 @@ namespace PetCareApp.Interfaces
     public interface IMasterService
     {
         public Task<string> AddContacts(AddContactsDto contacts);
-        public Task<string> UpdateContacts(ContactsDto contacts);
-
-        public Task<string> AddService(AddServiceDto service);
-        public string UpdateService(UpdateServiceDto service);
-        public List<GetServiceDto> GetServices(string masterId);
+        public Task<string> UpdateContacts(ContactsDto contacts);        
         public Task<string> UpsertSchedule(List<ScheduleDto> schedule);
         public Task<string> UpsertBreaks(List<BreakDto> breaks);
 

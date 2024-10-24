@@ -1,0 +1,59 @@
+﻿@page "/create-service"
+@inject NavigationManager Navigation
+
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            <div class="row text-center">
+                <button type="button" class="btn col-2 m-1 p-0 btn-func-danger" style="height: 3em" @onclick="Back">
+                    <i class="bi bi-arrow-left"></i>   Back
+                </button>
+
+                @if (isServiceCreation){
+                <div class="col-6 offset-2">
+                    <h3 ><b>Service Creation</b></h3>
+                    <p >Fill form with info about service</p>
+                </div>
+                }
+                else if (isQuestionaryCreation)
+                {
+                    <div class="col-6 offset-2">
+                        <h3><b>Questionary Creation</b></h3>
+                        <p>Create questionary or skip this step</p>
+                    </div>
+                }
+            </div>
+            <hr />
+            @if (isServiceCreation)
+            {
+                <_AddService serviceDto="@serviceDto" OnFinishCreation="FinishCreation"></_AddService>
+            }
+            else if (isQuestionaryCreation)
+            {
+                <_AddQuestionary></_AddQuestionary>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    public AddServiceDto serviceDto { get; set; } = new AddServiceDto();
+    public bool isServiceCreation = true;
+    public bool isQuestionaryCreation = false;
+
+    public void FinishCreation()
+    {
+        isServiceCreation = false;
+        isQuestionaryCreation = true;
+        StateHasChanged();
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("javascript:history.back()");
+    }
+}

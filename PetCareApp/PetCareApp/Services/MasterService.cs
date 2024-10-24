@@ -154,74 +154,6 @@ namespace PetCareApp.Services
 
         }
 
-        public async Task<string> AddService(AddServiceDto serviceDto)
-        {
-            try
-            {
-                var user = await GetCurrentUserAsync();
-                if (user == null)
-                {
-                    return "User not found";
-                }
-
-                var service = _mapper.Map<Models.Service>(serviceDto);
-                if (service != null)
-                {
-                    service.AppUserId = user.Id;
-                    _dbContext.Add(service);
-                    await _dbContext.SaveChangesAsync();
-                    return service.Id.ToString();
-                }
-                return "Error during adding";
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-        }
-
-        public string UpdateService(UpdateServiceDto serviceDto)
-        {
-            try
-            {
-                var service = _mapper.Map<Models.Service>(serviceDto);
-                if (service != null)
-                {
-                    var res = _dbContext.Update(service);
-                    return _dbContext.SaveChanges().ToString();
-                }
-                return "Error during updating";
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-        }
-
-        public List<GetServiceDto> GetServices(string masterId)
-        {
-            var res = new List<GetServiceDto>();
-            try
-            {
-                var masterExist = _dbContext.Users.Any(x => x.Id == masterId);
-                if (masterExist)
-                {
-                   var masterServices = _dbContext.Services
-                        .Where(x => x.AppUserId == masterId && !x.IsHidden)
-                        .Include(x => x.Reviews).ToList();
-                    
-                    if (masterServices.Count > 0)
-                    {
-                        res = _mapper.Map<List<GetServiceDto>>(masterServices);
-                    }
-                }
-                return res;
-            }
-            catch 
-            {
-                return res;
-            }
-        }
         public async Task<string> UpdateContacts(ContactsDto contacts)
         {
             try
@@ -346,8 +278,8 @@ namespace PetCareApp.Services
                     if (item.DayOfWeek != null)
                     {
                         dates = GetClosestDatesByDayOfWeek(item.DayOfWeek.Value);
-                        
-                        if (timeSlots.Where(x=> dates.Contains(x.Date.Date)).Count() > 0)
+
+                        if (timeSlots.Where(x => dates.Contains(x.Date.Date)).Count() > 0)
                         {
                             continue;
                         }
@@ -358,14 +290,15 @@ namespace PetCareApp.Services
                         dates.Add(item.Date.Value);
                         dayOfWeek = (int)item.Date.Value.DayOfWeek;
                     }
-                    
+
                     var dayBreaks = breaks.Where(x => x.DayOfWeek == dayOfWeek)
                        .OrderBy(x => x.StartTime)
                        .ToList();
 
                     if (dayBreaks.Count() == 0)
                     {
-                        foreach (var date in dates) { 
+                        foreach (var date in dates)
+                        {
                             timeSlots.Add(new TimeSlot
                             {
                                 Date = date,
@@ -376,7 +309,7 @@ namespace PetCareApp.Services
                     }
                     else
                     {
-                       
+
                         foreach (var date in dates)
                         {
                             TimeSpan startTime = item.StartTime;
@@ -410,9 +343,9 @@ namespace PetCareApp.Services
         {
             var res = new List<DateTime>();
             var now = DateTime.Today;
-            while(now <= DateTime.Today.AddDays(daysAhead))
+            while (now <= DateTime.Today.AddDays(daysAhead))
             {
-                if((int)now.DayOfWeek == dayOfWeek)
+                if ((int)now.DayOfWeek == dayOfWeek)
                 {
                     res.Add(now);
                     now = now.AddDays(7);
@@ -471,8 +404,8 @@ namespace PetCareApp.Services
         //check if there no other appointments at the same time
         private bool CheckIfFreeTimeSlot(string masterId, DateTime startTime, DateTime endTime)
         {
-            var intersections = _dbContext.Records.Where(x => x.AppUserId == masterId 
-                                && x.StartTime > startTime  && x.EndTime < endTime 
+            var intersections = _dbContext.Records.Where(x => x.AppUserId == masterId
+                                && x.StartTime > startTime && x.EndTime < endTime
                                 && x.Status != "Canceled").ToList();
             if (intersections.Any())
             {
@@ -492,20 +425,20 @@ namespace PetCareApp.Services
                 return resSlots;
             }
             var records = _dbContext.Records
-                .Where(x => x.Status != "Canceled" && 
+                .Where(x => x.Status != "Canceled" &&
                         masterServices.Contains((int)x.ServiceId)
                         && x.StartTime > DateTime.Now)
                 .OrderBy(x => x.StartTime)
                 .ToList();
 
-            
+
             foreach (var slot in workSlots)
             {
                 var slotServices = records
                     .Where(x => x.StartTime.Date == slot.Date &&
                     x.StartTime.TimeOfDay >= slot.StartTime &&
                     x.EndTime.TimeOfDay <= slot.EndTime)
-                    .OrderBy (x => x.StartTime)
+                    .OrderBy(x => x.StartTime)
                     .ToList();
 
                 if (slotServices.Count == 0)
@@ -515,7 +448,7 @@ namespace PetCareApp.Services
                 else
                 {
                     var startTime = slot.StartTime;
-                    
+
                     foreach (var service in slotServices)
                     {
                         if (startTime == service.StartTime.TimeOfDay)
@@ -523,7 +456,7 @@ namespace PetCareApp.Services
                             startTime = service.EndTime.TimeOfDay;
                             continue;
                         }
-                            resSlots.Add(new TimeSlot
+                        resSlots.Add(new TimeSlot
                         {
                             Date = slot.Date,
                             StartTime = startTime,
@@ -558,7 +491,7 @@ namespace PetCareApp.Services
             }
             foreach (var slot in workSlots)
             {
-                if(limitDates.Contains(slot.Date.Date) || limitDayOfWeek.Contains((int)slot.Date.DayOfWeek))
+                if (limitDates.Contains(slot.Date.Date) || limitDayOfWeek.Contains((int)slot.Date.DayOfWeek))
                 {
                     continue;
                 }
@@ -566,7 +499,7 @@ namespace PetCareApp.Services
                 while (startTime < slot.EndTime)
                 {
                     var endTime = startTime.Add(TimeSpan.FromMinutes((double)time));
-                    if(endTime > slot.EndTime)
+                    if (endTime > slot.EndTime)
                     {
                         break;
                     }
@@ -597,8 +530,9 @@ namespace PetCareApp.Services
                 if (fixedQuestion.Answer.IsTimeMinimum)
                 {
                     resTime = service.MinimumTime;
-                }else if(fixedQuestion.Answer.IsTimeMaximum) 
-                { 
+                }
+                else if (fixedQuestion.Answer.IsTimeMaximum)
+                {
                     resTime = service.MaximumTime;
                 }
                 else
@@ -649,12 +583,12 @@ namespace PetCareApp.Services
                     OrganizationId = organizationId
                 });
                 return _dbContext.SaveChanges().ToString();
-            } 
-            catch (Exception ex) 
+            }
+            catch (Exception ex)
             {
                 return ex.Message;
             }
-                
+
         }
 
         public async Task<string> CancelRecord(int recordId, string reason)
@@ -665,12 +599,12 @@ namespace PetCareApp.Services
                 if (user != null)
                 {
                     var record = _dbContext.Records.Where(x => x.Id == recordId).Include(x => x.Service).FirstOrDefault();
-                    if(record == null)
+                    if (record == null)
                     {
                         return "There is no such record";
                     }
-                    if(record.Service.AppUserId == user.Id && 
-                        record.StartTime > DateTime.UtcNow 
+                    if (record.Service.AppUserId == user.Id &&
+                        record.StartTime > DateTime.UtcNow
                         && record.Status == "Created") //check if right master cancels the record
                     {
                         record.Status = "Canceled";

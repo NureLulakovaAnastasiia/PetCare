@@ -504,6 +504,33 @@ table {
     color: rgba(39, 193, 167, 0.5); 
 }
 
+.input-textarea-style {
+    border: none;
+    background-color: rgba(0, 0, 0, 0.05);
+    font-size: 1.2rem;
+    color: rgba(var(--bs-primary-rgb)) !important;
+    padding: 0.25em;
+    margin: 0;
+    box-shadow: none;
+    outline: none;
+    text-align: left;
+    border-radius: 15px;
+}
+
+    .input-textarea-style:focus {
+        outline: none;
+        border: none;
+    }
+
+    .input-textarea-style::placeholder {
+        color: rgba(39, 193, 167, 0.7);
+    }
+
+    .input-textarea-style:disabled {
+        background-color: rgba(0, 0, 0, 0);
+        color: rgba(39, 193, 167, 0.5);
+    }
+
 form-container {
     padding: 20px;
     background-color: #f5f5f5;

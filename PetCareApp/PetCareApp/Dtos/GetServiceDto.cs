@@ -22,5 +22,21 @@ namespace PetCareApp.Dtos
 
         public string? AppUserId { get; set; }
         public List<Review> Reviews { get; set; } = new List<Review>();
+
+        public GetServiceDto() { }
+        public GetServiceDto(GetServiceDto dto)
+        {
+            this.Id = dto.Id;
+            this.Name = dto.Name;
+            this.Description = dto.Description;
+            this.MinimumPrice = dto.MinimumPrice;
+            this.MaximumPrice = dto.MaximumPrice;
+            this.RealTime = dto.RealTime;
+            this.IsHidden = dto.IsHidden;
+            this.IsFixedTime = dto.IsFixedTime;
+            this.IsNearestTime = dto.IsNearestTime;
+            this.MinimumTime = dto.MinimumTime;
+            this.MaximumTime = dto.MaximumTime;
+        }
     }
 }
