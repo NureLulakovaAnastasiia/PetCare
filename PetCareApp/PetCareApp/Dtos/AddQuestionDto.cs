@@ -9,6 +9,6 @@ namespace PetCareApp.Dtos
         [Required]
         public bool HasAnswerWithFixedTime { get; set; } = false;
         [Required]
-        public List<AddAnswerDto> Answers { get; set; }
+        public List<AddAnswerDto> Answers { get; set; } = new List<AddAnswerDto>();
     }
 }

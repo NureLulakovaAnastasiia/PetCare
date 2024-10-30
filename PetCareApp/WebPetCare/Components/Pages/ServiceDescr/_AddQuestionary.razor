@@ -1,5 +1,126 @@
-﻿<h3>_AddQuestionary</h3>
+﻿
+<div class=" m-4 align-content-center text-center">
+    <div class="col-12 mb-2 ms-3">
+        <div class="m-2 p-2">
+            <div class="form-check col-7">
+                <InputCheckbox @bind-Value="isNotNeeded" class="form-check-input" />
+                <label class="form-check-label"><h4>Skip questionary creation</h4></label>
+            </div>
+        </div>
+    </div>
+
+    @if (!isNotNeeded)
+    {
+        <div class="row justify-content-end">
+            <button class="btn btn-func" type="button" @onclick="AddQuestion">Add Question</button>
+        </div>
+        <hr />
+        <form method="post" @onsubmit="SubmitAdding">
+            <ol>
+                @foreach (var question in questions)
+                {
+                    <li>
+                        <div class="mb-3" @key="question">
+                            <label class="form-check-label">Question Text</label>
+                            <InputText @bind-Value="question.Name" class="form-control" />
+                            @{
+                                var questionInd = questions.IndexOf(question);
+                            }
+                            <button class="btn btn-func m-3" type="button" @onclick="() => AddAnswer(questionInd)">Add Answer</button>
+
+                            <ul>
+                                @foreach (var answer in question.Answers)
+                                {
+                                    
+                                    var answerInd = questions[questionInd].Answers.IndexOf(answer);
+                                    <li>
+                                        <div class="row mt-2" @key="answer">
+                                            <div class="col-5">
+                                                <label class="form-check-label">Answer</label>
+                                                <InputText @bind-Value="answer.Text" class="form-control" />
+                                            </div>
+                                            <div class="row col-6 ms-4">
+                                                @if ((fixedQuestionNum == questionInd || fixedQuestionNum == -1) && (fixedAnswerNum == answerInd || fixedAnswerNum == -1))
+                                                {
+                                                    <div class="form-check col-5">
+                                                        <InputCheckbox @bind-Value="answer.IsTimeFixed" @onclick="() => ChooseFixedQuestion(questionInd, answerInd)"
+                                                        class="form-check-input" />
+                                                        <label class="form-check-label">Is Time Fixed</label>
+                                                        <fieldset disabled="@(!answer.IsTimeFixed)">
+                                                            @* Maximum is default if nothing else  *@
+                                                                <div class="form-check mt-3">
+                                                                    <InputCheckbox @bind-Value="answer.IsTimeMinimum" class="form-check-input" />
+                                                                    <label class="form-check-label">Minimum Time</label>
+                                                                </div>
+                                                           
+                                                        </fieldset>
+                                                    </div>
+                                                }
+                                                <div class="col-5 text-center">
+                                                    <label class="form-check-label">Time @(answer.IsTimeFixed ? "(fixed)" : "(+/- format)")</label>
+                                                    <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <hr />
+                                }
+                            </ul>
+                        </div>
+                    </li>
+                }
+
+                <button type="submit" class="btn col-2 btn-func-success mt-3" style="font-size: 1.5em">Save</button>
+            </ol>
+        </form>
+    }
+</div>
+
+
 
 @code {
+    private bool isNotNeeded { get; set; } = false;
 
+    private List<AddQuestionDto> questions = new List<AddQuestionDto>();
+    private int fixedQuestionNum = -1;
+    private int fixedAnswerNum = -1;
+
+    private void ToggleVisibility()
+    {
+        isNotNeeded = !isNotNeeded;
+        questions.Clear();
+    }
+
+    private void SubmitAdding()
+    {
+
+    }
+
+    private void AddQuestion()
+    {
+        questions.Add(new AddQuestionDto { Answers = new List<AddAnswerDto>() });
+    }
+
+    private void AddAnswer(int questionInd)
+    {
+        if (questionInd >= 0 && questionInd < questions.Count)
+        {
+            questions[questionInd].Answers.Add(new AddAnswerDto());
+        }
+    }
+
+    private void ChooseFixedQuestion(int questionInd, int answerInd)
+    {
+        if (fixedQuestionNum == questionInd && fixedAnswerNum == answerInd)
+        {
+            fixedQuestionNum = -1;
+            fixedAnswerNum = -1;
+        }
+        else
+        {
+            fixedQuestionNum = questionInd;
+            fixedAnswerNum = answerInd;
+        }
+        StateHasChanged();
+    }
 }
