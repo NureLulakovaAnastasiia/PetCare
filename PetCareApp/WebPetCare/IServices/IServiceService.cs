@@ -7,5 +7,7 @@ namespace WebPetCare.IServices
     {
         public Task<Result<GetServiceDto>> getServiceDetails(int serviceId);
         public Task<string> UpdateService(GetServiceDto service);
+
+        public Task<string> AddService(AddServiceDto serviceDto, List<AddQuestionDto> questions);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.JSInterop;
 using PetCareApp.Dtos;
 using PetCareApp.Models;
+using System.Net;
 using System.Text.Json;
 using WebPetCare.IServices;
 
@@ -78,6 +79,93 @@ namespace WebPetCare.Services
                     res = await response.Content.ReadAsStringAsync();
                 }
 
+                res = error;
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> AddService(AddServiceDto serviceDto, List<AddQuestionDto> questions)
+        {
+            var res = "";
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(serviceDto, options);
+            httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            string error = string.Empty;
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Service/addService";
+
+                HttpResponseMessage response = await httpClient.PostAsync(fullUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    if (int.TryParse(result, out int id))
+                    {
+                        if (id != 0)
+                        {
+                            if (questions != null && questions.Count > 0)
+                            {
+                                res = await AddQuestionary(questions, id);
+                            }
+                            return res;
+                        }
+                    }
+                }
+                else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    return "Unauthorized";
+                }
+                
+                res = await response.Content.ReadAsStringAsync();
+                res = error;
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        private async Task<string> AddQuestionary(List<AddQuestionDto> questions, int serviceId)
+        {
+            var res = "";
+            
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(questions, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+            string error = string.Empty;
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Master/addQuestionary?serviceId={serviceId}";
+
+                HttpResponseMessage response = await httpClient.PostAsync(fullUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    if (int.TryParse(result, out int num))
+                    {
+                        if (num > 0)
+                        {
+                            return res;
+                        }
+                    }
+                }
+
+                res = await response.Content.ReadAsStringAsync();
                 res = error;
             }
             catch (Exception ex)

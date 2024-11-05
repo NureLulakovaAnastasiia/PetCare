@@ -1,5 +1,7 @@
 ﻿@page "/create-service"
 @inject NavigationManager Navigation
+@inject IServiceService service
+@inject IJSRuntime _JSRuntime
 
 
 <div class="d-flex justify-content-center">
@@ -27,11 +29,11 @@
             <hr />
             @if (isServiceCreation)
             {
-                <_AddService serviceDto="@serviceDto" OnFinishCreation="FinishCreation"></_AddService>
+                <_AddService serviceDto="@serviceDto" OnFinishCreation="ChangeStageOfCreation"></_AddService>
             }
             else if (isQuestionaryCreation)
             {
-                <_AddQuestionary></_AddQuestionary>
+                <_AddQuestionary questions="@questions" returnToServiceCreate="ChangeStageOfCreation" submitServiceCreation="SubmitServiceCreation"></_AddQuestionary>
             }
 
         </div>
@@ -43,13 +45,32 @@
 @code {
     public AddServiceDto serviceDto { get; set; } = new AddServiceDto();
     public bool isServiceCreation = true;
+    public List<AddQuestionDto> questions = new List<AddQuestionDto>();
     public bool isQuestionaryCreation = false;
 
-    public void FinishCreation()
+    public void ChangeStageOfCreation()
     {
-        isServiceCreation = false;
-        isQuestionaryCreation = true;
+        isServiceCreation = !isServiceCreation;
+        isQuestionaryCreation = !isQuestionaryCreation;
         StateHasChanged();
+    }
+
+    public async Task SubmitServiceCreation()
+    {
+        var res = await service.AddService(serviceDto, questions);
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Service was added successfully!", "Success");
+            Navigation.NavigateTo("/account");
+        }else if(res.Equals("Unauthorized"))
+        {
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+
+        }
     }
 
     private void Back()

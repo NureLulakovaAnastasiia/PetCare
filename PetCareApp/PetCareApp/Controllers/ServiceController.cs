@@ -20,7 +20,7 @@ namespace PetCareApp.Controllers
 
         [HttpPost("addService")]
         [Authorize(Roles = "Master")]
-        public async Task<IActionResult> AddService(AddServiceDto service)
+        public async Task<IActionResult> AddService([FromBody]AddServiceDto service)
         {
             if (!ModelState.IsValid)
             {

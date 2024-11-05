@@ -89,7 +89,7 @@ namespace PetCareApp.Controllers
 
         [HttpPost("addQuestionary")]
         [Authorize(Roles = "Master")]
-        public async Task<IActionResult> AddQuestionary(List<AddQuestionDto> questionaryDto, [FromQuery] int serviceId)
+        public async Task<IActionResult> AddQuestionary([FromBody]List<AddQuestionDto> questionaryDto, [FromQuery] int serviceId)
         {
             if (!ModelState.IsValid)
             {
