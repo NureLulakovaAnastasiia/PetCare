@@ -8,5 +8,7 @@ namespace PetCareApp.Interfaces
         public string UpdateService(UpdateServiceDto service);
         public Task<List<GetServiceDto>> GetServices(string? masterId);
         public GetServiceDto GetServiceDetails(int serviceId);
+        public Task<string> DeleteService(int serviceId);
+        public Task<string> ChangeServiceVisibility(int serviceId);
     }
 }

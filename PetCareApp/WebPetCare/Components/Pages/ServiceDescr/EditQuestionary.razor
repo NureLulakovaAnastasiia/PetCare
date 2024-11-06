@@ -1,0 +1,242 @@
+﻿@page "/questionary/edit/serviceId={serviceId:int}"
+@inject IServiceService _service
+@inject IJSRuntime _JSRuntime
+@inject NavigationManager Navigation
+
+<div class="d-flex justify-content-center">
+<div class="col-lg-10 align-items-center">
+    <div class="form-custom-border bg-body-secondary p-3 ">
+        <div class="row text-center">
+            <button type="button" class="btn col-2 m-1 p-0 btn-func-danger" style="height: 3em" @onclick="Back">
+                <i class="bi bi-arrow-left"></i>   Back
+            </button>
+            <div class="col-6 offset-2">
+                <h3><b>Questionary Modification</b></h3>
+                <p>Update or remove questionary</p>
+            </div>
+        </div>
+        <hr />
+        <div class=" m-4 align-content-center text-center">
+            <div class="col-12 mb-2 ms-3">
+                <div class="m-2 p-2">
+                    <div class="form-check col-7">
+                        <InputCheckbox @bind-Value="isNotNeeded" class="form-check-input" />
+                        <label class="form-check-label"><h4>Remove questionary</h4></label>
+                    </div>
+                </div>
+            </div>
+
+            @if (questions != null && !isNotNeeded)
+            {
+                <div class="row justify-content-end">
+                    <button class="btn btn-func" type="button" @onclick="AddQuestion">Add Question</button>
+                </div>
+                <hr />
+                <form method="post" @onsubmit="SubmitAdding">
+                    <ol>
+                        @foreach (var question in questions)
+                        {
+                            <li>
+                                <div class="mb-3" @key="question">
+                                    <label class="form-check-label">Question Text</label>
+                                    <InputText @bind-Value="question.Name" class="form-control" />
+                                        @{
+                                            var questionInd = questions.IndexOf(question);
+                                        }
+                                    <div>
+                                        <button type="button" class="btn btn-danger" @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash3"></i></button>
+                                        <button class="btn btn-func m-3" type="button" @onclick="() => AddAnswer(questionInd)">Add Answer</button>
+                                        <InputCheckbox @bind-Value="question.HasAnswerWithFixedTime" @onclick="() => ChooseFixedQuestion(questionInd)"></InputCheckbox>
+                                        <label class="form-check-label">Is Time Fixed</label>
+                                    </div>
+                                    <ul>
+                                        @foreach (var answer in question.Answers)
+                                        {
+
+                                            var answerInd = questions[questionInd].Answers.IndexOf(answer);
+                                            <li>
+                                                <div class="row mt-2" @key="answer">
+                                                    <div class="col-5">
+                                                        <label class="form-check-label">Answer</label>
+                                                        <InputText @bind-Value="answer.Text" class="form-control" />
+                                                    </div>
+                                                    <div class="row col-6 ms-4">
+                                                        @if ((fixedQuestionNum == questionInd || fixedQuestionNum == -1))
+                                                        {
+                                                            <div class="form-check col-5">
+                                                                <fieldset disabled="@(!answer.IsTimeFixed)">
+                                                                    @* Maximum is default if nothing else  *@
+                                                                    <div class="form-check mt-3">
+                                                                        <InputCheckbox @bind-Value="answer.IsTimeMinimum" class="form-check-input" />
+                                                                        <label class="form-check-label">Minimum Time</label>
+                                                                      
+                                                                    </div> @* make radiobutton *@
+
+                                                                </fieldset>
+                                                            </div>
+                                                        }
+                                                        <div class="col-4 text-center">
+                                                            <label class="form-check-label">Time @((fixedQuestionNum == questionInd || fixedQuestionNum == -1) ? "(fixed)" : "(+/- format)")</label>
+                                                            <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
+                                                        </div>
+                                                        <div class="col-1 mt-3 text-center">
+                                                            <button type="button" class="btn btn-danger" @onclick="() => deleteAnswer(questionInd, answerInd)"><i class="bi bi-trash3"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <hr />
+                                        }
+                                    </ul>
+                                </div>
+                            </li>
+                        }
+                        <button type="submit" class="btn col-2 btn-func-success mt-3" style="font-size: 1.5em">Save</button>
+
+                    </ol>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int serviceId { get; set; }
+
+    private bool isNotNeeded { get; set; } = false;
+
+    public List<UpdateQuestionDto> questions { get; set; }
+
+    private int fixedQuestionNum = -1;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (questions == null)
+            {
+                var res = await _service.GetQuestionary(serviceId);
+                if (res.IsSuccess)
+                {
+                    questions = res.Data;
+                    for(int i = 0; i < questions.Count; i++)
+                    {
+                        if (questions[i].HasAnswerWithFixedTime)
+                        {
+                            fixedQuestionNum = i;
+                            break;
+                        }
+                    }
+                    StateHasChanged();
+                }
+                else
+                {
+                    await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res.ErrorMessage, "Error");
+
+                }
+            }
+        }
+    }
+
+    private void ToggleVisibility()
+    {
+        isNotNeeded = !isNotNeeded;
+        questions.Clear();
+    }
+
+    private void deleteAnswer(int questionInd, int answerInd)
+    {
+        if (questionInd >= 0 && questionInd < questions.Count)
+        {
+            if (answerInd >= 0 && answerInd < questions[questionInd].Answers.Count)
+            {
+                questions[questionInd].Answers.RemoveAt(answerInd);
+            }
+        }
+    }
+
+    private void deleteQuestion(int questionInd)
+    {
+        if (questionInd < questions.Count && questionInd >= 0)
+        {
+            questions.RemoveAt(questionInd);
+        }
+    }
+
+    private async Task SubmitAdding()
+    {
+        var res = await _service.UpdateQuestionary(questions);
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Data updated and saved successfully!", "Success");
+            Navigation.NavigateTo($"/service-id={serviceId}");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+
+        }
+    }
+
+    private void AddQuestion()
+    {
+        questions.Add(new UpdateQuestionDto { Answers = new List<UpdateAnswerDto>() });
+    }
+
+    private void AddAnswer(int questionInd)
+    {
+        if (questionInd >= 0 && questionInd < questions.Count)
+        {
+            var answer = new UpdateAnswerDto();
+            if(fixedQuestionNum == questionInd)
+            {
+                answer.IsTimeFixed = true;
+            }
+            questions[questionInd].Answers.Add(answer);
+        }
+    }
+
+    private void ChooseFixedQuestion(int questionInd)
+    {
+        var oldQuestion = questions.Where(q => q.HasAnswerWithFixedTime).FirstOrDefault();
+        if (oldQuestion != null)
+        {
+            var oldFixedInd = questions.IndexOf(oldQuestion);
+            questions[oldFixedInd].HasAnswerWithFixedTime = false;
+            foreach(var answer in questions[oldFixedInd].Answers)
+            {
+                answer.IsTimeFixed = false;
+            }
+        }
+
+        if (fixedQuestionNum == questionInd)
+        {
+            fixedQuestionNum = -1;
+            foreach (var answer in questions[questionInd].Answers)
+            {
+                answer.IsTimeFixed = false;
+            }
+        }
+        else
+        {
+            fixedQuestionNum = questionInd;
+            questions[questionInd].HasAnswerWithFixedTime = true;
+            foreach (var answer in questions[questionInd].Answers)
+            {
+                answer.IsTimeFixed = true;
+            }
+
+        }
+        StateHasChanged();
+    }
+
+
+    private void Back()
+    {
+        Navigation.NavigateTo("javascript:history.back()");
+    }
+}

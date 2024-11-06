@@ -12,7 +12,7 @@ namespace PetCareApp.Interfaces
 
         public Task<string> AddQuestionary(List<AddQuestionDto> questionary, int serviceId);
         public Task<string> UpdateQuestionary(List<UpdateQuestionDto> questionary);
-
+        public Task<List<UpdateQuestionDto>> GetQuestionary(int serviceId);
         public string CheckQuestionary<TQuestion, TAnswer>(List<TQuestion> questionary) 
             where TQuestion : IQuestionDto<TAnswer>
             where TAnswer : IAnswerDto;

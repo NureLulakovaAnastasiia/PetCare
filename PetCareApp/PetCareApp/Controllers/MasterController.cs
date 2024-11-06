@@ -123,6 +123,23 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
+        [HttpGet("getQuestionary")]
+        public async Task<IActionResult> GetQuestionary([FromQuery]int serviceId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _masterService.GetQuestionary(serviceId);
+            if (res == null || res.Count == 0)
+            {
+                return StatusCode(500, "Error during getting questionary");
+            }
+
+            return Ok(res);
+        }
+
         [HttpPost("upsertSchedule")]
         [Authorize(Roles = "Master,Admin")]
         public async Task<IActionResult> UpsertSchedule(List<ScheduleDto> scheduleDto)

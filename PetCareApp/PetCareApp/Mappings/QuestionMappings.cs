@@ -47,6 +47,7 @@ namespace PetCareApp.Mappings
                     HasAnswerWithFixedTime = questionDto.HasAnswerWithFixedTime,
                     ServiceId = questionDto.ServiceId
                 };
+                question.Answers = new List<Answer>(); 
                 foreach (UpdateAnswerDto answerDto in questionDto.Answers)
                 {
                     question.Answers.Add(new Answer
@@ -57,10 +58,44 @@ namespace PetCareApp.Mappings
                         Time = answerDto.Time,
                         IsTimeFixed = answerDto.IsTimeFixed,
                         IsTimeMaximum = answerDto.IsTimeMaximum,
-                        IsTimeMinimum = answerDto.IsTimeMinimum
+                        IsTimeMinimum = answerDto.IsTimeMinimum,
+                        QuestionId = question.Id
                     });
                 }
                 res.Add(question);
+            }
+
+            return res;
+        }
+
+        public static List<UpdateQuestionDto> MapQuestionListToUpdate(List<Question> questionary)
+        {
+            var res = new List<UpdateQuestionDto>();
+            foreach (var question in questionary)
+            {
+                var questionDto = new UpdateQuestionDto
+                {
+                    Id = question.Id,
+                    Name = question.Name,
+                    HasAnswerWithFixedTime = question.HasAnswerWithFixedTime,
+                    ServiceId = question.ServiceId != null ? (int)question.ServiceId : 0
+                };
+                questionDto.Answers = new List<UpdateAnswerDto>();
+
+                foreach (Answer answer in question.Answers)
+                {
+                    questionDto.Answers.Add(new UpdateAnswerDto
+                    {
+                        Id = answer.Id,
+                        Text = answer.Text,
+                        Photo = answer.Photo,
+                        Time = answer.Time,
+                        IsTimeFixed = answer.IsTimeFixed,
+                        IsTimeMaximum = answer.IsTimeMaximum,
+                        IsTimeMinimum = answer.IsTimeMinimum
+                    });
+                }
+                res.Add(questionDto);
             }
 
             return res;

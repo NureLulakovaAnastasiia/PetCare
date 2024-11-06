@@ -28,7 +28,7 @@
                                 question.HasAnswerWithFixedTime = questionInd == fixedQuestionNum;
                             }
                             <div>
-                                <button type="button" class="btn btn-danger" @onclick="() => deleteQuestion(questionInd)">Delete</button>
+                                <button type="button" class="btn btn-danger" @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash3"></i></button>
                                 <button class="btn btn-func m-3" type="button" @onclick="() => AddAnswer(questionInd)">Add Answer</button>
                                 <InputCheckbox @bind-Value="question.HasAnswerWithFixedTime" @onclick="() => ChooseFixedQuestion(questionInd)"></InputCheckbox>
                                 <label class="form-check-label">Is Time Fixed</label>
@@ -68,7 +68,7 @@
                                                     <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
                                                 </div>
                                                 <div class="col-1 mt-3 text-center">
-                                                    <button type="button" class="btn btn-danger" @onclick="() => deleteAnswer(questionInd, answerInd)">Delete</button>
+                                                    <button type="button" class="btn btn-danger" @onclick="() => deleteAnswer(questionInd, answerInd)"><i class="bi bi-trash3"></i></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -79,9 +79,8 @@
                         </div>
                     </li>
                 }
-
+                <button type="button" class="btn col-2 btn-func-warning mt-3 ms-3" style="font-size: 1em; padding: 0.7em" @onclick="ReturnToServiceCreation">To previous step</button>
                 <button type="submit" class="btn col-2 btn-func-success mt-3"  style="font-size: 1.5em">Save</button>
-                <button type="button" class="btn col-2 btn-func-warning mt-3" style="font-size: 1em; padding: 0.7em" @onclick="ReturnToServiceCreation" >To previous step</button>
 
             </ol>
         </form>

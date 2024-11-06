@@ -117,5 +117,55 @@ namespace PetCareApp.Services
                 return res;
             }
         }
+
+        public async Task<string> DeleteService(int serviceId)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User not found";
+                }
+
+                var service = _dbContext.Services.FirstOrDefault(x => x.Id == serviceId);
+                if (service != null && service.AppUserId == user.Id)
+                {
+                    _dbContext.Remove(service);
+                    return _dbContext.SaveChanges().ToString();
+                }
+                return "Error during adding";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public async Task<string> ChangeServiceVisibility(int serviceId)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User not found";
+                }
+
+                var service = _dbContext.Services.FirstOrDefault(x => x.Id == serviceId);
+                if (service != null && service.AppUserId == user.Id)
+                {
+                    service.IsHidden = !service.IsHidden;
+                    _dbContext.Update(service);
+                    return _dbContext.SaveChanges().ToString();
+                }
+                return "Error during adding";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
     }
 }

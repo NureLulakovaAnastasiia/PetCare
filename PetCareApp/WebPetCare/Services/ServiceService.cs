@@ -174,5 +174,131 @@ namespace WebPetCare.Services
             }
             return res;
         }
+
+        public async Task<string> DeleteService(int serviceId)
+        {
+            var res = "";
+            
+            httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Service/deleteService?serviceId={serviceId}";
+
+                HttpResponseMessage response = await httpClient.DeleteAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    return "Unauthorized";
+                }
+
+                res = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> ChangeServiceVisibility(int serviceId)
+        {
+            var res = "";
+
+            httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Service/changeServiceVisibility?serviceId={serviceId}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    return "Unauthorized";
+                }
+
+                res = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> UpdateQuestionary(List<UpdateQuestionDto> questionaryDto)
+        {
+            var res = "error";
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(questionaryDto, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Master/updateQuestionary";
+
+                HttpResponseMessage response = await _httpClient.PutAsync(fullUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return "";
+
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<Result<List<UpdateQuestionDto>>> GetQuestionary(int serviceId)
+        {
+            var res = new Result<List<UpdateQuestionDto>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Master/getQuestionary?serviceId={serviceId}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<UpdateQuestionDto>>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
     }
 }

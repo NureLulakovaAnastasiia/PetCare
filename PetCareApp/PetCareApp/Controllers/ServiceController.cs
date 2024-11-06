@@ -85,5 +85,41 @@ namespace PetCareApp.Controllers
             }
             return Ok(service);
         }
+
+        [HttpDelete("deleteService")]
+        [Authorize(Roles = "Master")]
+        public async Task<IActionResult> DeleteService([FromQuery] int serviceId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _serviceService.DeleteService(serviceId);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+
+            return StatusCode(500, res);
+        }
+
+        [HttpGet("changeServiceVisibility")]
+        [Authorize(Roles = "Master")]
+        public async Task<IActionResult> ChangeServiceVisibility([FromQuery] int serviceId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _serviceService.ChangeServiceVisibility(serviceId);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+
+            return StatusCode(500, res);
+        }
     }
 }

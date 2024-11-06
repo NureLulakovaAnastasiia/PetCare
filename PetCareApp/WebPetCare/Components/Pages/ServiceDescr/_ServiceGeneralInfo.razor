@@ -1,19 +1,20 @@
 ﻿@inject IServiceService _service
 @inject IJSRuntime _JSRuntime
-
+@inject NavigationManager Navigation
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border bg-body-secondary p-3 ">
             @if (serviceDto != null)
             {
-            @if (!IsEdit)
-            {
-                <div class="row text-center">
-                    <h3 class="col-8 offset-2"><b>Service Details</b></h3>
-                    <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
-                </div>
-            }
+                @if (!IsEdit)
+                {
+                    <div class="row text-center">
+                        <h3 class="col-6 offset-3" ><b>Service Details</b></h3>
+                        <button class="btn col-2 me-3 btn-func-danger" @onclick="DeleteService"><i class="bi bi-trash"></i>    Delete</button>
+                        <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    </div>
+                }
 
                 <form method="post" @onsubmit="UpdateService">
                 @if (IsEdit)
@@ -29,7 +30,7 @@
 
                 <div class="text-start m-4 align-content-center">
                         <div class="row col-12 mb-2 ms-3">
-                            <div class="col-10">
+                            <div class="col-9">
                                     <div class="m-2 p-2">
                                         <h4>Name</h4>
                                         <InputText @bind-Value="serviceDto.Name"
@@ -42,10 +43,11 @@
                                                        placeholder="@(serviceDto.Description != null ? serviceDto.Description : " ")"
                                                        disabled=" @(!IsEdit)" class="input-textarea-style col-12"></InputTextArea>
                                     </div>
-                              </div>
-                            <div class="col-2">
-                                <buttton class="btn">Questionary</buttton>
-                                </div>
+                            </div>
+                            <div class="col-3 text-center p-3 mb-2">
+                                <buttton class="btn btn-func" @onclick="ChangeServiceVisibility"><i class="bi bi-eye@(serviceDto.IsHidden ? "" : "-slash")"></i>@(serviceDto.IsHidden ? " Show" : " Hide")</buttton>
+                                <buttton class="btn" @onclick="ToQuestionaryUpdate">Questionary</buttton>
+                            </div>
                         </div>
 
                         <div class="row col-12 justify-content-around">
@@ -114,8 +116,43 @@
 
         }
     }
+
     private void FillInitialData()
     {
         initialServiceDto = new GetServiceDto(serviceDto);
+    }
+
+    private async void DeleteService()
+    {
+        var res = await _service.DeleteService(serviceDto.Id);
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Service was deleted successfully!", "Success");
+            Navigation.NavigateTo("/account");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+
+    private async void ChangeServiceVisibility()
+    {
+        var res = await _service.ChangeServiceVisibility(serviceDto.Id);
+        if (String.IsNullOrEmpty(res))
+        {
+            serviceDto.IsHidden = !serviceDto.IsHidden;
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", serviceDto.IsHidden ? "Service become hidden!" : "Service is now shown!", "Success");
+            StateHasChanged();
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+
+    private void ToQuestionaryUpdate()
+    {
+        Navigation.NavigateTo($"/questionary/edit/serviceId={serviceDto.Id}");
     }
 }

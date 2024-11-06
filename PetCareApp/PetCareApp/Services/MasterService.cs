@@ -142,7 +142,30 @@ namespace PetCareApp.Services
                 var questionaryToAdd = QuestionMappings.MapUpdateQuestionList(questionary);
                 if (questionaryToAdd != null)
                 {
-                    _dbContext.UpdateRange(questionaryToAdd);
+                    foreach(var question in questionaryToAdd)
+                    {
+                        if(question.Id == 0)
+                        {
+                            question.ServiceId = service.Id;
+                             _dbContext.Add(question);
+                            var res = _dbContext.SaveChanges();
+                            
+                        }
+                        else
+                        {
+                            var answersFromDb = _dbContext.Answers.AsNoTracking().Where(a => a.QuestionId == question.Id).ToList();
+                            var answersToDelete = answersFromDb
+                                .Where(a => !question.Answers.Any(q => q.Id == a.Id))
+                                .ToList(); 
+                            foreach(Answer answer in answersToDelete)
+                            {
+                                _dbContext.Remove(answer);
+                            }
+                            _dbContext.Update(question);
+
+                        }
+                    }
+                    
                     return _dbContext.SaveChanges().ToString();
                 }
                 return "Error during adding data";
@@ -154,6 +177,7 @@ namespace PetCareApp.Services
 
         }
 
+        
         public async Task<string> UpdateContacts(ContactsDto contacts)
         {
             try
@@ -680,6 +704,30 @@ namespace PetCareApp.Services
             {
                 return ex.Message;
             }
+        }
+
+        public async Task<List<UpdateQuestionDto>> GetQuestionary(int serviceId)
+        {
+            var res = new List<UpdateQuestionDto>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return res;
+                }
+                var questionary = _dbContext.Questions.Where(s => s.ServiceId == serviceId)
+                    .Include(s => s.Answers)
+                    .ToList();
+
+                res = QuestionMappings.MapQuestionListToUpdate(questionary);
+            }
+            catch (Exception ex)
+            {
+                return res;
+            }
+
+            return res;
         }
     }
 }
