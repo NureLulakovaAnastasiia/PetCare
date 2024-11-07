@@ -146,7 +146,6 @@ namespace WebPetCare.Services
             string json = JsonSerializer.Serialize(questions, options);
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
-            string error = string.Empty;
             try
             {
                 string fullUrl = $"{_apiUrl}/api/Master/addQuestionary?serviceId={serviceId}";
@@ -164,9 +163,13 @@ namespace WebPetCare.Services
                         }
                     }
                 }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                    res += await DeleteService(serviceId);
+                }
 
-                res = await response.Content.ReadAsStringAsync();
-                res = error;
+                
             }
             catch (Exception ex)
             {
@@ -300,5 +303,35 @@ namespace WebPetCare.Services
 
             return res;
         }
+
+        public async Task<string> DeleteQuestionary(int serviceId)
+        {
+            var res = "";
+
+            httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Service/deleteQuestionary?serviceId={serviceId}";
+
+                HttpResponseMessage response = await httpClient.DeleteAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    return "Unauthorized";
+                }
+
+                res = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
     }
 }

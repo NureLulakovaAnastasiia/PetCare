@@ -25,7 +25,16 @@
                     </div>
                 </div>
             </div>
-
+                @if (showConfirmation)
+                {
+                    <div class="modal-overlay">
+                        <div class="modal-content">
+                            <h4>Are you sure you want to submit?</h4>
+                            <button class="btn btn-success" @onclick="ConfirmSubmission">Yes</button>
+                            <button class="btn btn-secondary" @onclick="Cancel">No</button>
+                        </div>
+                    </div>
+                }
             @if (questions != null && !isNotNeeded)
             {
                 <div class="row justify-content-end">
@@ -107,7 +116,8 @@
     [Parameter]
     public int serviceId { get; set; }
 
-    private bool isNotNeeded { get; set; } = false;
+    private bool isNotNeeded = false;
+    private bool showConfirmation = false;
 
     public List<UpdateQuestionDto> questions { get; set; }
 
@@ -167,18 +177,35 @@
         }
     }
 
+    private void ShowConfirmation()
+    {
+        showConfirmation = true;
+    }
+
+    private async void ConfirmSubmission()
+    {
+        var res = await _service.DeleteQuestionary(serviceId);
+        showToastr(res, "Questionary was deleted successfully!");
+        showConfirmation = false;
+        Back();
+    }
+
+    private void Cancel()
+    {
+        showConfirmation = false;
+    }
+
     private async Task SubmitAdding()
     {
-        var res = await _service.UpdateQuestionary(questions);
-        if (String.IsNullOrEmpty(res))
+        var res = "";
+        if (isNotNeeded)
         {
-            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Data updated and saved successfully!", "Success");
-            Navigation.NavigateTo($"/service-id={serviceId}");
+            ShowConfirmation();
         }
         else
         {
-            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
-
+            res = await _service.UpdateQuestionary(questions);
+            showToastr(res, "Data updated and saved successfully!");
         }
     }
 
@@ -234,9 +261,21 @@
         StateHasChanged();
     }
 
-
     private void Back()
     {
         Navigation.NavigateTo("javascript:history.back()");
+    }
+
+    private async void showToastr(string res, string successMessage)
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+            Navigation.NavigateTo($"/service-id={serviceId}");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
     }
 }

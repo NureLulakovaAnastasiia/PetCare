@@ -64,7 +64,7 @@
                                                     </div>
                                                 }
                                                 <div class="col-4 text-center">
-                                                    <label class="form-check-label">Time @((fixedQuestionNum == questionInd || fixedQuestionNum == -1) ? "(fixed)" : "(+/- format)")</label>
+                                                    <label class="form-check-label">Time @((fixedQuestionNum == questionInd) ? "(fixed)" : "(+/- format)")</label>
                                                     <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
                                                 </div>
                                                 <div class="col-1 mt-3 text-center">
@@ -133,6 +133,19 @@
         if(fixedQuestionNum != -1 && fixedQuestionNum < questions.Count)
         {
             questions[fixedQuestionNum].HasAnswerWithFixedTime = true;
+        }
+        bool time;
+        for (int i = 0; i < questions.Count; i++)
+        {
+            time = false;
+            if (i == fixedQuestionNum)
+            {
+                time = true;    
+            }
+            foreach (var answer in questions[i].Answers)
+            {
+                answer.IsTimeFixed = time;
+            }
         }
         if (submitServiceCreation.HasDelegate)
         {

@@ -123,6 +123,24 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
+        [HttpDelete("deleteQuestionary")]
+        [Authorize(Roles = "Master")]
+        public async Task<IActionResult> DeleteQuestionary([FromQuery]int serviceId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _masterService.DeleteQuestionary(serviceId);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+
+            return StatusCode(500, res);
+        }
+
         [HttpGet("getQuestionary")]
         public async Task<IActionResult> GetQuestionary([FromQuery]int serviceId)
         {

@@ -97,7 +97,7 @@ namespace PetCareApp.Services
             if (fixedTimeQuestions.Count > 0 && questionary.GetType() == typeof(List<AddQuestionDto>))
             {
                 var fixedAnswers = fixedTimeQuestions[0].Answers
-                    .All(x => x.IsTimeFixed && (x.IsTimeMaximum || x.IsTimeMinimum || x.Time > 0));
+                    .All(x => x.IsTimeFixed && (x.IsTimeMaximum || x.IsTimeMinimum || x.Time >= 0));
                 if (!fixedAnswers)
                 {
                     return "Every answer in question with fixed time must have fixed time";
@@ -716,6 +716,11 @@ namespace PetCareApp.Services
                 {
                     return res;
                 }
+                var service = _dbContext.Services.FirstOrDefault(s => s.Id == serviceId);
+                if(service == null || service.AppUserId != user.Id)
+                {
+                    return res;
+                }
                 var questionary = _dbContext.Questions.Where(s => s.ServiceId == serviceId)
                     .Include(s => s.Answers)
                     .ToList();
@@ -728,6 +733,35 @@ namespace PetCareApp.Services
             }
 
             return res;
+        }
+
+        public async Task<string> DeleteQuestionary(int serviceId)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User is not found";
+                }
+                var service = _dbContext.Services.FirstOrDefault(s => s.Id == serviceId);
+                if (service == null || service.AppUserId != user.Id)
+                {
+                    return "You don't have rights to delete this questionary";
+                }
+                var questions = _dbContext.Questions.Where(q => q.ServiceId == serviceId).ToList();
+                if (questions.Count > 0)
+                {
+                    _dbContext.RemoveRange(questions);
+                    return _dbContext.SaveChanges().ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+            return "Error during deleting questionary";
         }
     }
 }
