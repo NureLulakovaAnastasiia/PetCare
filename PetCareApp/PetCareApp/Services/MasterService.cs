@@ -763,5 +763,81 @@ namespace PetCareApp.Services
 
             return "Error during deleting questionary";
         }
-    }
+
+        public async Task<Result<List<GetRecordDto>>> GetRecordsForMonth(int month, int year)
+        {
+            var res = new Result<List<GetRecordDto>>();    
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    res.ErrorMessage = "User not found";
+                    return res;
+                }
+                var services = _dbContext.Services.Where(s => s.AppUserId == user.Id).ToList();
+                var servicesIds = services.Select(s => s.Id).ToList();
+                if (services == null || !services.Any())
+                {
+                    res.ErrorMessage = "Master has no services";
+                    return res;
+                }
+
+                var records = _dbContext.Records
+                    .Where(r => servicesIds.Contains((int)r.ServiceId) && 
+                    (r.StartTime.Month == month && r.StartTime.Year == year))
+                    .ToList();
+                if (records.Count > 0)
+                {
+                    res.Data = _mapper.Map<List<GetRecordDto>>(records);
+                    foreach (var record in res.Data)
+                    {
+                        record.ServiceName = services.Where(s => s.Id == record.ServiceId).Select(s => s.Name).First();
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "No records were found";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+                return res;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<List<BreakDto>>> GetMasterBreaks()
+        {
+            var res = new Result<List<BreakDto>>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    res.ErrorMessage = "User not found";
+                    return res;
+                }
+                var breaks = _dbContext.Breaks.Where(x => x.AppUserId == user.Id).ToList();
+                if (breaks == null || breaks.Count == 0)
+                {
+                    res.ErrorMessage = "No breaks found";
+                }
+                else
+                {
+                    res.Data = _mapper.Map<List<BreakDto>>(breaks);
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+                return res;
+            }
+
+            return res;
+        }
+    }   
+
 }

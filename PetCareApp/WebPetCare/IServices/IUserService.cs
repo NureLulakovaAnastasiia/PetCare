@@ -8,5 +8,7 @@ namespace WebPetCare.IServices
         public Task<Result<GetGeneralMasterDto>> getGeneralMasterData();
 
         public Task<string> UpdateGeneralMasterData(GetGeneralMasterDto dto);
+
+        public Task<Result<List<BreakDto>>> getMasterBreaks();
     }
 }

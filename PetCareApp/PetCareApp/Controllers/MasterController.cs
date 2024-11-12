@@ -263,6 +263,36 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
+        [HttpGet("getMasterRecordsForMonth")]
+        public async Task<IActionResult> GetMasterRecordsForMonth(int month, int year)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            var data = await _masterService.GetRecordsForMonth(month, year);
+            if (data.IsSuccess)
+            {
+                return Ok(data.Data);
+            }
+            return StatusCode(500, data.ErrorMessage);
+        }
+
+        [HttpGet("getMasterBreaks")]
+        public async Task<IActionResult> GetMasterBreaks()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await _masterService.GetMasterBreaks();
+            if (data.IsSuccess)
+            {
+                return Ok(data.Data);
+            }
+            return StatusCode(500, data.ErrorMessage);
+        }
     }
 }

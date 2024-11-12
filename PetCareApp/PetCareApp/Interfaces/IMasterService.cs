@@ -32,5 +32,8 @@ namespace PetCareApp.Interfaces
 
         public Task<GetGeneralMasterDto> GetGeneralMasterData();
         public Task<string> UpdateGeneralMasterData(GetGeneralMasterDto masterData);
+
+        public Task<Result<List<GetRecordDto>>> GetRecordsForMonth(int month, int year);
+        public Task<Result<List<BreakDto>>> GetMasterBreaks();
     }
 }

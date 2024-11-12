@@ -7,17 +7,29 @@
 <div class="container align-items-center">
     <div class="col-1"></div>
     <div class="row col-10 offset-2 mb-3">
-        <button class="btn col-lg-2 me-3  btn-nav-active">General</button>
-        <button class="btn col-lg-2 me-3 btn-nav">Calendar</button>
-        <button class="btn col-lg-2 me-3 btn-nav">My services</button>
-        <button class="btn col-lg-2 me-3 btn-nav">Reviews</button>
+        <button class="btn col-lg-2 me-3  btn-nav@(options == menuOptions.General ? "-active" : "")" @onclick="() => ChangePage(menuOptions.General)">General</button>
+        <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Calendar ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Calendar)">Calendar</button>
+        <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Services ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Services)">My services</button>
+        <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Reviews ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Reviews)">Reviews</button>
     </div>
 
-   
-        <_GeneralAccount masterData="masterData"></_GeneralAccount>
-    
-    <_MyServicesGeneral services="@masterData.Services"></_MyServicesGeneral>
+    @switch (options)
+    {
+        case menuOptions.Calendar:
+            <Calendar></Calendar>
+            break;
 
+        case menuOptions.Services:
+            break;
+
+        case menuOptions.Reviews:
+            break;
+
+        case menuOptions.General:
+            <_GeneralAccount masterData="masterData"></_GeneralAccount>
+            <_MyServicesGeneral services="@masterData.Services"></_MyServicesGeneral>
+            break;
+    }
 </div>
 
 
@@ -25,7 +37,12 @@
     public GetGeneralMasterDto masterData { get; set; } = new GetGeneralMasterDto();
 
     public string Error { get; set; } = "";
+    private menuOptions options = menuOptions.General;
 
+    public enum menuOptions
+    {
+        General, Calendar, Services, Reviews
+    }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -45,4 +62,9 @@
         }
     }
 
+    public void ChangePage(menuOptions option)
+    {
+        options = option;
+        StateHasChanged();
+    }
 }

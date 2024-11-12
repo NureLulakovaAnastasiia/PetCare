@@ -5,9 +5,13 @@
     <div>
         <NavMenu @ref="navMenu" isLogged="@isAuthenticated" />
     </div>
+    <MudPopoverProvider />
+    <MudThemeProvider />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
         <CascadingValue Value="(Func<bool, Task>)UpdateAuthenticationStatus">
             <main>
-                <article >
+                <article>
                     @Body
                 </article>
             </main>

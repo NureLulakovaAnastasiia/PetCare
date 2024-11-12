@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="jQuery" Version="3.7.1" />
+    <PackageReference Include="MudBlazor" Version="7.15.0" />
+    <PackageReference Include="Syncfusion.Blazor.Schedule" Version="27.1.58" />
     <PackageReference Include="toastr" Version="2.1.1" />
   </ItemGroup>
 

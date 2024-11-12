@@ -1,0 +1,198 @@
+﻿@inject IDialogService DialogService
+@inject IServiceService service
+@inject IJSRuntime _JSRuntime
+@inject IUserService _userService
+@rendermode InteractiveAuto
+
+
+<SfSchedule TValue="AppointmentData" StartHour="6:00" Readonly="true" EnableAllDayScroll="true" Height="700" SelectedDateChanged="DateRangeChanged">
+    <ScheduleEventSettings TValue="AppointmentData" DataSource="@events">
+@*         <ScheduleField Id="Id">
+            <FieldSubject Name="ServiceName"></FieldSubject>
+            <FieldDescription Name="Description"></FieldDescription>
+            <FieldStartTime Name="StartTime"></FieldStartTime>
+            <FieldEndTime Name="EndTime"></FieldEndTime>
+        </ScheduleField>
+ *@    </ScheduleEventSettings>
+    <ScheduleViews>
+        <ScheduleView Option="View.Day"></ScheduleView>
+        <ScheduleView Option="View.Week"></ScheduleView>
+        <ScheduleView Option="View.Month"></ScheduleView>
+    </ScheduleViews>
+
+</SfSchedule>
+
+
+@code {
+    private DayOfWeek _firstDayOfWeek = DayOfWeek.Tuesday;
+    private bool _fixed;
+    private List<GetRecordDto> records = new List<GetRecordDto>();
+    private List<BreakDto> breaks = new List<BreakDto>();
+    private List<DateTime> availableDates = new List<DateTime>();
+    private List<AppointmentData> events = new List<AppointmentData>();
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var res = await _userService.getMasterBreaks();
+            if (res.IsSuccess)
+            {
+                breaks = res.Data;
+                UpdateBreaks();
+            }
+        }
+        StateHasChanged();
+    }
+
+    private async void DateRangeChanged(DateTime date)
+    {
+        foreach (var avDate in availableDates)
+        {
+            if (avDate.Month == avDate.Month && avDate.Year == avDate.Year)
+            {
+                return;
+            }
+        }
+        var recordsResult = await service.getMasterRecordForMonth(date);
+        if (recordsResult.IsSuccess)
+        {
+
+            records.AddRange(recordsResult.Data);
+            availableDates.Add(date);
+            UpdateEvents(recordsResult.Data);
+            showToastr("", "Records were succesfully gotten");
+
+        }
+        else
+        {
+            showToastr(recordsResult.ErrorMessage);
+        }
+        StateHasChanged();
+    }
+
+    private void UpdateEvents(List<GetRecordDto> getRecords)
+    {
+        foreach(var record in records)
+        {
+            var appointment = new AppointmentData
+                {
+                    Id = record.Id,
+                    Subject = record.ServiceName,
+                    StartTime = record.StartTime,
+                    EndTime = record.EndTime,
+                    Description = record.Description,
+                    Type = "Record"
+                };
+            switch (record.Status)
+            {
+                case "Created":
+                    record.CssClass = "e-green";
+                    break;
+                case "Finished":
+                    record.CssClass = "e-blue";
+                    break;
+                case "Cancelled":
+                    record.CssClass = "e-red";
+                    break;
+            }
+
+            events.Add(appointment);
+        }
+    }
+
+    private void UpdateBreaks()
+    {
+        foreach (var breakItem in breaks)
+        {
+            if (breakItem.DayOfWeek != null)
+            {
+                events.Add(GetWeeklyBreak(breakItem));
+            }
+        }
+    }
+
+    public AppointmentData GetWeeklyBreak(BreakDto breakDto)
+    {
+        string recurrenceRule = $"FREQ=WEEKLY;BYDAY={GetDayOfWeek(breakDto.DayOfWeek)}";
+
+        return new AppointmentData
+            {
+                Id = breakDto.Id * -1,
+                Subject = "Break",
+                StartTime = DateTime.Today.Add(breakDto.StartTime),
+                EndTime = DateTime.Today.Add(breakDto.EndTime),
+                Description = "Recurring weekly break",
+                CssClass = "e-break",
+                Type = "Break",
+                RecurrenceRule = recurrenceRule
+            };
+    }
+
+    private string GetDayOfWeek(int? dayOfWeek)
+    {
+        switch (dayOfWeek)
+        {
+            case 0: return "SU"; // Sunday
+            case 1: return "MO"; // Monday
+            case 2: return "TU"; // Tuesday
+            case 3: return "WE"; // Wednesday
+            case 4: return "TH"; // Thursday
+            case 5: return "FR"; // Friday
+            case 6: return "SA"; // Saturday
+            default: return "";
+        }
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+    if (String.IsNullOrEmpty(res))
+    {
+        await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+    }
+    else
+    {
+        await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+    }
+    }
+
+    public class AppointmentData
+    {
+    public int Id { get; set; }
+    public string Subject { get; set; }
+    public string Location { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public string Description { get; set; }
+    public bool IsAllDay { get; set; }
+    public string Type { get; set; }
+    public string CssClass { get; set; } = "";
+        public string RecurrenceRule { get; set; }
+        public string RecurrenceException { get; set; }
+        public Nullable<int> RecurrenceID { get; set; }
+    }
+
+}
+
+<style>
+    .e-break {
+        background: #f57e42 !important;
+        opacity: 0.75 !important;
+    }
+
+    .e-green {
+        background: #28a745 !important;  
+    }
+
+    .e-blue {
+        background: #007bff !important;  
+
+    }
+
+    .e-red {
+        background: #dc3545  !important;  
+    }
+    
+
+</style>

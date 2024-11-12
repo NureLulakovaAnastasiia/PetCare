@@ -3,8 +3,12 @@ using PetCareApp.Models;
 using WebPetCare.Components;
 using WebPetCare.IServices;
 using WebPetCare.Services;
+using MudBlazor.Services;
+using Syncfusion;
+using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH5fcXVUQ2RcWUB0WEI=");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -15,6 +19,8 @@ builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddHttpClient();
+builder.Services.AddMudServices();
+builder.Services.AddSyncfusionBlazor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
