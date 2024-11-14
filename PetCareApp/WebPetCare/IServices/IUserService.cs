@@ -10,5 +10,7 @@ namespace WebPetCare.IServices
         public Task<string> UpdateGeneralMasterData(GetGeneralMasterDto dto);
 
         public Task<Result<List<BreakDto>>> getMasterBreaks();
+
+        public Task<string> UpdateAppointments(List<GetRecordDto> records);
     }
 }

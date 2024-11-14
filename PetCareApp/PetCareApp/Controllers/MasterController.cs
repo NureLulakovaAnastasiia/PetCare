@@ -195,7 +195,7 @@ namespace PetCareApp.Controllers
         }
 
 
-        [HttpPost("MakeAnAppointment")]
+        [HttpPost("makeAnAppointment")]
         public async Task<IActionResult> MakeAnAppointment(RecordDto record)
         {
             if (!ModelState.IsValid)
@@ -206,6 +206,26 @@ namespace PetCareApp.Controllers
             if (int.TryParse(res, out int num))
             {
                 return Ok(num);
+            }
+
+            return StatusCode(500, res);
+        }
+
+        [HttpPut("updateAppointments")]
+        public async Task<IActionResult> UpdateAnAppointments(List<GetRecordDto> records)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var res = await _masterService.UpdateAppointments(records);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+            if(res == "Unauthorized")
+            {
+                return StatusCode(401, res);
             }
 
             return StatusCode(500, res);

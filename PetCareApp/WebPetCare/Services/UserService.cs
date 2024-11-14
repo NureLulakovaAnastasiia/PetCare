@@ -63,7 +63,6 @@ namespace WebPetCare.Services
             };
             string json = JsonSerializer.Serialize(dto, options);
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            string error = string.Empty;
             try
             {
                 string fullUrl = $"{_apiUrl}/api/Master/updateMasterGeneralData";
@@ -80,7 +79,6 @@ namespace WebPetCare.Services
                     res = await response.Content.ReadAsStringAsync();
                 }
 
-                res = error;
             }
             catch (Exception ex)
             {
@@ -122,6 +120,33 @@ namespace WebPetCare.Services
                 res.ErrorMessage = ex.Message;
             }
 
+            return res;
+        }
+
+        public async Task<string> UpdateAppointments(List<GetRecordDto> records)
+        {
+            var res = "";
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(records, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Master/updateAppointments";
+
+                HttpResponseMessage response = await _httpClient.PutAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                res = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
             return res;
         }
     }

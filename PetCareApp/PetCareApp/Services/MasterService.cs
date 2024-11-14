@@ -653,7 +653,59 @@ namespace PetCareApp.Services
             }
         }
 
+        public async Task<string> UpdateAppointments(List<GetRecordDto> recordsDto)
+        {
+            try
+            {
+                if (recordsDto.Count == 0)
+                {
+                    return "No data to update";
+                }
+                var res = "";
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    foreach (var rec in recordsDto)
+                    {
+                        var service = _dbContext.Services.Where(s => s.Id == recordsDto[0].Id).FirstOrDefault();
+                        if (service != null)
+                        {
+                            var sameTime = _dbContext.Records
+                                .Where(r => r.ServiceId == service.Id && r.Status == "Created" &&
+                                (r.StartTime < rec.StartTime && rec.StartTime < r.EndTime) ||
+                                (r.StartTime < rec.EndTime))
+                                .ToList();
+                            if (sameTime != null && sameTime.Count > 0)
+                            {
+                                res += $"Records is already set to this time ({rec.StartTime})";
+                            }
 
+                            var record = _dbContext.Records.FirstOrDefault(r => r.Id == rec.Id);
+                            if (record != null)
+                            {
+                                record.StartTime = rec.StartTime;
+                                record.EndTime = rec.EndTime;
+                                record.Status = rec.Status;
+                                record.Description = rec.Description;
+                                record.Comment = rec.Comment;
+                                _dbContext.Update(record);
+                                return _dbContext.SaveChanges().ToString();
+                            }
+                            res = $"There is no such record {rec.Id}";
+                        }
+                        else
+                        {
+                            return "There is no service like this";
+                        }
+                    }
+                }
+                return "Unauthorized";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
         public async Task<GetGeneralMasterDto> GetGeneralMasterData()
         {
             var res = new GetGeneralMasterDto();

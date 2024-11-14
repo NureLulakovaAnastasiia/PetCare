@@ -23,6 +23,8 @@ namespace PetCareApp.Interfaces
 
         public Task<string> MakeAppointment(RecordDto recordDto);
 
+        public Task<string> UpdateAppointments(List<GetRecordDto> recordDto);
+
         public int AnalizeQuestionary(List<QuestionDto> questionary, int serviceId);
         public string GetQuestionaryDescription(List<QuestionDto> questionary);
 

@@ -1,19 +1,90 @@
-﻿@inject IDialogService DialogService
+﻿@using System.Globalization
+@using Syncfusion.Blazor.Schedule
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using System.Collections.ObjectModel
+@inject IDialogService DialogService
 @inject IServiceService service
 @inject IJSRuntime _JSRuntime
 @inject IUserService _userService
 @rendermode InteractiveAuto
 
 
-<SfSchedule TValue="AppointmentData" StartHour="6:00" Readonly="true" EnableAllDayScroll="true" Height="700" SelectedDateChanged="DateRangeChanged">
-    <ScheduleEventSettings TValue="AppointmentData" DataSource="@events">
+<SfSchedule TValue="AppointmentData" StartHour="6:00" EnableAllDayScroll="true" Height="700" 
+SelectedDateChanged="DateRangeChanged">
+    <ScheduleTemplates>
+        <EditorTemplate>
+         
+            <table class="custom-event-editor" width="100%" cellpadding="5">
+                @{
+                    var data = context as AppointmentData;
+                }
+
+                <tbody>
+                    <tr>
+                        <td class="e-textlabel">Service Name</td>
+                        <td colspan="4">
+                            <SfTextBox @bind-Value="@(data.Subject)"></SfTextBox>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="e-textlabel">From</td>
+                        <td colspan="4">
+                            <SfDateTimePicker @bind-Value="@(data.StartTime)"></SfDateTimePicker>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="e-textlabel">To</td>
+                        <td colspan="4">
+                            <SfDateTimePicker @bind-Value="@(data.EndTime)"></SfDateTimePicker>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="e-textlabel">Description</td>
+                        <td colspan="4">
+                            <SfTextBox Multiline="true" @bind-Value="@(data.Description)"></SfTextBox>
+                        </td>
+                    </tr>
+                    @if (data.Type == "Break"){
+                        <tr>
+                            <td class="e-textlabel">Recurrence</td>
+                            <td colspan="4">
+                                <SfRecurrenceEditor @bind-Value="@(data.RecurrenceRule)"></SfRecurrenceEditor>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="e-textlabel">Status</td>
+                            <td colspan="4">
+                                <SfDropDownList TValue="int" TItem="Status" Placeholder="Change status" DataSource="@StatusData" @bind-Value="@data.Status.Id">
+                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </EditorTemplate>
+    </ScheduleTemplates>
+    
+    <ScheduleEventSettings TValue="AppointmentData" DataSource="@events" >
 @*         <ScheduleField Id="Id">
             <FieldSubject Name="ServiceName"></FieldSubject>
             <FieldDescription Name="Description"></FieldDescription>
             <FieldStartTime Name="StartTime"></FieldStartTime>
             <FieldEndTime Name="EndTime"></FieldEndTime>
         </ScheduleField>
- *@    </ScheduleEventSettings>
+
+
+ *@    
+
+    </ScheduleEventSettings>
+
+    <ScheduleEvents TValue="AppointmentData" ActionCompleted="UpdateDataInDb"></ScheduleEvents>
     <ScheduleViews>
         <ScheduleView Option="View.Day"></ScheduleView>
         <ScheduleView Option="View.Week"></ScheduleView>
@@ -29,7 +100,7 @@
     private List<GetRecordDto> records = new List<GetRecordDto>();
     private List<BreakDto> breaks = new List<BreakDto>();
     private List<DateTime> availableDates = new List<DateTime>();
-    private List<AppointmentData> events = new List<AppointmentData>();
+    private ObservableCollection<AppointmentData> events = new ObservableCollection<AppointmentData>();
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -41,9 +112,10 @@
             {
                 breaks = res.Data;
                 UpdateBreaks();
+                DateRangeChanged(DateTime.Now);
+                StateHasChanged();
             }
         }
-        StateHasChanged();
     }
 
     private async void DateRangeChanged(DateTime date)
@@ -62,6 +134,8 @@
             records.AddRange(recordsResult.Data);
             availableDates.Add(date);
             UpdateEvents(recordsResult.Data);
+            StateHasChanged();
+
             showToastr("", "Records were succesfully gotten");
 
         }
@@ -74,27 +148,35 @@
 
     private void UpdateEvents(List<GetRecordDto> getRecords)
     {
-        foreach(var record in records)
+        foreach (var record in getRecords)
         {
+            var same = events.FirstOrDefault(e => e.Id == record.Id);
+            if(same != null)
+            {
+                events.Remove(same);
+            }
             var appointment = new AppointmentData
                 {
                     Id = record.Id,
                     Subject = record.ServiceName,
                     StartTime = record.StartTime,
                     EndTime = record.EndTime,
+                    Status = StatusData.First(s => s.Name == record.Status),
                     Description = record.Description,
+                    Comment = record.Comment != null ? record.Comment : "",
+                    ServiceId = record.ServiceId,
                     Type = "Record"
                 };
             switch (record.Status)
             {
                 case "Created":
-                    record.CssClass = "e-green";
+                    appointment.CssClass = "e-green";
                     break;
                 case "Finished":
-                    record.CssClass = "e-blue";
+                    appointment.CssClass = "e-blue";
                     break;
                 case "Cancelled":
-                    record.CssClass = "e-red";
+                    appointment.CssClass = "e-red";
                     break;
             }
 
@@ -110,64 +192,142 @@
             {
                 events.Add(GetWeeklyBreak(breakItem));
             }
+            else
+            {
+                events.Add(new AppointmentData
+                    {
+                        Id = breakItem.Id * -1,
+                        Subject = "Break",
+                        StartTime = breakItem.StartDate + breakItem.StartTime,
+                        EndTime = breakItem.StartDate + breakItem.EndTime,
+                        Description = "Break",
+                        CssClass = "e-break",
+                        Type = "Break",
+                    });
+            }
         }
+    }
+
+    private async void UpdateDataInDb(ActionEventArgs<AppointmentData> args)
+    {
+        if(args.ActionType == ActionType.EventChange)
+        {
+            var changedEvents = new List<GetRecordDto>();
+            foreach (var rec in args.ChangedRecords)
+            {
+                if (rec.Type == "Record")
+                {
+                    changedEvents.Add(mapAppointment(rec));
+                }
+            }
+            var res = await _userService.UpdateAppointments(changedEvents);
+            if (String.IsNullOrEmpty(res))
+            {
+                UpdateEvents(changedEvents);
+                StateHasChanged();
+                showToastr("", "Records were succesfully updated");
+            }
+            else
+            {
+                showToastr(res);
+            }
+        }
+    }
+
+    private GetRecordDto mapAppointment(AppointmentData data)
+    {
+        var status = StatusData.FirstOrDefault(s => s.Id == data.Status.Id);
+        return new GetRecordDto
+            {
+                Id = data.Id,
+                Description = data.Description,
+                StartTime = data.StartTime,
+                EndTime = data.EndTime,
+                Comment = data.Comment,
+                ServiceName = data.Subject,
+                Status = status != null ? status.Name : data.Status.Name,
+                ServiceId = data.ServiceId
+            };
     }
 
     public AppointmentData GetWeeklyBreak(BreakDto breakDto)
     {
         string recurrenceRule = $"FREQ=WEEKLY;BYDAY={GetDayOfWeek(breakDto.DayOfWeek)}";
 
-        return new AppointmentData
+        var res = new AppointmentData
             {
                 Id = breakDto.Id * -1,
                 Subject = "Break",
-                StartTime = DateTime.Today.Add(breakDto.StartTime),
-                EndTime = DateTime.Today.Add(breakDto.EndTime),
+                StartTime = breakDto.StartDate + breakDto.StartTime,
+                EndTime = breakDto.StartDate + breakDto.EndTime,
                 Description = "Recurring weekly break",
                 CssClass = "e-break",
                 Type = "Break",
                 RecurrenceRule = recurrenceRule
             };
+
+        if(breakDto.EndDate != null)
+        {
+            res.RecurrenceRule += ";UNTIL=" + breakDto.EndDate.Value.ToString("yyyyMMdd'T'HHmmss'Z'", CultureInfo.InvariantCulture);
+            //res.EndTime = breakDto.EndDate.Value + breakDto.EndTime;
+        }
+        return res;
     }
 
     private string GetDayOfWeek(int? dayOfWeek)
     {
         switch (dayOfWeek)
         {
-            case 0: return "SU"; // Sunday
-            case 1: return "MO"; // Monday
-            case 2: return "TU"; // Tuesday
-            case 3: return "WE"; // Wednesday
-            case 4: return "TH"; // Thursday
-            case 5: return "FR"; // Friday
-            case 6: return "SA"; // Saturday
+            case 0: return "SU"; 
+            case 1: return "MO"; 
+            case 2: return "TU"; 
+            case 3: return "WE"; 
+            case 4: return "TH";
+            case 5: return "FR"; 
+            case 6: return "SA"; 
             default: return "";
         }
     }
 
     private async void showToastr(string res, string successMessage = "")
     {
-    if (String.IsNullOrEmpty(res))
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+
+    public class Status
     {
-        await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        public int Id { get; set; } = 0;
+        public string Name { get; set; } = "";
     }
-    else
+
+    List<Status> StatusData = new List<Status>()
     {
-        await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
-    }
-    }
+        new Status(){ Id= 1, Name= "Created" },
+        new Status(){ Id= 2, Name= "Finished" },
+        new Status(){ Id= 3, Name= "Cancelled" },
+    };
 
     public class AppointmentData
     {
-    public int Id { get; set; }
-    public string Subject { get; set; }
-    public string Location { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public string Description { get; set; }
-    public bool IsAllDay { get; set; }
-    public string Type { get; set; }
-    public string CssClass { get; set; } = "";
+        public int Id { get; set; }
+        public string Subject { get; set; }
+        public string Location { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public string Description { get; set; }
+        public string Comment { get; set; }
+        public Status Status { get; set; } = new Status();
+        public bool IsAllDay { get; set; }
+        public string Type { get; set; }
+        public int ServiceId { get; set; }
+        public string CssClass { get; set; } = "";
         public string RecurrenceRule { get; set; }
         public string RecurrenceException { get; set; }
         public Nullable<int> RecurrenceID { get; set; }
@@ -194,5 +354,12 @@
         background: #dc3545  !important;  
     }
     
+    .custom-event-editor td{
+        padding: 7px;
+        padding-right: 16px;
+    }
 
+    .dropdown .e-dropdownlist {
+        color: inherit !important;
+    }
 </style>

@@ -15,5 +15,8 @@ namespace PetCareApp.Models
         public string? AppUserId { get; set; }
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public AppUser? AppUser { get; set; }
+
+        public DateTime StartDate { get; set; } = DateTime.UtcNow;
+        public DateTime? EndDate { get; set; }
     }
 }

@@ -14,6 +14,5 @@ namespace PetCareApp.Dtos
         public string Status { get; set; } = "Created";
         public int ServiceId { get; set; }
         public string ServiceName { get; set; } = "";
-        public string CssClass { get; set; } = "";
     }
 }
