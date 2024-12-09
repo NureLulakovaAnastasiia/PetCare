@@ -12,5 +12,6 @@ namespace WebPetCare.IServices
         public Task<Result<List<BreakDto>>> getMasterBreaks();
 
         public Task<string> UpdateAppointments(List<GetRecordDto> records);
+        public Task<string> UpdateBreaks(List<BreakDto> breaks);
     }
 }

@@ -149,6 +149,33 @@ namespace WebPetCare.Services
             }
             return res;
         }
+
+        public async Task<string> UpdateBreaks(List<BreakDto> breaks)
+        {
+            var res = "";
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(breaks, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Master/upsertBreaks";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                res = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
     }
 }
 

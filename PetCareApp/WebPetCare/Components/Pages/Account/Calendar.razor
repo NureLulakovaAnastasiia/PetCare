@@ -11,8 +11,8 @@
 @rendermode InteractiveAuto
 
 
-<SfSchedule TValue="AppointmentData" StartHour="6:00" EnableAllDayScroll="true" Height="700" 
-SelectedDateChanged="DateRangeChanged">
+<SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" EnableAdaptiveUI="true" StartHour="6:00" EnableAllDayScroll="true" Height="700"
+            SelectedDateChanged="DateRangeChanged">
     <ScheduleTemplates>
         <EditorTemplate>
          
@@ -51,7 +51,9 @@ SelectedDateChanged="DateRangeChanged">
                         <tr>
                             <td class="e-textlabel">Recurrence</td>
                             <td colspan="4">
-                                <SfRecurrenceEditor @bind-Value="@(data.RecurrenceRule)"></SfRecurrenceEditor>
+                                <SfRecurrenceEditor @bind-Value="@(data.RecurrenceRule)" Frequencies="@Repeats" >
+
+                                </SfRecurrenceEditor>
                             </td>
                         </tr>
                     }
@@ -107,6 +109,7 @@ SelectedDateChanged="DateRangeChanged">
     {
         if (firstRender)
         {
+            breaks.Clear();
             var res = await _userService.getMasterBreaks();
             if (res.IsSuccess)
             {
@@ -186,20 +189,37 @@ SelectedDateChanged="DateRangeChanged">
 
     private void UpdateBreaks()
     {
-        foreach (var breakItem in breaks)
+        for (int i = 0; i < breaks.Count; i++)
         {
-            if (breakItem.DayOfWeek != null)
+            if (breaks[i].DayOfWeek != null)
             {
-                events.Add(GetWeeklyBreak(breakItem));
+                var sameDateTime = breaks.FindAll(br => BreakDto.HasSameTimeDate(br, breaks[i]));
+                if (sameDateTime.Count > 1)
+                {
+                    var rule = GetRecurrenceForMultipleBreaks(sameDateTime);
+                    var ids = sameDateTime.Select(x => x.Id).ToList();
+                    events.Add(GetWeeklyBreak(breaks[i], ids, rule));
+                    foreach(var item in sameDateTime)
+                    {
+                        if(breaks.IndexOf(item) > i)
+                        {
+                            breaks.Remove(item);
+                        }
+                    }
+                }
+                else
+                {
+                    events.Add(GetWeeklyBreak(breaks[i], null));
+                }
             }
             else
             {
                 events.Add(new AppointmentData
                     {
-                        Id = breakItem.Id * -1,
+                        Id = breaks[i].Id * -1,
                         Subject = "Break",
-                        StartTime = breakItem.StartDate + breakItem.StartTime,
-                        EndTime = breakItem.StartDate + breakItem.EndTime,
+                        StartTime = breaks[i].StartDate + breaks[i].StartTime,
+                        EndTime = breaks[i].StartDate + breaks[i].EndTime,
                         Description = "Break",
                         CssClass = "e-break",
                         Type = "Break",
@@ -213,18 +233,32 @@ SelectedDateChanged="DateRangeChanged">
         if(args.ActionType == ActionType.EventChange)
         {
             var changedEvents = new List<GetRecordDto>();
+            var changedBreaks = new List<BreakDto>();
             foreach (var rec in args.ChangedRecords)
             {
                 if (rec.Type == "Record")
                 {
                     changedEvents.Add(mapAppointment(rec));
+                }else if(rec.Type == "Break")
+                {
+                    var added = args.AddedRecords.Where(x => x.RecurrenceID == rec.Id).FirstOrDefault();
+                    if (added != null)
+                    {
+                        changedBreaks.AddRange(mapBreak(added, true));
+                    }
+                    else
+                    {
+                        changedBreaks.AddRange(mapBreak(rec, false));
+                    }
                 }
             }
             var res = await _userService.UpdateAppointments(changedEvents);
-            if (String.IsNullOrEmpty(res))
+            var breakRes = await _userService.UpdateBreaks(changedBreaks);
+            if (String.IsNullOrEmpty(res) || String.IsNullOrEmpty(breakRes))
             {
-                UpdateEvents(changedEvents);
-                StateHasChanged();
+                //UpdateEvents(changedEvents);
+                await OnAfterRenderAsync(true);
+                //StateHasChanged();
                 showToastr("", "Records were succesfully updated");
             }
             else
@@ -239,7 +273,7 @@ SelectedDateChanged="DateRangeChanged">
         var status = StatusData.FirstOrDefault(s => s.Id == data.Status.Id);
         return new GetRecordDto
             {
-                Id = data.Id,
+                Id = data.Id, // * -1
                 Description = data.Description,
                 StartTime = data.StartTime,
                 EndTime = data.EndTime,
@@ -250,9 +284,100 @@ SelectedDateChanged="DateRangeChanged">
             };
     }
 
-    public AppointmentData GetWeeklyBreak(BreakDto breakDto)
+    private List<BreakDto> mapBreak(AppointmentData data, bool isNew)
     {
-        string recurrenceRule = $"FREQ=WEEKLY;BYDAY={GetDayOfWeek(breakDto.DayOfWeek)}";
+        var res = new List<BreakDto>();
+        var dayOfWeek = new List<int>();
+        if (!String.IsNullOrEmpty(data.RecurrenceRule))
+        {
+            var ind = data.RecurrenceRule.IndexOf("BYDAY=");
+            if(ind != -1)
+            {
+                ind += 6;
+            }
+            while (ind == -1 || ind < data.RecurrenceRule.Length)
+            {
+                var addItem = GetNumDayOfWeek(data.RecurrenceRule.Substring(ind, 2));
+                if (addItem != -1)
+                {
+                    dayOfWeek.Add(addItem);
+                    ind += 3;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        DateTime? endDate = data.EndTime.Date;
+        if (data.RecurrenceRule != null) { 
+            var index = data.RecurrenceRule.IndexOf("UNTIL=");
+            if (index != -1)
+            {
+                string format = "yyyyMMdd'T'HHmmss'Z'";
+                string dateString = data.RecurrenceRule.Substring(index + 6);
+                if (String.IsNullOrEmpty(dateString))
+                {
+                    endDate = DateTime.ParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                }
+            }
+            else
+            {
+                endDate = null;
+            }
+        }
+
+        var id_ind = 0;
+        var hasIds = data.breakIds != null && data.breakIds.Count == dayOfWeek.Count;
+        foreach (var dayOfWeekNum in dayOfWeek){
+            var newBreak = new BreakDto
+                {
+                    Id = hasIds ? data.breakIds[id_ind] : data.Id * -1,
+                    StartTime = new TimeSpan(data.StartTime.Hour, data.StartTime.Minute, 0),
+                    EndTime = new TimeSpan(data.EndTime.Hour, data.EndTime.Minute, 0),       
+                    StartDate = data.StartTime.Date,
+                    EndDate = endDate,
+                    DayOfWeek = dayOfWeekNum >= 0 ? dayOfWeekNum : null
+             };
+            id_ind++;
+            res.Add(newBreak);
+        }
+        if (!isNew)
+        {
+            res.Add(new BreakDto
+                {
+                    Id = data.Id * -1,
+                    StartTime = new TimeSpan(data.StartTime.Hour, data.StartTime.Minute, 0),
+                    EndTime = new TimeSpan(data.EndTime.Hour, data.EndTime.Minute, 0),
+                    StartDate = data.StartTime.Date,
+                    EndDate = endDate
+                });
+        }
+        return res;
+    }
+
+    public string GetRecurrenceForMultipleBreaks(List<BreakDto> breaks) //day when repeats
+    {
+        string rule = "";
+        foreach(var br in breaks)
+        {
+            var day = GetDayOfWeek(br.DayOfWeek);
+            if (!String.IsNullOrEmpty(day))
+            {
+                rule = rule + day + ",";
+            }
+        }
+        if(rule.LastIndexOf(",") == rule.Length - 1)
+        {
+            rule = rule.Substring(0, rule.Length - 1);
+        }
+        return rule;
+    }
+
+    public AppointmentData GetWeeklyBreak(BreakDto breakDto, List<int>? ids, string recurrenceRule = "")
+    {
+        recurrenceRule = $"FREQ=WEEKLY;BYDAY=" + (String.IsNullOrEmpty(recurrenceRule) ? GetDayOfWeek(breakDto.DayOfWeek) : recurrenceRule);
+
 
         var res = new AppointmentData
             {
@@ -263,7 +388,8 @@ SelectedDateChanged="DateRangeChanged">
                 Description = "Recurring weekly break",
                 CssClass = "e-break",
                 Type = "Break",
-                RecurrenceRule = recurrenceRule
+                RecurrenceRule = recurrenceRule,
+                breakIds = ids
             };
 
         if(breakDto.EndDate != null)
@@ -288,7 +414,20 @@ SelectedDateChanged="DateRangeChanged">
             default: return "";
         }
     }
-
+    private int GetNumDayOfWeek(string dayOfWeek)
+    {
+        switch (dayOfWeek)
+        {
+            case "SU": return 0;
+            case "MO": return 1;
+            case "TU": return 2;
+            case "WE": return 3;
+            case "TH": return 4;
+            case "FR": return 5;
+            case "SA": return 6;
+            default: return -1;
+        }
+    }
     private async void showToastr(string res, string successMessage = "")
     {
         if (String.IsNullOrEmpty(res))
@@ -331,8 +470,13 @@ SelectedDateChanged="DateRangeChanged">
         public string RecurrenceRule { get; set; }
         public string RecurrenceException { get; set; }
         public Nullable<int> RecurrenceID { get; set; }
+        public List<int>? breakIds { get; set; } = null;
     }
-
+    
+    List<RepeatType> Repeats = new List<RepeatType>()
+    {
+       RepeatType.None, RepeatType.Weekly
+    };
 }
 
 <style>

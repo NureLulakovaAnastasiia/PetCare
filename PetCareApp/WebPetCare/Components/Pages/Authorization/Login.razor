@@ -29,12 +29,12 @@
         }
 
         <div class="d-flex flex-row mx-2 px-2 align-items-end">
-            <div class="col-2 col-lg-1">
+            <div class="col-2 col-lg-3">
             </div>
             @if (IsLogin)
             {
                
-                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="LoginFunc" class="col-lg-10 col-9 text-center">
+                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="LoginFunc" class="col-lg-6 col-9 text-center">
                     <div class="form-group py-2 text-center">
                         <h5>Email</h5>
                         <InputText class="form-control" @bind-Value="LoginModel.Email" />
@@ -50,7 +50,7 @@
             else if(!IsLogin && !IsCode)
             {
 
-                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="RegisterFunc" class="col-lg-7 col-9 text-center">
+                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="RegisterFunc" class="col-lg-6 col-9 text-center">
                     <div class="form-group py-2 text-center">
                         <h5>First Name</h5>
                         <InputText class="form-control" @bind-Value="RegisterModel.FirstName" />

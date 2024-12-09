@@ -260,16 +260,19 @@ namespace PetCareApp.Services
                 var breaks = _mapper.Map<List<Break>>(breaksDto);
                 if (breaks != null)
                 {
+                    var updatedIds = new List<int>();
                     foreach (var item in breaks)
                     {
                         item.AppUserId = user.Id;
-                        if (item.Id == 0)
+                        if (updatedIds.Contains(item.Id) || item.Id == 0)
                         {
+                            item.Id = 0;
                             _dbContext.Add(item);
                         }
                         else
                         {
                             _dbContext.Update(item);
+                            updatedIds.Add(item.Id);
                         }
                     }
                     return _dbContext.SaveChanges().ToString();
