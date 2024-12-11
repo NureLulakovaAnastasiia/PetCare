@@ -5,10 +5,7 @@
     <div>
         <NavMenu @ref="navMenu" isLogged="@isAuthenticated" />
     </div>
-    <MudPopoverProvider />
-    <MudThemeProvider />
-    <MudDialogProvider />
-    <MudSnackbarProvider />
+      <Syncfusion.Blazor.Popups.SfDialogProvider />
         <CascadingValue Value="(Func<bool, Task>)UpdateAuthenticationStatus">
             <main>
                 <article>

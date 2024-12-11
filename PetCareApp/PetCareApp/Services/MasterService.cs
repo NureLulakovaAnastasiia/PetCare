@@ -285,6 +285,36 @@ namespace PetCareApp.Services
             }
         }
 
+        public async Task<string> DeleteBreaks(List<int> breaksId)
+        {
+            if (breaksId.Count == 0)
+            {
+                return "Nothing to add or update";
+            }
+
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User not found";
+                }
+                    foreach (var id in breaksId)
+                    {
+                        var itemToDelete = _dbContext.Breaks.FirstOrDefault(b => b.Id == id);
+                        if(itemToDelete != null)
+                        {
+                            _dbContext.Remove(itemToDelete);
+                        }
+                    }
+                    return _dbContext.SaveChanges().ToString();
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
         //returns all working time slots (using schedule and breaks)
         public List<TimeSlot> GetWorkTimeSlots(string masterId)
         {
@@ -634,7 +664,7 @@ namespace PetCareApp.Services
                         record.StartTime > DateTime.UtcNow
                         && record.Status == "Created") //check if right master cancels the record
                     {
-                        record.Status = "Canceled";
+                        record.Status = "Cancelled";
                         _dbContext.Update(record);
                         _dbContext.Add(new RecordCancel
                         {
@@ -643,7 +673,7 @@ namespace PetCareApp.Services
                             Reason = reason,
                             Date = DateTime.UtcNow
                         });
-                        _dbContext.SaveChanges();
+                        return _dbContext.SaveChanges().ToString();
                     }
                     return "You cannnot cancel this record";
                 }
@@ -670,17 +700,20 @@ namespace PetCareApp.Services
                 {
                     foreach (var rec in recordsDto)
                     {
-                        var service = _dbContext.Services.Where(s => s.Id == recordsDto[0].Id).FirstOrDefault();
+                        var service = _dbContext.Services.Where(s => s.Id == recordsDto[0].ServiceId).FirstOrDefault();
                         if (service != null)
                         {
+                            var masterServices = _dbContext.Services.Where(s => s.AppUserId == user.Id)
+                                .Select(s => s.Id).ToList();
+
                             var sameTime = _dbContext.Records
-                                .Where(r => r.ServiceId == service.Id && r.Status == "Created" &&
+                                .Where(r => masterServices.Contains(r.ServiceId.Value) && r.Status != "Canceled" &&
                                 (r.StartTime < rec.StartTime && rec.StartTime < r.EndTime) ||
-                                (r.StartTime < rec.EndTime))
+                                (r.StartTime < rec.EndTime && r.StartTime > rec.StartTime))
                                 .ToList();
-                            if (sameTime != null && sameTime.Count > 0)
+                            if (sameTime != null && sameTime.Count > 1)
                             {
-                                res += $"Records is already set to this time ({rec.StartTime})";
+                                return $"Records is already set to this time ({rec.StartTime})";
                             }
 
                             var record = _dbContext.Records.FirstOrDefault(r => r.Id == rec.Id);
@@ -690,6 +723,7 @@ namespace PetCareApp.Services
                                 record.EndTime = rec.EndTime;
                                 record.Status = rec.Status;
                                 record.Description = rec.Description;
+                                record.ServiceId = rec.ServiceId;
                                 record.Comment = rec.Comment;
                                 _dbContext.Update(record);
                                 return _dbContext.SaveChanges().ToString();

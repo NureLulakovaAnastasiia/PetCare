@@ -194,6 +194,24 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
+        [HttpPost("deleteBreaks")]
+        [Authorize(Roles = "Master,Admin")]
+        public async Task<IActionResult> DeleteBreaks(List<int> breaksIds)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _masterService.DeleteBreaks(breaksIds);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok("Breaks were successfully deleted!");
+            }
+
+            return StatusCode(500, res);
+        }
+
 
         [HttpPost("makeAnAppointment")]
         public async Task<IActionResult> MakeAnAppointment(RecordDto record)
@@ -268,7 +286,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("CancelRecord")]
-        public async Task<IActionResult> CancelRecord(int recordId, string reason)
+        public async Task<IActionResult> CancelRecord([FromQuery]int recordId, [FromBody]string reason)
         {
             if (!ModelState.IsValid)
             {

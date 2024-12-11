@@ -150,7 +150,7 @@ namespace WebPetCare.Services
             return res;
         }
 
-        public async Task<string> UpdateBreaks(List<BreakDto> breaks)
+        public async Task<string> UpsertBreaks(List<BreakDto> breaks)
         {
             var res = "";
             JsonSerializerOptions options = new JsonSerializerOptions
@@ -174,6 +174,126 @@ namespace WebPetCare.Services
             {
                 res = ex.Message;
             }
+            return res;
+        }
+
+        public async Task<string> DeleteBreaks(List<int> breaks)
+        {
+            var res = "";
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(breaks, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Master/deleteBreaks";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                res = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> AddRecord(RecordDto record)
+        {
+            var res = "";
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(record, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Master/makeAnAppointment";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                res = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> CancelAppointment(int appointmentId, string reason)
+        {
+            var res = "";
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(reason, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Master/CancelRecord?recordId={appointmentId}";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                res = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+        public async Task<Result<Dictionary<int, string>>> GetMasterServicesNames()
+        {
+            var res = new Result<Dictionary<int, string>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Service/getMasterServicesNames";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<Dictionary<int, string>>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                    if(res.ErrorMessage == null)
+                    {
+                        res.ErrorMessage = "Error";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
             return res;
         }
     }

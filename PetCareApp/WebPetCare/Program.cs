@@ -6,6 +6,7 @@ using WebPetCare.Services;
 using MudBlazor.Services;
 using Syncfusion;
 using Syncfusion.Blazor;
+using Syncfusion.Blazor.Popups;
 
 var builder = WebApplication.CreateBuilder(args);
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH5fcXVUQ2RcWUB0WEI=");
@@ -21,6 +22,7 @@ builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddHttpClient();
 builder.Services.AddMudServices();
 builder.Services.AddSyncfusionBlazor();
+builder.Services.AddScoped<SfDialogService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {

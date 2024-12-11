@@ -9,7 +9,7 @@ namespace PetCareApp.Interfaces
         public Task<string> UpdateContacts(ContactsDto contacts);        
         public Task<string> UpsertSchedule(List<ScheduleDto> schedule);
         public Task<string> UpsertBreaks(List<BreakDto> breaks);
-
+        public Task<string> DeleteBreaks(List<int> breaksId);
         public Task<string> AddQuestionary(List<AddQuestionDto> questionary, int serviceId);
         public Task<string> UpdateQuestionary(List<UpdateQuestionDto> questionary);
         public Task<List<UpdateQuestionDto>> GetQuestionary(int serviceId);

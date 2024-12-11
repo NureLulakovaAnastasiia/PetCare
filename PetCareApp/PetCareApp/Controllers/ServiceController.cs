@@ -121,5 +121,26 @@ namespace PetCareApp.Controllers
 
             return StatusCode(500, res);
         }
+
+        [HttpGet("getMasterServicesNames")]
+        public async Task<IActionResult> GetMasterServicesNames()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var services = await _serviceService.GetServices(null);
+            if (services == null || services.Count == 0)
+            {
+                return NotFound();
+            }
+            var dict = new Dictionary<int, string>();
+            foreach (var service in services)
+            {
+                dict[service.Id] = service.Name;
+            }
+            return Ok(dict);
+        }
     }
 }

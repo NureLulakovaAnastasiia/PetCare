@@ -14,5 +14,16 @@ namespace PetCareApp.Dtos
         public string Status { get; set; } = "Created";
         public int ServiceId { get; set; }
 
+
+        public RecordDto() { }
+
+        public RecordDto(GetRecordDto recordDto) { 
+            Description = recordDto.Description;
+            StartTime = recordDto.StartTime;
+            EndTime = recordDto.EndTime;
+            Comment = recordDto.Comment;
+            Status = recordDto.Status;
+            ServiceId = recordDto.ServiceId;
+        }
     }
 }

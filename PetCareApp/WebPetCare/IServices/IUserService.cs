@@ -12,6 +12,11 @@ namespace WebPetCare.IServices
         public Task<Result<List<BreakDto>>> getMasterBreaks();
 
         public Task<string> UpdateAppointments(List<GetRecordDto> records);
-        public Task<string> UpdateBreaks(List<BreakDto> breaks);
+        public Task<string> UpsertBreaks(List<BreakDto> breaks);
+        public Task<string> AddRecord(RecordDto record);
+        public Task<string> DeleteBreaks(List<int> breaks);
+        public Task<string> CancelAppointment(int appointmentId, string reason);
+
+        public Task<Result<Dictionary<int, string>>> GetMasterServicesNames();
     }
 }

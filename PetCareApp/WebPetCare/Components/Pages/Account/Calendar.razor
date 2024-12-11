@@ -3,15 +3,17 @@
 @using Syncfusion.Blazor.Calendars
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Popups
 @using System.Collections.ObjectModel
-@inject IDialogService DialogService
+@using Syncfusion.Blazor.SplitButtons
+@inject SfDialogService DialogService
 @inject IServiceService service
 @inject IJSRuntime _JSRuntime
 @inject IUserService _userService
 @rendermode InteractiveAuto
 
 
-<SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" EnableAdaptiveUI="true" StartHour="6:00" EnableAllDayScroll="true" Height="700"
+<SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" EnableAdaptiveUI="true" StartHour="6:00" ShowQuickInfo="false" EnableAllDayScroll="true" Height="700"
             SelectedDateChanged="DateRangeChanged">
     <ScheduleTemplates>
         <EditorTemplate>
@@ -22,12 +24,30 @@
                 }
 
                 <tbody>
-                    <tr>
-                        <td class="e-textlabel">Service Name</td>
+                    @if (String.IsNullOrEmpty(data.Type))
+                    {
+                        <tr >
+                            <td colspan="2" class="text-center">
+                                <SfButtonGroup Mode="Syncfusion.Blazor.SplitButtons.SelectionMode.Single">
+                                    <ButtonGroupButton @bind-Selected="@isRecord">Record</ButtonGroupButton>
+                                    <ButtonGroupButton @bind-Selected="@isBreak">Break</ButtonGroupButton>
+                                </SfButtonGroup>
+                              </td>
+                        </tr>
+                    }
+
+                    @if (data.Type == "Record" || isRecord)
+                    {
+                        <tr>
+                            <td class="e-textlabel">Service Name</td>
                         <td colspan="4">
-                            <SfTextBox @bind-Value="@(data.Subject)"></SfTextBox>
+                            <SfDropDownList TValue="int" TItem="ServiceName" @bind-Value="@(data.ServiceId)" Placeholder="Select a service name" DataSource="@serviceNames">
+                                <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                <DropDownListEvents TValue="int" TItem="ServiceName"></DropDownListEvents>
+                            </SfDropDownList>
                         </td>
                     </tr>
+                    }
                     
                     <tr>
                         <td class="e-textlabel">From</td>
@@ -47,7 +67,7 @@
                             <SfTextBox Multiline="true" @bind-Value="@(data.Description)"></SfTextBox>
                         </td>
                     </tr>
-                    @if (data.Type == "Break"){
+                    @if (data.Type == "Break" || isBreak){
                         <tr>
                             <td class="e-textlabel">Recurrence</td>
                             <td colspan="4">
@@ -63,7 +83,7 @@
                             <td class="e-textlabel">Status</td>
                             <td colspan="4">
                                 <SfDropDownList TValue="int" TItem="Status" Placeholder="Change status" DataSource="@StatusData" @bind-Value="@data.Status.Id">
-                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                    <DropDownListFieldSettings Value="Id" Text="Name" ></DropDownListFieldSettings>
                                 </SfDropDownList>
                             </td>
                         </tr>
@@ -103,20 +123,25 @@
     private List<BreakDto> breaks = new List<BreakDto>();
     private List<DateTime> availableDates = new List<DateTime>();
     private ObservableCollection<AppointmentData> events = new ObservableCollection<AppointmentData>();
-
+    private List<ServiceName> serviceNames = new List<ServiceName>();
+    private bool isRecord = true;
+    private bool isBreak = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             breaks.Clear();
+            events.Clear();
+            availableDates.Clear();
             var res = await _userService.getMasterBreaks();
             if (res.IsSuccess)
             {
                 breaks = res.Data;
                 UpdateBreaks();
+                GetMasterServicesNames();
                 DateRangeChanged(DateTime.Now);
-                StateHasChanged();
+                //StateHasChanged();
             }
         }
     }
@@ -137,7 +162,7 @@
             records.AddRange(recordsResult.Data);
             availableDates.Add(date);
             UpdateEvents(recordsResult.Data);
-            StateHasChanged();
+            //StateHasChanged();
 
             showToastr("", "Records were succesfully gotten");
 
@@ -158,13 +183,14 @@
             {
                 events.Remove(same);
             }
+            var status = StatusData.FirstOrDefault(s => s.Name == record.Status);
             var appointment = new AppointmentData
                 {
                     Id = record.Id,
                     Subject = record.ServiceName,
                     StartTime = record.StartTime,
                     EndTime = record.EndTime,
-                    Status = StatusData.First(s => s.Name == record.Status),
+                Status = status == null ? new Status() { Id = 3, Name = "Cancelled" } : status,
                     Description = record.Description,
                     Comment = record.Comment != null ? record.Comment : "",
                     ServiceId = record.ServiceId,
@@ -193,12 +219,20 @@
         {
             if (breaks[i].DayOfWeek != null)
             {
+                var same = events.Where(e => e.Id == breaks[i].Id * -1).FirstOrDefault();
+                if (same != null)
+                {
+                    events.Remove(same);
+                }
                 var sameDateTime = breaks.FindAll(br => BreakDto.HasSameTimeDate(br, breaks[i]));
                 if (sameDateTime.Count > 1)
                 {
                     var rule = GetRecurrenceForMultipleBreaks(sameDateTime);
                     var ids = sameDateTime.Select(x => x.Id).ToList();
-                    events.Add(GetWeeklyBreak(breaks[i], ids, rule));
+
+                    var created = GetWeeklyBreak(breaks[i], ids, rule);
+
+                    events.Add(created);
                     foreach(var item in sameDateTime)
                     {
                         if(breaks.IndexOf(item) > i)
@@ -244,33 +278,176 @@
                     var added = args.AddedRecords.Where(x => x.RecurrenceID == rec.Id).FirstOrDefault();
                     if (added != null)
                     {
-                        changedBreaks.AddRange(mapBreak(added, true));
+                        changedBreaks.AddRange(await mapBreak(added, true));
+                        args.AddedRecords.Remove(added);
                     }
                     else
                     {
-                        changedBreaks.AddRange(mapBreak(rec, false));
+                        changedBreaks.AddRange(await mapBreak(rec, false));
                     }
                 }
             }
+
             var res = await _userService.UpdateAppointments(changedEvents);
-            var breakRes = await _userService.UpdateBreaks(changedBreaks);
+            var breakRes = await _userService.UpsertBreaks(changedBreaks);
+
             if (String.IsNullOrEmpty(res) || String.IsNullOrEmpty(breakRes))
             {
-                //UpdateEvents(changedEvents);
-                await OnAfterRenderAsync(true);
-                //StateHasChanged();
+                if (changedBreaks.Count > 0 || args.AddedRecords.Count > 0)
+                {
+                    await OnAfterRenderAsync(true);
+                }
+                UpdateEvents(changedEvents);
+                StateHasChanged();
                 showToastr("", "Records were succesfully updated");
             }
             else
             {
                 showToastr(res);
             }
+        }else if(args.ActionType == ActionType.EventCreate)
+        {
+            if (args.AddedRecords.Count > 0)
+            {
+                await AddNewRecords(args.AddedRecords);
+                await OnAfterRenderAsync(true);
+            }
+        }else if(args.ActionType == ActionType.EventRemove)
+        {
+            if (args.DeletedRecords != null && args.DeletedRecords.Count > 0)
+            {
+                string reason = "";
+                if (args.DeletedRecords[0].Type == "Record")
+                {
+                    reason = await DialogService.PromptAsync("Enter reason to cancel appointment:", "Cancel Appointment");
+                    if (!String.IsNullOrEmpty(reason))
+                    {
+                        await DeleteRecords(args.DeletedRecords, reason);
+                    }
+                    else
+                    {
+                        showToastr("Reason cannot be empty");
+                        events.Add(args.DeletedRecords[0]);
+                    }
+                }
+                else
+                {
+                    await DeleteRecords(args.DeletedRecords, reason);
+                }
+
+            }
         }
     }
+
+    private async Task AddNewRecords(List<AppointmentData> records)
+    {
+        List<GetRecordDto> recordsToAdd = new List<GetRecordDto>();
+        List<BreakDto> breaksToAdd = new List<BreakDto>();
+        foreach(var item in records)
+        {
+            if(item.Type == "Break" || isBreak)
+            {
+                breaksToAdd.AddRange(await mapBreak(item, true));
+            }
+            else
+            {
+                recordsToAdd.Add(mapAppointment(item));
+            }
+        }
+        string temp = "";
+        if(recordsToAdd.Count > 0)
+        {
+
+            foreach(var record in recordsToAdd)
+            {
+                temp += await _userService.AddRecord(new RecordDto(record));
+            }
+        }
+        if(breaksToAdd.Count > 0)
+        {
+            breaksToAdd.ForEach(x => x.Id = 0);
+            temp += await _userService.UpsertBreaks(breaksToAdd);
+        }
+
+        if (String.IsNullOrEmpty(temp))
+        {
+            showToastr("", "Data were succefully added");
+        }
+        else
+        {
+            showToastr(temp);
+        }
+    }
+
+    private async void GetMasterServicesNames()
+    {
+        var names = await _userService.GetMasterServicesNames();
+        if (names.IsSuccess)
+        {
+            foreach(var item in names.Data)
+            {
+                if (serviceNames.Find(x => x.Id == item.Key) == null)
+                {
+                    serviceNames.Add(new ServiceName
+                        {
+                            Id = item.Key,
+                            Name = item.Value
+                        });
+                }
+            }
+
+        }
+        else
+        {
+            showToastr("No services were found");
+        }
+    }
+
+    private async Task DeleteRecords(List<AppointmentData> records, string reason)
+    {
+        List<int> recordsToDelete = new List<int>();
+        List<int> breaksToDelete = new List<int>();
+        foreach (var item in records)
+        {
+            if (item.Type == "Break")
+            {
+                var breaks = await mapBreak(item, false);
+                breaksToDelete.AddRange(breaks.Select(b => b.Id));
+            }
+            else
+            {
+                recordsToDelete.Add(mapAppointment(item).Id);
+            }
+        }
+        string temp = "";
+        if (recordsToDelete.Count > 0)
+        {
+
+            foreach (var record in recordsToDelete)
+            {
+                temp += await _userService.CancelAppointment(record, reason);
+            }
+        }
+        if (breaksToDelete.Count > 0)
+        {
+            temp += await _userService.DeleteBreaks(breaksToDelete);
+        }
+
+        if (String.IsNullOrEmpty(temp))
+        {
+            showToastr("", "Data were succefully deleted");
+        }
+        else
+        {
+            showToastr(temp);
+        }
+    }
+
 
     private GetRecordDto mapAppointment(AppointmentData data)
     {
         var status = StatusData.FirstOrDefault(s => s.Id == data.Status.Id);
+        var serviceName = serviceNames.Where(x => x.Id == data.ServiceId).Select(x => x.Name).FirstOrDefault();
         return new GetRecordDto
             {
                 Id = data.Id, // * -1
@@ -278,53 +455,20 @@
                 StartTime = data.StartTime,
                 EndTime = data.EndTime,
                 Comment = data.Comment,
-                ServiceName = data.Subject,
+                ServiceName = serviceName == null ? data.Subject : serviceName,
                 Status = status != null ? status.Name : data.Status.Name,
                 ServiceId = data.ServiceId
             };
     }
 
-    private List<BreakDto> mapBreak(AppointmentData data, bool isNew)
+    private async Task<List<BreakDto>> mapBreak(AppointmentData data, bool isNew)
     {
         var res = new List<BreakDto>();
-        var dayOfWeek = new List<int>();
-        if (!String.IsNullOrEmpty(data.RecurrenceRule))
-        {
-            var ind = data.RecurrenceRule.IndexOf("BYDAY=");
-            if(ind != -1)
-            {
-                ind += 6;
-            }
-            while (ind == -1 || ind < data.RecurrenceRule.Length)
-            {
-                var addItem = GetNumDayOfWeek(data.RecurrenceRule.Substring(ind, 2));
-                if (addItem != -1)
-                {
-                    dayOfWeek.Add(addItem);
-                    ind += 3;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
+        var dayOfWeek = GetDaysOfWeek(data.RecurrenceRule);
+
         DateTime? endDate = data.EndTime.Date;
-        if (data.RecurrenceRule != null) { 
-            var index = data.RecurrenceRule.IndexOf("UNTIL=");
-            if (index != -1)
-            {
-                string format = "yyyyMMdd'T'HHmmss'Z'";
-                string dateString = data.RecurrenceRule.Substring(index + 6);
-                if (String.IsNullOrEmpty(dateString))
-                {
-                    endDate = DateTime.ParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
-                }
-            }
-            else
-            {
-                endDate = null;
-            }
+        if (data.RecurrenceRule != null) {
+            endDate = GetUntilDate(data.RecurrenceRule);
         }
 
         var id_ind = 0;
@@ -342,7 +486,22 @@
             id_ind++;
             res.Add(newBreak);
         }
-        if (!isNew)
+        if (res.Count > 0 && data.breakIds != null && res.Count != data.breakIds.Count)
+        {
+            var breaksToDelete = new List<int>();
+            foreach(var id in data.breakIds)
+            {
+                if(res.Where(e => e.Id == id).FirstOrDefault() == null)
+                {
+                    breaksToDelete.Add(id);
+                }
+            }
+            if(await DeleteBreaks(breaksToDelete))
+            {
+                showToastr("", "Breaks were succefully deleted");
+            }
+        }
+        if (res.Count == 0)
         {
             res.Add(new BreakDto
                 {
@@ -353,7 +512,64 @@
                     EndDate = endDate
                 });
         }
+        
         return res;
+    }
+
+    private List<int> GetDaysOfWeek(string rule)
+    {
+        var dayOfWeek = new List<int>();
+        if (!String.IsNullOrEmpty(rule))
+        {
+            var ind = rule.IndexOf("BYDAY=");
+            if (ind != -1)
+            {
+                ind += 6;
+            }
+            while (ind == -1 || ind < rule.Length)
+            {
+                var addItem = GetNumDayOfWeek(rule.Substring(ind, 2));
+                if (addItem != -1)
+                {
+                    dayOfWeek.Add(addItem);
+                    ind += 3;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        return dayOfWeek;
+    }
+
+    private DateTime? GetUntilDate(string rule)
+    {
+        DateTime? endDate = null;
+        if (rule != null)
+        {
+            var index = rule.IndexOf("UNTIL=");
+            if (index != -1)
+            {
+                string format = "yyyyMMdd'T'HHmmss'Z'";
+                string dateString = rule.Substring(index + 6);
+                if (String.IsNullOrEmpty(dateString))
+                {
+                    endDate = DateTime.ParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                }
+            }
+        }
+        return endDate;
+    }
+
+    public async Task<bool> DeleteBreaks(List<int> breaksIds)
+    {
+        var res = await _userService.DeleteBreaks(breaksIds);
+        if (String.IsNullOrEmpty(res))
+        {
+            return true;
+        }
+        return false;
     }
 
     public string GetRecurrenceForMultipleBreaks(List<BreakDto> breaks) //day when repeats
@@ -446,11 +662,16 @@
         public string Name { get; set; } = "";
     }
 
+    public class ServiceName
+    {
+        public int Id { get; set; } = 0;
+        public string Name { get; set; } = "";
+    }
+
     List<Status> StatusData = new List<Status>()
     {
         new Status(){ Id= 1, Name= "Created" },
-        new Status(){ Id= 2, Name= "Finished" },
-        new Status(){ Id= 3, Name= "Cancelled" },
+        new Status(){ Id= 2, Name= "Finished" }
     };
 
     public class AppointmentData
