@@ -332,5 +332,56 @@ namespace PetCareApp.Controllers
             }
             return StatusCode(500, data.ErrorMessage);
         }
+
+
+        [HttpGet("getPortfolio")] //if masterId is empty - search for portfolio of current user
+        public async Task<IActionResult> GetMasterPortfolio(string? masterId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await _masterService.GetMasterPortfolio(masterId);
+            if (data.IsSuccess)
+            {
+                return Ok(data.Data);
+            }
+            return StatusCode(500, data.ErrorMessage);
+        }
+
+        [HttpPost("upsertPortfolio")]
+        [Authorize(Roles = "Master")]
+        public async Task<IActionResult> UpsertPortfolio([FromBody]List<PortfolioDto> portfolioDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _masterService.UpsertPortfolio(portfolioDto);
+            if (int.TryParse(res.ErrorMessage, out int num))
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res);
+        }
+
+        [HttpDelete("deletePortfolio")]
+        [Authorize(Roles = "Master")]
+        public async Task<IActionResult> DeletePortfolio([FromQuery] int porfolioId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var res = await _masterService.DeletePortfolio(porfolioId);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+            return StatusCode(500, res);
+        }
     }
 }

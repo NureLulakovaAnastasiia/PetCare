@@ -17,6 +17,10 @@ namespace WebPetCare.IServices
         public Task<string> DeleteBreaks(List<int> breaks);
         public Task<string> CancelAppointment(int appointmentId, string reason);
 
+        public Task<Result<List<PortfolioDto>>> GetMasterPortfolio(string? masterId = null);
         public Task<Result<Dictionary<int, string>>> GetMasterServicesNames();
+        public Task<Result<List<int>>> UpsertPortfolio(List<PortfolioDto> portfolio);
+
+        public Task<string> DeletePortfolio(int portfolioId); 
     }
 }

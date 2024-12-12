@@ -6,11 +6,13 @@
 
 <div class="container align-items-center">
     <div class="col-1"></div>
-    <div class="row col-10 offset-2 mb-3">
+    <div class="row col-9 offset-2 mb-3 ">
         <button class="btn col-lg-2 me-3  btn-nav@(options == menuOptions.General ? "-active" : "")" @onclick="() => ChangePage(menuOptions.General)">General</button>
         <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Calendar ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Calendar)">Calendar</button>
         <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Services ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Services)">My services</button>
         <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Reviews ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Reviews)">Reviews</button>
+        <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Portfolio ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Portfolio)">Portfolio</button>
+
     </div>
 
     @switch (options)
@@ -18,7 +20,9 @@
         case menuOptions.Calendar:
             <Calendar></Calendar>
             break;
-
+        case menuOptions.Portfolio:
+            <Portfolio></Portfolio>
+            break;
         case menuOptions.Services:
             break;
 
@@ -41,7 +45,7 @@
 
     public enum menuOptions
     {
-        General, Calendar, Services, Reviews
+        General, Calendar, Services, Reviews, Portfolio
     }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)

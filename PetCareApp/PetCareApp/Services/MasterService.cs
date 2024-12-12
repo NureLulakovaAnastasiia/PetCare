@@ -7,6 +7,7 @@ using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
 using PetCareApp.Mappings;
 using PetCareApp.Models;
+using System.Reflection.Metadata.Ecma335;
 
 namespace PetCareApp.Services
 {
@@ -926,6 +927,113 @@ namespace PetCareApp.Services
             }
 
             return res;
+        }
+
+        public async Task<Result<List<PortfolioDto>>> GetMasterPortfolio(string? masterId)
+        {
+            var res = new Result<List<PortfolioDto>>();
+            try
+            {
+                
+                var user = await GetCurrentUserAsync();
+                if (masterId == null )
+                {
+                    if (user == null)
+                    {
+                        res.ErrorMessage = "User not found";
+                        return res;
+                    }
+                }
+                var portfolio = _dbContext.Portfolios.Where(x => x.AppUserId == (masterId == null ? user.Id : masterId)).ToList();
+                if (portfolio == null || portfolio.Count == 0)
+                {
+                    res.ErrorMessage = "No portfolio were found";
+                }
+                else
+                {
+                    res.Data = _mapper.Map<List<PortfolioDto>>(portfolio);
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+                return res;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<List<int>>> UpsertPortfolio(List<PortfolioDto> portfolio)
+        {
+            var res = new Result<List<int>>();
+            if (portfolio.Count == 0)
+            {
+                res.ErrorMessage = "Nothing to add or update";
+            }
+
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    res.ErrorMessage = "User not found";
+                    return res;
+                }
+
+                var addPortfolio = _mapper.Map<List<Portfolio>>(portfolio);
+                if (addPortfolio != null)
+                {
+                    res.Data = new List<int>();
+                    foreach (var item in addPortfolio)
+                    {
+                        item.AppUserId = user.Id;
+                        if (item.Id == 0)
+                        {
+                            _dbContext.Add(item);
+                            res.ErrorMessage = _dbContext.SaveChanges().ToString();
+                            res.Data.Add(item.Id);
+                        }
+                        else
+                        {
+                            _dbContext.Update(item);
+                        }
+                    }
+                    res.ErrorMessage = _dbContext.SaveChanges().ToString();
+                }
+                else
+                {
+                    res.ErrorMessage = "Error during updating or inserting data";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> DeletePortfolio(int portfolioId)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User is not found";
+                }
+                var porfolio = _dbContext.Portfolios.FirstOrDefault(s => s.Id == portfolioId);
+                if (porfolio == null || porfolio.AppUserId != user.Id)
+                {
+                    return "You don't have rights to delete this item";
+                }
+                
+                    _dbContext.Remove(porfolio);
+                    return _dbContext.SaveChanges().ToString();
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
     }   
 

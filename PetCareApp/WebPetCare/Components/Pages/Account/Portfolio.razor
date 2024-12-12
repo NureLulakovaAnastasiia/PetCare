@@ -1,0 +1,326 @@
+﻿@using static System.Net.WebRequestMethods
+@inject IUserService _userService
+@inject IJSRuntime _JSRuntime
+
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            @if (!IsEdit)
+            {
+                <div class="row text-center">
+                    <h3 class="col-7 offset-2"><b>My portfolio</b></h3>
+                    <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    <button class="btn col-2 btn-func ms-2" @onclick="OpenModal"><i class="bi bi-plus"></i>   Add</button>
+                </div>
+            }
+            <form method="post" @onsubmit="UpdatePortfolio">
+                @if (IsEdit)
+                {
+                    <div class="row text-center">
+                        <h3 class="col-7 offset-2"><b>My portfolio</b></h3>
+                        <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
+                        <button type="submit" class="btn col-2 btn-func-success">Save</button>
+                    </div>
+                }
+
+                <hr />
+
+                @if (portfolioDtos.Count > 0)
+                {
+                    <div class="container my-4">
+                        <div class="row">
+                            @foreach (var portfolio in portfolioDtos)
+                            {
+                                <div class="col-md-3 mb-4">
+                                    <div class="card">
+                                       
+                                            @if (portfolio.Photo != null && portfolio.Photo.Length > 0)
+                                            {
+                                                var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(portfolio.Photo)}";
+                                                <img src="@base64Image" class="card-img-top" alt="Portfolio Image" />
+                                            }
+                                            else
+                                            {
+                                                <div class="card-body text-center">
+                                                    <p>No image available</p>
+                                                </div>
+                                            }
+                                            <div class="card-body">
+                                            <InputTextArea @bind-Value="portfolio.Text" placeholder="@portfolio.Text"
+                                                           class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" @oninput="() => AddToUpdated(portfolio.Id)" />
+                                            @if(IsEdit){
+                                                <button class="btn btn-danger" @onclick="()=>DeletePortfolio(portfolio.Id)"><i class="bi bi-trash"></i></button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        <h3>You don't have portfolio yet.</h3>
+                    </div>
+                }
+            </form>
+
+            @if (IsModalOpen)
+            {
+                <div class="modal-overlay">
+                    <div class="modal-content">
+                        <div>
+                            <span class="close" @onclick="CloseModal">&times;</span>
+                            <h2>Add new item to portfolio</h2>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col col-6 p-2">
+                                <label for="description" class="p-2">Description</label>
+                                <textarea id="description" @bind="Description" class="form-control"></textarea>
+                            </div>
+                            <div class="col-6 p-2 text-center">
+                                <label for="photo" class="d-block pb-2 pt-2">Photo</label>
+                                
+                                @if (UploadedImage != null)
+                                {
+                                    <img src="@UploadedImage" class="pb-2" alt="Preview image" style="max-width: 200px;" />
+                                }
+
+                                <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CloseModal">Cancel</button>
+                            <button type="submit" class="btn col-2 btn-func-success" @onclick="AddPortfolio">Save</button>
+                        </div>
+                    </div>
+                </div>
+            }
+            
+
+         </div>
+    </div>
+</div>
+
+
+@code{
+    public bool IsEdit = false;
+    public List<PortfolioDto> portfolioDtos = new List<PortfolioDto>();
+    private bool IsModalOpen = false;
+    public List<int> itemsToUpdate = new List<int>();
+
+    private string Description { get; set; }
+    private IBrowserFile SelectedFile;
+    private string? UploadedImage;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        SelectedFile = e.File;
+
+        using var stream = new MemoryStream();
+        await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+        UploadedImage = $"data:{SelectedFile.ContentType};base64,{Convert.ToBase64String(stream.ToArray())}";
+        StateHasChanged();
+    }
+
+    private void AddToUpdated(int id)
+    {
+        if (!itemsToUpdate.Contains(id))
+        {
+            itemsToUpdate.Add(id);
+        }
+    }
+
+    private async Task UpdatePortfolio()
+    {
+        var dataToUpdate = new List<PortfolioDto>();
+        foreach(var id in itemsToUpdate)
+        {
+            var item = portfolioDtos.Find(p => p.Id == id);
+            if(item != null)
+            {
+                dataToUpdate.Add(item);
+            }
+        }
+
+        if (dataToUpdate.Count > 0)
+        {
+            var res = await _userService.UpsertPortfolio(dataToUpdate);
+            if (res.IsSuccess)
+            {
+                showToastr("", "Portfolio was succesfully updated");
+                IsEdit = false;
+            }
+            else
+            {
+                showToastr(res.ErrorMessage);
+            }
+        }
+    }
+
+    private async Task DeletePortfolio(int id)
+    {
+        var item = portfolioDtos.FirstOrDefault(x => x.Id == id);
+        if(item != null)
+        {
+            var res = await _userService.DeletePortfolio(id);
+            if (String.IsNullOrEmpty(res))
+            {
+                portfolioDtos.Remove(item);
+                showToastr("", "Item was succefully deleted");
+            }
+            else
+            {
+                showToastr(res);
+            }
+        }
+    }
+
+    private async Task AddPortfolio()
+    {
+        if (SelectedFile != null)
+        {
+            using var stream = new MemoryStream();
+            await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+
+            var addPortfolio = new PortfolioDto
+                {
+                    Id = 0,
+                    Text = Description,
+                    Photo = stream.ToArray()
+                };
+
+            var list = new List<PortfolioDto> { addPortfolio };
+            var res = await _userService.UpsertPortfolio(list);
+            if (res.IsSuccess)
+            {
+                if (res.Data.Count > 0)
+                {
+                    addPortfolio.Id = res.Data[0];
+                    portfolioDtos.Add(addPortfolio);
+                    showToastr("", "Portfolio was succesfully saved");
+                    CloseModal();
+                }
+                else
+                {
+                    await OnAfterRenderAsync(true);
+                }
+            }
+            else
+            {
+                showToastr(res.ErrorMessage);
+            }
+
+
+        }
+        else
+        {
+            showToastr("Please upload an image");
+        }
+
+
+    }
+
+    private void OpenModal()
+    {
+        IsModalOpen = true;
+        UploadedImage = null;
+        Description = string.Empty;
+    }
+
+    private void CancelEdit()
+    {
+        IsEdit = false;
+    }
+    private void CloseModal()
+    {
+        IsModalOpen = false;
+        StateHasChanged();
+    }
+
+    public async Task GetPortfolio()
+    {
+        var res = await _userService.GetMasterPortfolio();
+        if (res.IsSuccess)
+        {
+            portfolioDtos = res.Data;
+            StateHasChanged();
+            showToastr("", "Data were succefully gotten");
+        }
+        else
+        {
+            showToastr(res.ErrorMessage);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetPortfolio();
+        }
+    }
+
+    private void OnButtonClick()
+    {
+        IsEdit = !IsEdit;
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+    
+    private void AddPortfolio(MouseEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        z-index: 1020;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5); /* Тло напівпрозоре */
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        z-index: 1030;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+</style>

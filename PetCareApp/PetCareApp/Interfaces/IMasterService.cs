@@ -37,5 +37,9 @@ namespace PetCareApp.Interfaces
 
         public Task<Result<List<GetRecordDto>>> GetRecordsForMonth(int month, int year);
         public Task<Result<List<BreakDto>>> GetMasterBreaks();
+
+        public Task<Result<List<PortfolioDto>>> GetMasterPortfolio(string? masterId);
+        public Task<Result<List<int>>> UpsertPortfolio(List<PortfolioDto> portfolio);
+        public Task<string> DeletePortfolio(int portfolioId);
     }
 }
