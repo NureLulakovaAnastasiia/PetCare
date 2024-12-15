@@ -6,7 +6,7 @@ namespace PetCareApp.Interfaces
     public interface IMasterService
     {
         public Task<string> AddContacts(AddContactsDto contacts);
-        public Task<string> UpdateContacts(ContactsDto contacts);        
+        public Task<string> UpdateContacts(ContactsDto contacts);
         public Task<string> UpsertSchedule(List<ScheduleDto> schedule);
         public Task<string> UpsertBreaks(List<BreakDto> breaks);
         public Task<string> DeleteBreaks(List<int> breaksId);
@@ -14,7 +14,7 @@ namespace PetCareApp.Interfaces
         public Task<string> UpdateQuestionary(List<UpdateQuestionDto> questionary);
         public Task<List<UpdateQuestionDto>> GetQuestionary(int serviceId);
         public Task<string> DeleteQuestionary(int serviceId);
-        public string CheckQuestionary<TQuestion, TAnswer>(List<TQuestion> questionary) 
+        public string CheckQuestionary<TQuestion, TAnswer>(List<TQuestion> questionary)
             where TQuestion : IQuestionDto<TAnswer>
             where TAnswer : IAnswerDto;
 
@@ -41,5 +41,6 @@ namespace PetCareApp.Interfaces
         public Task<Result<List<PortfolioDto>>> GetMasterPortfolio(string? masterId);
         public Task<Result<List<int>>> UpsertPortfolio(List<PortfolioDto> portfolio);
         public Task<string> DeletePortfolio(int portfolioId);
-    }
+        public Task<Result<List<GetServiceDto>>> GetMasterServices(string? masterId);
+    } 
 }

@@ -1035,6 +1035,41 @@ namespace PetCareApp.Services
                 return ex.Message;
             }
         }
+
+        public async Task<Result<List<GetServiceDto>>> GetMasterServices(string? masterId)
+        {
+            var res = new Result<List<GetServiceDto>>();
+            try
+            {
+
+                var user = await GetCurrentUserAsync();
+                if (masterId == null)
+                {
+                    if (user == null)
+                    {
+                        res.ErrorMessage = "User not found";
+                        return res;
+                    }
+                }
+                var services = _dbContext.Services.Where(s => s.AppUserId == (masterId == null ? user.Id : masterId)).ToList();
+                if (services == null || services.Count == 0)
+                {
+                    res.ErrorMessage = "No services were found";
+                }
+                else
+                {
+                    res.Data = _mapper.Map<List<GetServiceDto>>(services);
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+                return res;
+            }
+
+            return res;
+        }
+
     }   
 
 }

@@ -1,0 +1,93 @@
+﻿@inject IUserService _userService
+@inject IJSRuntime _JSRuntime
+@inject NavigationManager Navigation
+
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            @if(services.Count == 0)
+            {
+                <h3>No services were found</h3>
+            }
+            else
+            {
+                <div class="container my-4 align-items-center">
+                    <div class="row">
+                        @foreach(var service in services)
+                        {
+                            <div class="col-md-10 mb-4 offset-1">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>@service.Name</h3>
+                                    </div>
+                                    
+                                    <div class="row p-3">
+                                        <div class="col-9">
+                                           <h5>Price: @service.MinimumPrice - @service.MaximumPrice</h5>
+                                            <h5>Time: @service.MinimumTime - @service.MaximumTime min</h5>
+                                        </div>
+                                        <div class="col-2">
+                                            <button class="btn " style="background-color: #8de3af; " @onclick="()=> GoToDetails(service.Id)">More</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            }
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    private List<GetServiceDto> services = new List<GetServiceDto>();
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetMasterServices();
+
+        }
+    }
+    private async Task GetMasterServices()
+    {
+        var res = await _userService.GetMasterServices();
+        if (res.IsSuccess)
+        {
+            services = res.Data;
+            StateHasChanged();
+        }
+        else
+        {
+
+        }
+
+    }
+
+    private void GoToDetails(int serviceId)
+    {
+        Navigation.NavigateTo($"/service-id={serviceId}");
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+           await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+          await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+}

@@ -25,7 +25,7 @@ namespace PetCareApp.Controllers
             {
                 return BadRequest(ModelState);
             }
-             
+
             var res = await _masterService.AddContacts(contacts);
             if (int.TryParse(res, out int num))
             {
@@ -53,7 +53,7 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
-        
+
 
         [HttpGet("getMasterGeneralData")]
         public async Task<IActionResult> GetMasterGeneralData()
@@ -89,7 +89,7 @@ namespace PetCareApp.Controllers
 
         [HttpPost("addQuestionary")]
         [Authorize(Roles = "Master")]
-        public async Task<IActionResult> AddQuestionary([FromBody]List<AddQuestionDto> questionaryDto, [FromQuery] int serviceId)
+        public async Task<IActionResult> AddQuestionary([FromBody] List<AddQuestionDto> questionaryDto, [FromQuery] int serviceId)
         {
             if (!ModelState.IsValid)
             {
@@ -125,7 +125,7 @@ namespace PetCareApp.Controllers
 
         [HttpDelete("deleteQuestionary")]
         [Authorize(Roles = "Master")]
-        public async Task<IActionResult> DeleteQuestionary([FromQuery]int serviceId)
+        public async Task<IActionResult> DeleteQuestionary([FromQuery] int serviceId)
         {
             if (!ModelState.IsValid)
             {
@@ -142,7 +142,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("getQuestionary")]
-        public async Task<IActionResult> GetQuestionary([FromQuery]int serviceId)
+        public async Task<IActionResult> GetQuestionary([FromQuery] int serviceId)
         {
             if (!ModelState.IsValid)
             {
@@ -241,7 +241,7 @@ namespace PetCareApp.Controllers
             {
                 return Ok(num);
             }
-            if(res == "Unauthorized")
+            if (res == "Unauthorized")
             {
                 return StatusCode(401, res);
             }
@@ -254,7 +254,7 @@ namespace PetCareApp.Controllers
         {
             var descr = _masterService.GetQuestionaryDescription(questionary);
             var time = _masterService.AnalizeQuestionary(questionary, serviceId);
-            if(time == 0)
+            if (time == 0)
             {
                 return StatusCode(500, "Error during analizing questionary");
             }
@@ -263,7 +263,7 @@ namespace PetCareApp.Controllers
             {
                 return StatusCode(500, "Error during getting timeslots");
             }
-            
+
 
             return Ok(new QuestionaryAnalisysDto
             {
@@ -286,7 +286,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("CancelRecord")]
-        public async Task<IActionResult> CancelRecord([FromQuery]int recordId, [FromBody]string reason)
+        public async Task<IActionResult> CancelRecord([FromQuery] int recordId, [FromBody] string reason)
         {
             if (!ModelState.IsValid)
             {
@@ -352,7 +352,7 @@ namespace PetCareApp.Controllers
 
         [HttpPost("upsertPortfolio")]
         [Authorize(Roles = "Master")]
-        public async Task<IActionResult> UpsertPortfolio([FromBody]List<PortfolioDto> portfolioDto)
+        public async Task<IActionResult> UpsertPortfolio([FromBody] List<PortfolioDto> portfolioDto)
         {
             if (!ModelState.IsValid)
             {
@@ -382,6 +382,23 @@ namespace PetCareApp.Controllers
                 return Ok(num);
             }
             return StatusCode(500, res);
+        }
+
+
+        [HttpGet("getMasterServices")] //if masterId is empty - search for services of current user
+        public async Task<IActionResult> GetMasterServices(string? masterId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await _masterService.GetMasterServices(masterId);
+            if (data.IsSuccess)
+            {
+                return Ok(data.Data);
+            }
+            return StatusCode(500, data.ErrorMessage);
         }
     }
 }

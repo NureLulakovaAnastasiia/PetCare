@@ -392,6 +392,42 @@ namespace WebPetCare.Services
             }
             return res;
         }
+
+        public async Task<Result<List<GetServiceDto>>> GetMasterServices(string? masterId = null)
+        {
+            var res = new Result<List<GetServiceDto>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Master/getMasterServices{(masterId != null ? "?masterId=" + masterId : "")}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<GetServiceDto>>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
     }
 }
 

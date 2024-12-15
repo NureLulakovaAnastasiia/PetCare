@@ -22,5 +22,7 @@ namespace WebPetCare.IServices
         public Task<Result<List<int>>> UpsertPortfolio(List<PortfolioDto> portfolio);
 
         public Task<string> DeletePortfolio(int portfolioId); 
+
+        public Task<Result<List<GetServiceDto>>> GetMasterServices(string? masterId = null);
     }
 }
