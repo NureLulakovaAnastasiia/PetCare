@@ -9,7 +9,7 @@ namespace PetCareApp.Models
         public int Id { get; set; }
         [StringLength(500)]
         public string Text { get; set; } = string.Empty;
-        public byte[] Photo { get; set; } = [];
+        public byte[]? Photo { get; set; } = [];
         [Range(1, 5)]
         public int Rate { get; set; }
         public string? AppUserId { get; set; }

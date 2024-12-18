@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PetCareApp.Models;
+using System.Reflection.Emit;
 
 namespace PetCareApp.Data
 {
@@ -28,37 +29,55 @@ namespace PetCareApp.Data
         public DbSet<OrganizationEmployee> OrganizationEmployees { get; set; }
         public DbSet<Portfolio> Portfolios { get; set; }
         public DbSet<RequestToOrganization> RequestsToOrganization { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<City> Cities { get; set; }
+
 
         //protected override void OnModelCreating(ModelBuilder builder)
         //{
-        //    base.OnModelCreating(builder);
-        //    List<IdentityRole> roles = new List<IdentityRole>
-        //        {
-        //        new IdentityRole
-        //        {
-        //            Name = "Admin",
-        //            NormalizedName = "ADMIN"
-        //        },
-        //        new IdentityRole
-        //        {
-        //            Name = "User",
-        //            NormalizedName = "USER"
-        //        },
-        //        new IdentityRole
-        //        {
-        //            Name = "Master",
-        //            NormalizedName = "MASTER"
-        //        },
-        //        new IdentityRole
-        //        {
-        //            Name = "Organization",
-        //            NormalizedName = "ORGANIZATION"
-        //        }
-        //    };
 
-        //    builder.Entity<IdentityRole>().HasData(roles);
+            //builder.Entity<Country>(entity =>
+            //{
+            //    entity.ToTable("Countries");
+            //    entity.Property(e => e.LocalizedName)
+            //          .HasColumnType("NVARCHAR(MAX)");
+            //});
+
+            //builder.Entity<City>(entity =>
+            //{
+            //    entity.ToTable("Cities");
+            //    entity.Property(e => e.LocalizedName)
+            //          .HasColumnType("NVARCHAR(MAX)");
+            //});
+
+            //    base.OnModelCreating(builder);
+            //    List<IdentityRole> roles = new List<IdentityRole>
+            //        {
+            //        new IdentityRole
+            //        {
+            //            Name = "Admin",
+            //            NormalizedName = "ADMIN"
+            //        },
+            //        new IdentityRole
+            //        {
+            //            Name = "User",
+            //            NormalizedName = "USER"
+            //        },
+            //        new IdentityRole
+            //        {
+            //            Name = "Master",
+            //            NormalizedName = "MASTER"
+            //        },
+            //        new IdentityRole
+            //        {
+            //            Name = "Organization",
+            //            NormalizedName = "ORGANIZATION"
+            //        }
+            //    };
+
+            //    builder.Entity<IdentityRole>().HasData(roles);
         //}
 
 
-    }
+        }
 }

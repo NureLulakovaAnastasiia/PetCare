@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using System.ComponentModel.DataAnnotations;
 
 namespace PetCareApp.Models
@@ -21,6 +22,16 @@ namespace PetCareApp.Models
         public int MinimumTime { get; set; } = 0;
         public int MaximumTime { get; set; } = 0;
         public bool IsHidden { get; set; } = false;
+
+        public double Rate { get
+            {
+                var rates = Reviews.Select(x => x.Rate).ToList();
+                if (rates.Any())
+                {
+                    return rates.Average();
+                }
+                return 0;
+            } }
 
         public string? AppUserId { get; set; }
         [DeleteBehavior(DeleteBehavior.Cascade)]

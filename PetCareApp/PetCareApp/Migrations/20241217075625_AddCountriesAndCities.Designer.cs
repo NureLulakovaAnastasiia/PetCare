@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetCareApp.Data;
 
@@ -11,9 +12,11 @@ using PetCareApp.Data;
 namespace PetCareApp.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241217075625_AddCountriesAndCities")]
+    partial class AddCountriesAndCities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,34 +313,29 @@ namespace PetCareApp.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "geonameId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AdminRegion")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "adminName1");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CountryId")
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "countryId");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<double>("Latitude")
-                        .HasColumnType("float")
-                        .HasAnnotation("Relational:JsonPropertyName", "lat");
+                        .HasColumnType("float");
 
                     b.Property<string>("LocalizedName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Longitude")
-                        .HasColumnType("float")
-                        .HasAnnotation("Relational:JsonPropertyName", "lng");
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -384,15 +382,9 @@ namespace PetCareApp.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "countryId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CountryCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "countryCode");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");

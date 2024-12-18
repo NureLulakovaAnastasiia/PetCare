@@ -1,0 +1,102 @@
+﻿@page "/search"
+
+@using WebPetCare.Services
+@inject ISearchService _searchService
+@inject IJSRuntime _JSRuntime
+
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            <div>
+            <button class="btn">Filter </button>
+            <button class="btn">Sort </button>
+            <InputText>Search</InputText>
+            </div>
+            @* @if (CityList == null)
+            {
+                <p>Loading cities...</p>
+            }
+            else
+            {
+                <select @bind="SelectedCityId">
+                    <option value="">Select a city</option>
+                    @foreach (var city in CityList)
+                    {
+                        <option value="@city.GeonameId">@city.NameFormatted</option>
+                    }
+                </select>
+            } *@
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private List<CityDropdownItem> CityList { get; set; }
+    private int? SelectedCityId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await GetCities();
+        if (data != null)
+        {
+            CityList = data
+                .GroupBy(g => g.Name)
+                .SelectMany(group =>
+                    group.Count() > 1
+                        ? group.Select(city => new CityDropdownItem
+                            {
+                                GeonameId = city.GeonameId,
+                                NameFormatted = $"{city.Name} ({city.AdminName1})"
+                            })
+                        : group.Select(city => new CityDropdownItem
+                            {
+                                GeonameId = city.GeonameId,
+                                NameFormatted = city.Name
+                            })
+                )
+                .OrderBy(c => c.NameFormatted)
+                .ToList();
+        }
+        else
+        {
+            CityList = new List<CityDropdownItem>();
+        }
+    }
+
+
+    public async Task<List<GeoName>?> GetCities(string countryName = "UA")
+    {
+        var data = await _searchService.GetCityNames(countryName);
+        if (data.IsSuccess)
+        {
+            return data.Data;
+        }
+        else
+        {
+            showToastr(data.ErrorMessage);
+            return null;
+        }
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+
+
+    public class CityDropdownItem
+    {
+        public int GeonameId { get; set; }
+        public string NameFormatted { get; set; }
+    }
+}

@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="jQuery" Version="3.7.1" />
     <PackageReference Include="MudBlazor" Version="7.15.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Syncfusion.Blazor.Calendars" Version="27.1.58" />
     <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="27.1.58" />
     <PackageReference Include="Syncfusion.Blazor.Inputs" Version="27.1.58" />

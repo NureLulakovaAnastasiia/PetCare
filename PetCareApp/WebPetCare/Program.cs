@@ -19,6 +19,8 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
+
 builder.Services.AddHttpClient();
 builder.Services.AddMudServices();
 builder.Services.AddSyncfusionBlazor();
