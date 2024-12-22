@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PetCareApp.Data;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
+using PetCareApp.Mappings;
 using PetCareApp.Models;
 using System.Net.Http;
 using System.Text.Json;
@@ -134,9 +135,6 @@ namespace PetCareApp.Services
             return cities.DistinctBy(c => c.Id).ToList();
         }
 
-
-        
-
         public List<GetServiceDto>? FindServices(FiltersModel filters)
         {
             var services = _dbContext.Services.Include(s => s.Reviews)
@@ -209,6 +207,29 @@ namespace PetCareApp.Services
                     res.Add(dto);
                 }
             }
+            return res;
+        }
+
+        public List<ContactsDto> GetServicesContacts(List<string> userIds)
+        {
+            var res = new List<ContactsDto> ();
+            var contacts = _dbContext.Contacts.Include(c => c.Location)
+                .Where(c=> userIds.Contains(c.AppUserId))
+                .ToList();
+
+            if (contacts == null || contacts.Count == 0)
+            {
+                return res;
+            }
+            foreach (var contact in contacts)
+            {
+                var tmp = ContactsMapping.MapContact(contact);
+                if (tmp != null && tmp.Location != null)
+                {
+                    res.Add(tmp);
+                }
+            }
+            
             return res;
         }
     }

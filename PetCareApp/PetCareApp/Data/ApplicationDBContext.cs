@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PetCareApp.Models;
 using System.Reflection.Emit;
 
+
 namespace PetCareApp.Data
 {
     public class ApplicationDBContext: IdentityDbContext<AppUser>
@@ -32,9 +33,23 @@ namespace PetCareApp.Data
         public DbSet<Country> Countries { get; set; }
         public DbSet<City> Cities { get; set; }
 
+        public DbSet<Location> Locations { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(
+                "Data Source=CompNastia\\SQLEXPRESS;Initial Catalog=PetCare;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
+                x => x.UseNetTopologySuite() // Enable NetTopologySuite
+            );
+        }
         //protected override void OnModelCreating(ModelBuilder builder)
         //{
+        //    builder.Entity<Location>(entity =>
+        //    {
+        //        entity.Property(e => e.Coordinates)
+        //              .HasColumnType("geography");
+        //    });
+        //}
 
             //builder.Entity<Country>(entity =>
             //{
@@ -76,7 +91,7 @@ namespace PetCareApp.Data
             //    };
 
             //    builder.Entity<IdentityRole>().HasData(roles);
-        //}
+            //}
 
 
         }

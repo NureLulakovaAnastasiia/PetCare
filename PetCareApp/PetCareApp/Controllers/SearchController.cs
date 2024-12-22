@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
 using PetCareApp.Models;
 
@@ -63,6 +64,18 @@ namespace PetCareApp.Controllers
             }
             return NotFound();
 
+        }
+
+
+        [HttpPost("getServicesContacts")]
+        public IActionResult getServicesContacts([FromBody] List<string> userIds)
+        {
+            var res = _searchService.GetServicesContacts(userIds);
+            if (res == null || res.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(res);
         }
     }
 }

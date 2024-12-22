@@ -26,6 +26,7 @@ namespace PetCareApp.Data
             CreateMap<PortfolioDto, Portfolio>();
             CreateMap<Portfolio, PortfolioDto>();
             CreateMap<Contacts, GetContactsDto>();
+            CreateMap<Contacts, ContactsDto>();
             CreateMap<GetContactsDto, Contacts>();
             CreateMap<Models.Service, GetServiceDto>();
         }

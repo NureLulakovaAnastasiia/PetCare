@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PetCareApp.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace PetCareApp.Dtos
 {
@@ -12,5 +13,9 @@ namespace PetCareApp.Dtos
         public string City { get; set; }
         [Required]
         public string Phone { get; set; }
+
+        public string AppUserId { get; set; }
+
+        public LocationDto? Location { get; set; }
     }
 }

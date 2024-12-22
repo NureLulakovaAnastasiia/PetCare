@@ -12,6 +12,8 @@ namespace WebPetCare.IServices
         
         public Task<List<GetServiceDto>> GetFilteredData(FiltersModel filters);
 
+        public Task<List<ContactsDto>> getServicesContacts(List<string> userIds);
+
     }
 
 

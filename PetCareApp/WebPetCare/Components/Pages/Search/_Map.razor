@@ -1,0 +1,116 @@
+﻿@using static WebPetCare.Components.Pages.Search.SearchPage
+@inject ISearchService _searchService
+@inject IJSRuntime _JSRuntime
+
+
+
+<div id="map" style="height: 500px; width: 100%;"></div>
+
+@code {
+    [Parameter]
+    public List<ServiceSelection> services { get; set; } = new List<ServiceSelection>();
+    private string MapId = "map";
+    private List<ContactsDto> contacts = new List<ContactsDto>();
+    public List<Marker> markers = new List<Marker>();
+    private Marker? SelectedMarker;
+    private DotNetObjectReference<_Map>? _objectReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var users = services.Select(s => s.ServiceDto.AppUserId).Distinct().ToList();
+            if (users != null && users.Count > 0)
+            {
+                var data = await _searchService.getServicesContacts(users);
+                if(data != null)
+                {
+                    contacts = data;
+                    generateMarkers();
+                    _objectReference = DotNetObjectReference.Create(this);
+                    await _JSRuntime.InvokeVoidAsync("registerMapInterop", _objectReference);
+                    await _JSRuntime.InvokeVoidAsync("initMap", MapId, markers);
+                    
+                }
+            }
+        }
+    }
+    [JSInvokable("MarkerSelected")]
+    public void OnMarkerSelected(int markerId)
+    {
+        var selectedMarker = markers.FirstOrDefault(m => m.Id == markerId);
+        if (selectedMarker != null)
+        {
+            OnMarkerSelected(selectedMarker);
+        }
+    }
+    private void OnMarkerSelected(Marker marker)
+    {
+        markers.ForEach(m => m.Selected = false);
+        services.ForEach(s => s.Selected = false);
+
+        marker.Selected = true;
+
+        var relatedServices = services.Where(s => s.ServiceDto.AppUserId == contacts.FirstOrDefault(c => c.Id == marker.ContactsId)?.AppUserId);
+        foreach (var service in relatedServices)
+        {
+            service.Selected = true;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task HighlightMarker(Marker marker)
+    {
+        await _JSRuntime.InvokeVoidAsync("selectMarker", marker.Id);
+    }
+
+    public void OnServiceSelected(ServiceSelection service)
+    {
+        services.ForEach(s => s.Selected = false);
+        markers.ForEach(m => m.Selected = false);
+
+        service.Selected = true;
+
+        var relatedMarker = markers.FirstOrDefault(m => m.ContactsId == contacts.FirstOrDefault(c => c.AppUserId == service.ServiceDto.AppUserId)?.Id);
+        if (relatedMarker != null)
+        {
+            relatedMarker.Selected = true;
+            HighlightMarker(relatedMarker);
+        }
+
+        StateHasChanged();
+    }
+
+    public void generateMarkers()
+    {
+        foreach(var item in contacts)
+        {
+            if(item.Location != null){
+                markers.Add(new Marker
+                {
+                    Id = item.Location.Id,
+                    Name = item.Address,
+                    Latitude = item.Location.Latitude,
+                    Longitude = item.Location.Longitude,
+                    ContactsId = item.Id
+                });
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        _objectReference?.Dispose();
+    }
+
+    public class Marker
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public int ContactsId { get; set; }
+        public bool Selected { get; set; } = false;
+    }
+}

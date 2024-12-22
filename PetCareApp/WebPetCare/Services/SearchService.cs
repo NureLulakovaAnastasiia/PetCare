@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using MudBlazor.Charts;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PetCareApp.Dtos;
@@ -94,6 +95,39 @@ namespace WebPetCare.Services
             catch (Exception ex)
             {
                
+            }
+            return res;
+        }
+
+        public async Task<List<ContactsDto>> getServicesContacts(List<string> userIds)
+        {
+            var res = new List<ContactsDto>();
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(userIds, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Search/getServicesContacts";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+
+                    var data = JsonSerializer.Deserialize<List<ContactsDto>>(result, options);
+                    if (data != null)
+                    {
+                        return data;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
             }
             return res;
         }
