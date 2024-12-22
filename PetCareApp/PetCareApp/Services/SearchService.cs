@@ -16,6 +16,7 @@ namespace PetCareApp.Services
         private readonly ApplicationDBContext _dbContext;
         private HttpClient _httpClient;
         private const int maxData = 1000;
+        public static string defaultLocalization = "en";
         public SearchService(UserManager<AppUser> userManager, IMapper mapper, ApplicationDBContext context,
            IHttpContextAccessor httpContextAccessor, HttpClient httpClient) : base(userManager, httpContextAccessor)
         {
@@ -96,7 +97,7 @@ namespace PetCareApp.Services
             List<City> cities = new List<City>();
             do
             {
-                string apiUrl = $"http://api.geonames.org/searchJSON?country={countryCode}&featureClass=P&startRow={startRow}&maxRows={maxData}{(localization == "en" ? "" : "&lang=" + localization)}&username=anas_tasi_ia_311003";
+                string apiUrl = $"http://api.geonames.org/searchJSON?country={countryCode}&featureClass=P&startRow={startRow}&maxRows={maxData}{(localization == defaultLocalization ? "" : "&lang=" + localization)}&username=anas_tasi_ia_311003";
                 var response = await _httpClient.GetStringAsync(apiUrl);
                 try
                 {
@@ -134,7 +135,9 @@ namespace PetCareApp.Services
         }
 
 
-            public List<GetServiceDto>? FindServices(FiltersModel filters)
+        
+
+        public List<GetServiceDto>? FindServices(FiltersModel filters)
         {
             var services = _dbContext.Services.Include(s => s.Reviews)
                     .Include(s => s.AppUser).ThenInclude(u => u.Contacts).ToList();
@@ -154,14 +157,58 @@ namespace PetCareApp.Services
             if (filters.City != null)
             {
                 services = services
-                    .Where(s => s.AppUser.Contacts.City.Equals(filters.City))
+                    .Where(s => s.AppUser.Contacts.CityId == filters.City)
                     .ToList();
             }
              if(filters.Rate != null)
             {
                 services = services.Where(s => s.Rate >= filters.Rate).ToList();
             }
+             if(filters.MinPrice != null && filters.MaxPrice != null)
+            {
+                services = services.Where(s => 
+                    s.MinimumPrice >= filters.MinPrice &&
+                    s.MaximumPrice <= filters.MaxPrice
+                ).ToList();
+            }else if(filters.MaxPrice != null)
+            {
+                services = services.Where(s => s.MaximumPrice <= filters.MaxPrice).ToList();
+            }
+            else if (filters.MinPrice != null)
+            {
+                services = services.Where(s => s.MinimumPrice >= filters.MinPrice).ToList();
+            }
             var res = _mapper.Map<List<GetServiceDto>>(services);
+            return res;
+        }
+
+        public List<CityDto> GetCitiesList(int countryId, string localization = "en")
+        {
+            var res = new List<CityDto>();
+            var existingServiceCities = _dbContext.Contacts.Select(c => c.CityId).Distinct().ToList();
+            var cities = _dbContext.Cities.Where(c => c.CountryId == countryId).ToList();
+            if(existingServiceCities.Count > 0)
+            {
+                cities = cities.FindAll(c => existingServiceCities.Contains(c.Id)); 
+            }
+            foreach (var c in cities)
+            {
+                var dto = new CityDto
+                {
+                    CountryId = c.CountryId,
+                    Id = c.Id,
+                    AdminName = c.AdminRegion
+                };
+                var localized = JsonSerializer.Deserialize<Dictionary<string, string>>(c.LocalizedName);
+                if (localized != null)
+                {
+                    dto.Name = localized[localization] ?? string.Empty;
+                }
+                if (!String.IsNullOrEmpty(dto.Name))
+                {
+                    res.Add(dto);
+                }
+            }
             return res;
         }
     }

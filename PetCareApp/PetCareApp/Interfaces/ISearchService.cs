@@ -9,5 +9,6 @@ namespace PetCareApp.Interfaces
 
         public Task<string> AddCities(string countryCode, string localiation);
 
+        public List<CityDto> GetCitiesList(int countryId, string localization = "en");
     }
 }

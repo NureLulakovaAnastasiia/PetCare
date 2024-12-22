@@ -19,7 +19,7 @@ namespace PetCareApp.Dtos
         public int MinimumTime { get; set; } = 0;
         public int MaximumTime { get; set; } = 0;
         public bool IsHidden { get; set; } = false;
-
+        public double Rate { get; set; } = 0;
         public string? AppUserId { get; set; }
         public List<Review> Reviews { get; set; } = new List<Review>();
 

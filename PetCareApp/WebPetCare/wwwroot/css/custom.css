@@ -3264,6 +3264,13 @@ textarea.form-control-lg {
     border-color: #5bbbc2 !important;
 }
 
+.btn-func-little-padding {
+    background-color: #edd3d1;
+    padding: 0.15rem !important;
+    border-radius: 15px;
+    margin: 0.3rem;
+}
+
 
 .btn-func {
     background-color: #edd3d1;

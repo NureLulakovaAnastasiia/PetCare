@@ -9,7 +9,7 @@ using Syncfusion.Blazor;
 using Syncfusion.Blazor.Popups;
 
 var builder = WebApplication.CreateBuilder(args);
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH5fcXVUQ2RcWUB0WEI=");
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1feHRRQmlfUE1wWUY=");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

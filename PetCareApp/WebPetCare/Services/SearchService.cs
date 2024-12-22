@@ -1,6 +1,7 @@
 ﻿using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using PetCareApp.Dtos;
 using PetCareApp.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -25,15 +26,36 @@ namespace WebPetCare.Services
         }
 
 
-        public async Task<Result<List<GeoName>>> GetCityNames(string countryCode)
+        public async Task<Result<List<CityDto>>> GetCityNames(int countryId = 690791)
         {
-            var res = new Result<List<GeoName>>();
+            var res = new Result<List<CityDto>>();
             var localization = "en";
             //add getting localization
 
             try
             {
-            
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Search/getCitiesList?countryId={countryId}&localization={localization}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<CityDto>>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -43,12 +65,39 @@ namespace WebPetCare.Services
             return res;
         }
 
-    public class GeoName
-    {
-        public int GeonameId { get; set; }
+        public async Task<List<GetServiceDto>> GetFilteredData(FiltersModel filters)
+        {
+            var res = new List<GetServiceDto>();
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(filters, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Search/filters?all=false";
 
-        public string Name { get; set; }
-
-        public string AdminName1 { get; set; }
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    
+                    var data = JsonSerializer.Deserialize<List<GetServiceDto>>(result, options);
+                    if (data != null)
+                    {
+                        return data;
+                    }
+                }
+               
+            }
+            catch (Exception ex)
+            {
+               
+            }
+            return res;
+        }
     }
+
+    
 }

@@ -1,75 +1,267 @@
 ﻿@page "/search"
 
 @using WebPetCare.Services
+@using Syncfusion.Blazor.Inputs
 @inject ISearchService _searchService
 @inject IJSRuntime _JSRuntime
+@using LabelPosition = Syncfusion.Blazor.Inputs.LabelPosition
 
 
-<div class="d-flex justify-content-center">
+
+<div class="justify-content-center offset-2">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border bg-body-secondary p-3 ">
-            <div>
-            <button class="btn">Filter </button>
-            <button class="btn">Sort </button>
-            <InputText>Search</InputText>
-            </div>
-            @* @if (CityList == null)
-            {
-                <p>Loading cities...</p>
-            }
-            else
-            {
-                <select @bind="SelectedCityId">
-                    <option value="">Select a city</option>
-                    @foreach (var city in CityList)
-                    {
-                        <option value="@city.GeonameId">@city.NameFormatted</option>
-                    }
-                </select>
-            } *@
+            <div class="row">
+                <div class="col-3">
+                    <SfDropDownList TValue="int" TItem="CityDropdownItem" Placeholder="Select a city" AllowFiltering="true" DataSource="@CityList" CssClass="e-outline" FloatLabelType="FloatLabelType.Always">
+                        <DropDownListFieldSettings Text="NameFormatted" Value="GeonameId"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="int" TItem="CityDropdownItem" ValueChange="OnValueChange"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+                <div class="row col-2 text-center justify-content-center">
+                    <div class="">
+                    <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnFiter">
+                        <ContentTemplate>
+                            <div id='democontent' >
+                                    <div class="ms-0 text-center">
+                                        <h4>Rate</h4>
+                                    <SfRating @bind-Value=Rate ShowLabel=true ShowTooltip="false"  LabelPosition="LabelPosition.Left" >
+                                        <FullTemplate>
+                                            <img src=@fullTemplateImage widht="30" height="30" />
+                                        </FullTemplate>
+                                        <EmptyTemplate>
+                                            <img src=@emptyTemplateImage widht="30" height="30" />
+                                        </EmptyTemplate>
+                                        <LabelTemplate >@context+</LabelTemplate>
+                                    </SfRating>
+                                    <hr/>
+                                </div>
+                                    <div class="ps-4 pe-4 mt-1 text-center">
+                                        <h4>Price</h4>
+                                        <div class="row justify-content-around mt-2">
+                                            <InputNumber @bind-Value="RangeValue[0]" class="input-textarea-style col-5 p-1"></InputNumber>
+                                            <InputNumber @bind-Value="RangeValue[1]" class="input-textarea-style col-5 p-1"></InputNumber>
+                                        </div>
+                                        <SfSlider @bind-Value=@RangeValue Type="SliderType.Range" Min="minValue" Max="maxValue" Step="1"></SfSlider>
+                                </div>
+                                <hr/>
+                                <div class="row justify-content-center">
+                                    <button class="btn col-6 btn-danger btn-func-little-padding">Clear filters</button>
+                                </div>
+                            </div>
+                        </ContentTemplate>
+                        <ChildContent>
+                            <button class="btn" ID="btnFiter"><i class="bi bi-funnel-fill"></i>   Filter </button>
+                        </ChildContent>
+                    </SfTooltip>
+                    </div>
+                </div>
+                <div class="row col-2 text-center justify-content-center">
+                    <div class=" ">
+                        <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnSort">
+                            <ContentTemplate>
+                                <div id='democontent'>
+                                    <div class="ms-0 text-center">
+                                        <h4>By Rate</h4>
+                                        <SfCheckBox @bind-Checked="sorting.ByRate" @onchange="@(() => ChangeSortType("Rate"))"></SfCheckBox>
+                                            <div>
+                                            <SfRadioButton Label="From highest" Name="rates" Value="false" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
+                                            <SfRadioButton Label="From lowest" Name="rates" Value="true" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
+                                            </div>
+                                        <hr />
+                                    </div>
+                                        
+                                    <div class="ms-0 text-center">
+                                        <h4>By Price</h4>
+                                        <SfCheckBox @bind-Checked="sorting.ByPrice" @onchange="@(() => ChangeSortType("Price"))"></SfCheckBox>
+                                        <div>
+                                            <SfRadioButton Label="From highest" Name="prices" Value="false" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
+                                            <SfRadioButton Label="From lowest" Name="prices" Value="true" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
+                                        </div>
+                                        <hr />
+                                    </div>
 
+                                    <div class="ms-0 text-center">
+                                        <h4>By Reviews</h4>
+                                        <SfCheckBox @bind-Checked="sorting.ByNumOfReviews" @onchange="@(() => ChangeSortType("Reviews"))"></SfCheckBox>
+                                        <div>
+                                            <SfRadioButton Label="From highest" Name="reviews" Value="false" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
+                                            <SfRadioButton Label="From lowest" Name="reviews" Value="true" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
+                                        </div>
+
+                                        <hr />
+                                    </div>
+                                       
+                                </div>
+                            </ContentTemplate>
+                            <ChildContent>
+                                <button class="btn" ID="btnSort"><i class="bi bi-arrow-down-up"></i>   Sort </button>
+                            </ChildContent>
+                        </SfTooltip>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <button class="btn" @onclick="GetFilteredData">Apply</button>
+                </div>
+
+            </div>
+            
+
+        </div>
+    </div>
+    <div class="col-lg-10 align-items-center text-center mt-3">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            <div class="row">
+                @if (filteredServices.Count > 0)
+                {
+                    <div class="col-6">
+
+                    </div>
+                    <div class="col-6">
+                        @foreach (var item in filteredServices)
+                        {
+                            <div>
+                                <h4>@item.Name</h4>
+                                <p>@item.MinimumPrice  -  @item.MaximumPrice</p>
+                                <p>Rate: @item.Rate</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        No data to display
+                    </div>
+                }
+
+            </div>
         </div>
     </div>
 </div>
 
 
 @code {
-    private List<CityDropdownItem> CityList { get; set; }
-    private int? SelectedCityId { get; set; }
+    public double Rate = 0;
+    public List<CityDropdownItem> CityList { get; set; } = new List<CityDropdownItem>();
+    private string fullTemplateImage = "Images/star-fill.svg";
+    private string emptyTemplateImage = "Images/star.svg";
+    private FiltersModel filters = new FiltersModel();
+    private List<GetServiceDto> filteredServices = new List<GetServiceDto>();
+    private int minValue = 0;
+    private int maxValue = 10000;
+    public int[] RangeValue = { 0, 10000 };
+    public SortingSettings sorting = new SortingSettings();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var data = await GetCities();
-        if (data != null)
+        if (firstRender)
         {
-            CityList = data
-                .GroupBy(g => g.Name)
-                .SelectMany(group =>
-                    group.Count() > 1
-                        ? group.Select(city => new CityDropdownItem
-                            {
-                                GeonameId = city.GeonameId,
-                                NameFormatted = $"{city.Name} ({city.AdminName1})"
-                            })
-                        : group.Select(city => new CityDropdownItem
-                            {
-                                GeonameId = city.GeonameId,
-                                NameFormatted = city.Name
-                            })
-                )
-                .OrderBy(c => c.NameFormatted)
-                .ToList();
+            var data = await GetCities();
+            if (data != null)
+            {
+                CityList = data
+                    .GroupBy(g => g.Name)
+                    .SelectMany(group =>
+                        group.Count() > 1
+                            ? group.Select(city => new CityDropdownItem
+                                {
+                                    GeonameId = city.Id,
+                                    NameFormatted = $"{city.Name} ({city.AdminName})"
+                                })
+                            : group.Select(city => new CityDropdownItem
+                                {
+                                    GeonameId = city.Id,
+                                    NameFormatted = city.Name
+                                })
+                    )
+                    .OrderBy(c => c.NameFormatted)
+                    .ToList();
+            }
+            else
+            {
+                CityList = new List<CityDropdownItem>();
+            }
+            CityList.Insert(0, new CityDropdownItem
+                {
+                    GeonameId = 0,
+                    NameFormatted = "----"
+                });
+
         }
-        else
-        {
-            CityList = new List<CityDropdownItem>();
-        }
+        StateHasChanged();
     }
 
 
-    public async Task<List<GeoName>?> GetCities(string countryName = "UA")
+
+    public void CheckRange()
     {
-        var data = await _searchService.GetCityNames(countryName);
+        var min = (int)filteredServices.Select(s => s.MinimumPrice).Min();
+        var max = (int)filteredServices.Select(s => s.MaximumPrice).Max();
+        if (min < minValue && min >= 0)
+        {
+            minValue = min;
+            RangeValue[0] = minValue;
+        }
+        if(max > maxValue)
+        {
+            maxValue = max;
+            RangeValue[1] = maxValue;
+        }
+    }
+
+    public void ChangeSortType(string type)
+    {
+        if (type == "Rate" && sorting.ByRate)
+        {
+            sorting.ByPrice = false;
+            sorting.ByNumOfReviews = false;
+        }
+        else if (type == "Price" && sorting.ByPrice)
+        {
+            sorting.ByRate = false;
+            sorting.ByNumOfReviews = false;
+        }
+        else if (type == "Reviews" && sorting.ByNumOfReviews)
+        {
+            sorting.ByRate = false;
+            sorting.ByPrice = false;
+        }
+        if (filteredServices.Count > 0)
+        {
+            SortServices();
+        }
+        StateHasChanged();
+    }
+
+    public void SortServices()
+    {
+        var ascending = false;
+        if (sorting.ByRate)
+        {
+            filteredServices.Sort(SortByRate);
+            ascending = sorting.AscendingRate;
+        }else if (sorting.ByNumOfReviews)
+        {
+            filteredServices.Sort(SortByReviews);
+            ascending = sorting.AscendingReview;
+        }
+        else
+        {
+            filteredServices.Sort(SortByPrice);
+            ascending = sorting.AscendingPrice;
+        }
+
+        if (ascending)
+        {
+            filteredServices.Reverse();
+        }
+       
+    }
+
+    public async Task<List<CityDto>?> GetCities(int countryId = 690791)
+    {
+        var data = await _searchService.GetCityNames(countryId);
         if (data.IsSuccess)
         {
             return data.Data;
@@ -80,6 +272,36 @@
             return null;
         }
     }
+
+    public void OnValueChange(ChangeEventArgs<int, CityDropdownItem> args)
+    {
+        if (args.Value == 0)
+        {
+            filters.City = null;
+        }
+        else
+        {
+            filters.City = args.Value;
+        }
+    }
+
+
+    public async Task GetFilteredData()
+    {
+        if(Rate != 0)
+        {
+            filters.Rate = Rate;
+        }
+        if (minValue != RangeValue[0] || maxValue != RangeValue[1])
+        {
+            filters.MaxPrice = RangeValue[1];
+            filters.MinPrice = RangeValue[0];
+        }
+        filteredServices = await _searchService.GetFilteredData(filters);
+        CheckRange();
+        StateHasChanged();
+    }
+
 
     private async void showToastr(string res, string successMessage = "")
     {
@@ -97,6 +319,86 @@
     public class CityDropdownItem
     {
         public int GeonameId { get; set; }
-        public string NameFormatted { get; set; }
+        public string NameFormatted { get; set; } = string.Empty;
+    }
+
+    public class SortingSettings
+    {
+        public bool ByPrice { get; set; } = false;
+        public bool ByNumOfReviews { get; set; } = false;
+        public bool ByRate { get; set; } = false;
+
+        public bool AscendingRate { get; set; } = false;
+        public bool AscendingPrice { get; set; } = false;
+        public bool AscendingReview { get; set; } = false;
+    }
+
+    //descending sorting
+
+    private static int SortByRate(GetServiceDto a, GetServiceDto b)
+    {
+        if(a.Rate > b.Rate)
+        {
+            return -1;
+
+        }else if(a.Rate == b.Rate)
+        {
+            return 0;
+        }
+
+        return 1;
+    }
+
+    private static int SortByReviews(GetServiceDto a, GetServiceDto b)
+    {
+        if (a.Reviews.Count > b.Reviews.Count)
+        {
+            return -1;
+
+        }
+        else if (a.Reviews.Count == b.Reviews.Count)
+        {
+            return 0;
+        }
+
+        return 1;
+    }
+
+    private static int SortByPrice(GetServiceDto a, GetServiceDto b)
+    {
+        if (a.MinimumPrice > b.MinimumPrice)
+        {
+            return -1;
+
+        }
+        else if (a.MinimumPrice == b.MinimumPrice)
+        {
+            return 0;
+        }
+
+        return 1;
     }
 }
+
+
+
+<style>
+    .e-tooltip-wrap.e-popup {
+        background-color: #e3dccc;
+        border: 0px;
+        box-shadow: 0px 0px 7px #b5ab94;
+    }
+
+    .e-tooltip-wrap{
+        background-color: #e3dccc;
+    }
+
+    .e-rating-container .e-rating-label.e-label-right, .e-rating-container .e-rating-label.e-label-left {
+         min-width: 0px;
+    }
+
+    .e-rating-container .e-rating-label.e-label-left {
+        color: brown;
+        font-size: large;
+    }
+</style>
