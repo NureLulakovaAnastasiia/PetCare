@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using PetCareApp.Data;
@@ -12,9 +13,11 @@ using PetCareApp.Data;
 namespace PetCareApp.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241223170622_RemoveConnectionBetweenServiceAndTags")]
+    partial class RemoveConnectionBetweenServiceAndTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -886,21 +889,6 @@ namespace PetCareApp.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("ServiceTag", b =>
-                {
-                    b.Property<int>("ServicesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ServicesId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("ServiceTag");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1186,21 +1174,6 @@ namespace PetCareApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Service");
-                });
-
-            modelBuilder.Entity("ServiceTag", b =>
-                {
-                    b.HasOne("PetCareApp.Models.Service", null)
-                        .WithMany()
-                        .HasForeignKey("ServicesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PetCareApp.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("PetCareApp.Models.AppUser", b =>

@@ -39,6 +39,8 @@ namespace PetCareApp.Models
         public List<Question> Questions { get; set; } = new List<Question>();
         public List<Record>? Records { get; set; } = new List<Record>();
         public List<Review> Reviews { get; set; } = new List<Review>();
+        public List<Tag>? Tags { get; set; }
+
         public List<ServiceLimitation> ServiceLimitations { get; set; } = new List<ServiceLimitation>();
     }
 }

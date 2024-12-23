@@ -32,8 +32,8 @@ namespace PetCareApp.Data
         public DbSet<RequestToOrganization> RequestsToOrganization { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<City> Cities { get; set; }
-
         public DbSet<Location> Locations { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -51,48 +51,48 @@ namespace PetCareApp.Data
         //    });
         //}
 
-            //builder.Entity<Country>(entity =>
-            //{
-            //    entity.ToTable("Countries");
-            //    entity.Property(e => e.LocalizedName)
-            //          .HasColumnType("NVARCHAR(MAX)");
-            //});
+        //builder.Entity<Country>(entity =>
+        //{
+        //    entity.ToTable("Countries");
+        //    entity.Property(e => e.LocalizedName)
+        //          .HasColumnType("NVARCHAR(MAX)");
+        //});
 
-            //builder.Entity<City>(entity =>
-            //{
-            //    entity.ToTable("Cities");
-            //    entity.Property(e => e.LocalizedName)
-            //          .HasColumnType("NVARCHAR(MAX)");
-            //});
+        //builder.Entity<City>(entity =>
+        //{
+        //    entity.ToTable("Cities");
+        //    entity.Property(e => e.LocalizedName)
+        //          .HasColumnType("NVARCHAR(MAX)");
+        //});
 
-            //    base.OnModelCreating(builder);
-            //    List<IdentityRole> roles = new List<IdentityRole>
-            //        {
-            //        new IdentityRole
-            //        {
-            //            Name = "Admin",
-            //            NormalizedName = "ADMIN"
-            //        },
-            //        new IdentityRole
-            //        {
-            //            Name = "User",
-            //            NormalizedName = "USER"
-            //        },
-            //        new IdentityRole
-            //        {
-            //            Name = "Master",
-            //            NormalizedName = "MASTER"
-            //        },
-            //        new IdentityRole
-            //        {
-            //            Name = "Organization",
-            //            NormalizedName = "ORGANIZATION"
-            //        }
-            //    };
+        //    base.OnModelCreating(builder);
+        //    List<IdentityRole> roles = new List<IdentityRole>
+        //        {
+        //        new IdentityRole
+        //        {
+        //            Name = "Admin",
+        //            NormalizedName = "ADMIN"
+        //        },
+        //        new IdentityRole
+        //        {
+        //            Name = "User",
+        //            NormalizedName = "USER"
+        //        },
+        //        new IdentityRole
+        //        {
+        //            Name = "Master",
+        //            NormalizedName = "MASTER"
+        //        },
+        //        new IdentityRole
+        //        {
+        //            Name = "Organization",
+        //            NormalizedName = "ORGANIZATION"
+        //        }
+        //    };
 
-            //    builder.Entity<IdentityRole>().HasData(roles);
-            //}
+        //    builder.Entity<IdentityRole>().HasData(roles);
+        //}
 
 
-        }
+    }
 }

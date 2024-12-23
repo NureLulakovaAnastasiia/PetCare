@@ -100,6 +100,9 @@
                         </SfTooltip>
                     </div>
                 </div>
+                <div class="row col-2 text-center justify-content-center">
+                    <_TagSearch selectedTags="selectedTags"></_TagSearch>
+                </div>
                 <div class="col-2">
                     <button class="btn" @onclick="GetFilteredData">Apply</button>
                 </div>
@@ -153,6 +156,8 @@
     public int[] RangeValue = { 0, 10000 };
     public SortingSettings sorting = new SortingSettings();
     private _Map? mapComponent;
+    public List<Tag> selectedTags { get; set; } = new List<Tag>();
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -203,17 +208,20 @@
 
     public void CheckRange()
     {
-        var min = (int)filteredServices.Select(s => s.ServiceDto.MinimumPrice).Min();
-        var max = (int)filteredServices.Select(s => s.ServiceDto.MaximumPrice).Max();
-        if (min < minValue && min >= 0)
+        if (filteredServices.Count > 0)
         {
-            minValue = min;
-            RangeValue[0] = minValue;
-        }
-        if(max > maxValue)
-        {
-            maxValue = max;
-            RangeValue[1] = maxValue;
+            var min = (int)filteredServices.Select(s => s.ServiceDto.MinimumPrice).Min();
+            var max = (int)filteredServices.Select(s => s.ServiceDto.MaximumPrice).Max();
+            if (min < minValue && min >= 0)
+            {
+                minValue = min;
+                RangeValue[0] = minValue;
+            }
+            if (max > maxValue)
+            {
+                maxValue = max;
+                RangeValue[1] = maxValue;
+            }
         }
     }
 
@@ -304,7 +312,12 @@
             filters.MaxPrice = RangeValue[1];
             filters.MinPrice = RangeValue[0];
         }
+        if(selectedTags.Count > 0)
+        {
+            filters.Tags = selectedTags;
+        }
         var res = await _searchService.GetFilteredData(filters);
+        filteredServices.Clear();
         foreach(var item in res)
         {
             filteredServices.Add(new ServiceSelection

@@ -1,0 +1,111 @@
+﻿@using WebPetCare.Services
+@using Syncfusion.Blazor.Inputs
+@inject ISearchService _searchService
+
+
+<SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnTags">
+    <ContentTemplate>
+        <div id='democontent'>
+            <div class="ms-0 text-center">
+                <SfTextBox @bind-Value="@search" CssClass="input-textarea-style" ValueChange="filterTags"></SfTextBox>
+                <div class="row">
+                    <div class="d-flex flex-wrap m-2">
+                    @foreach (var item in filteredTags)
+                    {
+                        <div class="badge text-white d-inline-flex align-items-center me-2 " @onclick="() => SelectTag(item.Id)">
+                            @item.Name
+                        </div>
+                    }
+                    </div>
+                </div>
+                <hr/>
+                <div class="row text-start">
+                    <h6 class="offset-1 p-0"> Selected </h6>
+                    <div class="d-flex flex-wrap m-2">
+                        @foreach (var item in selectedTags)
+                        {
+                            <div class="badge text-white d-inline-flex align-items-center me-2 mt-1 p-2">
+                                @item.Name
+                                <button type="button" class="btn-close btn-close-white ms-2 " aria-label="Close" @onclick="() => DeleteTag(item.Id)"></button> 
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ContentTemplate>
+    <ChildContent>
+        <button class="btn" ID="btnTags"><i class="bi bi-tags-fill"></i>   Tags </button>
+    </ChildContent>
+</SfTooltip>
+
+@code {
+    [Parameter]
+    public List<Tag> selectedTags { get; set; } = new List<Tag>();
+
+    public List<Tag> allTags = new List<Tag>();
+
+    public List<Tag> filteredTags = new List<Tag>();
+
+    public string search = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetAllTags();
+            foreach(var item in allTags)
+            {
+                filteredTags.Add(new Tag
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    });
+            }
+        }
+    }
+
+    public void filterTags()
+    {
+        // filteredTags = allTags
+        // .Except(selectedTags)
+        // .Where(tag => tag.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+        // .ToList();
+        filteredTags = allTags
+        .Where(tag => tag.Name.Contains(search, StringComparison.OrdinalIgnoreCase) &&
+                      !selectedTags.Contains(tag))
+        .ToList();
+        StateHasChanged();
+    }
+
+    public async Task GetAllTags()
+    {
+        var res = await _searchService.GetAllTags();
+        if(res != null)
+        {
+            allTags = res;
+        }
+        StateHasChanged();
+    }
+
+    private void SelectTag(int id)
+    {
+        var tmp = filteredTags.FirstOrDefault(t => t.Id == id);
+        if(tmp != null)
+        {
+            selectedTags.Add(tmp);
+            filteredTags.Remove(tmp);
+        }
+        StateHasChanged();
+    }
+
+    private void DeleteTag(int id)
+    {
+        var item = selectedTags.FirstOrDefault(t => t.Id == id);
+        if(item != null)
+        {
+            selectedTags.Remove(item);
+            filterTags();
+        }
+    }
+}

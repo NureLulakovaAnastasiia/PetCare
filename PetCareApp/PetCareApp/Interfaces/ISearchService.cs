@@ -12,5 +12,7 @@ namespace PetCareApp.Interfaces
         public List<CityDto> GetCitiesList(int countryId, string localization = "en");
 
         public List<ContactsDto> GetServicesContacts(List<string> userIds);
+
+        public List<Tag> GetAllTags();
     }
 }

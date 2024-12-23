@@ -99,7 +99,7 @@ namespace WebPetCare.Services
             return res;
         }
 
-        public async Task<List<ContactsDto>> getServicesContacts(List<string> userIds)
+        public async Task<List<ContactsDto>> GetServicesContacts(List<string> userIds)
         {
             var res = new List<ContactsDto>();
             JsonSerializerOptions options = new JsonSerializerOptions
@@ -129,6 +129,39 @@ namespace WebPetCare.Services
             {
 
             }
+            return res;
+        }
+
+        public async Task<List<Tag>> GetAllTags()
+        {
+            var res = new List<Tag>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Search/allTags";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<Tag>>(result, options);
+                    if (data != null)
+                    {
+                        res = data;
+                    }
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
             return res;
         }
     }

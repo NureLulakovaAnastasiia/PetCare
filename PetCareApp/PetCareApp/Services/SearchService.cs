@@ -138,7 +138,9 @@ namespace PetCareApp.Services
         public List<GetServiceDto>? FindServices(FiltersModel filters)
         {
             var services = _dbContext.Services.Include(s => s.Reviews)
-                    .Include(s => s.AppUser).ThenInclude(u => u.Contacts).ToList();
+                    .Include(s => s.AppUser).ThenInclude(u => u.Contacts)
+                    .Include(s => s.Tags)
+                    .ToList();
 
             services.ForEach(s =>
             {
@@ -158,7 +160,12 @@ namespace PetCareApp.Services
                     .Where(s => s.AppUser.Contacts.CityId == filters.City)
                     .ToList();
             }
-             if(filters.Rate != null)
+            if (filters.Tags != null && filters.Tags.Count > 0)
+            {
+                services = services.Where(s => s.Tags != null && filters.Tags.All(t => s.Tags.Contains(t))).ToList();
+            }
+
+            if (filters.Rate != null)
             {
                 services = services.Where(s => s.Rate >= filters.Rate).ToList();
             }
@@ -176,6 +183,9 @@ namespace PetCareApp.Services
             {
                 services = services.Where(s => s.MinimumPrice >= filters.MinPrice).ToList();
             }
+
+            
+ 
             var res = _mapper.Map<List<GetServiceDto>>(services);
             return res;
         }
@@ -230,6 +240,17 @@ namespace PetCareApp.Services
                 }
             }
             
+            return res;
+        }
+
+        public List<Tag> GetAllTags()
+        {
+           var res = _dbContext.Tags.Where(t => t.Id > 0).ToList();
+            if(res == null)
+            {
+                return new List<Tag>();
+            }
+
             return res;
         }
     }

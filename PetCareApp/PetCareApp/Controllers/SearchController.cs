@@ -77,5 +77,18 @@ namespace PetCareApp.Controllers
             }
             return Ok(res);
         }
+
+
+        [HttpGet("allTags")]
+        public IActionResult getAllTags()
+        {
+            var res = _searchService.GetAllTags();
+            if(res.Count > 0)
+            {
+                return Ok(res);
+            }
+
+            return NotFound();
+        }
     }
 }

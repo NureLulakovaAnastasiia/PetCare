@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using PetCareApp.Data;
@@ -12,9 +13,11 @@ using PetCareApp.Data;
 namespace PetCareApp.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241223075913_AddTagsToService")]
+    partial class AddTagsToService
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -869,6 +872,29 @@ namespace PetCareApp.Migrations
                     b.ToTable("ServiceLimitations");
                 });
 
+            modelBuilder.Entity("PetCareApp.Models.ServiceTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ServiceTags");
+                });
+
             modelBuilder.Entity("PetCareApp.Models.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -1186,6 +1212,25 @@ namespace PetCareApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("PetCareApp.Models.ServiceTag", b =>
+                {
+                    b.HasOne("PetCareApp.Models.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PetCareApp.Models.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Service");
+
+                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("ServiceTag", b =>
