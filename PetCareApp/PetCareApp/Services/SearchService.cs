@@ -160,6 +160,9 @@ namespace PetCareApp.Services
                     .Where(s => s.AppUser.Contacts.CityId == filters.City)
                     .ToList();
             }
+            if (filters.Name != null) {
+                services = services.Where(s => s.Name.Contains(filters.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
             if (filters.Tags != null && filters.Tags.Count > 0)
             {
                 services = services.Where(s => s.Tags != null && filters.Tags.All(t => s.Tags.Contains(t))).ToList();

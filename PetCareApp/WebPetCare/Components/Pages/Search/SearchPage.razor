@@ -18,8 +18,10 @@
                         <DropDownListEvents TValue="int" TItem="CityDropdownItem" ValueChange="OnValueChange"></DropDownListEvents>
                     </SfDropDownList>
                 </div>
-                <div class="row col-2 text-center justify-content-center">
-                    <div class="">
+
+                <div class=" row col-5">
+                <div class="row col-4 m-0 p-0 text-center justify-content-center">
+                    <div class="m-0">
                     <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnFiter">
                         <ContentTemplate>
                             <div id='democontent' >
@@ -51,12 +53,12 @@
                             </div>
                         </ContentTemplate>
                         <ChildContent>
-                            <button class="btn" ID="btnFiter"><i class="bi bi-funnel-fill"></i>   Filter </button>
+                            <button class="btn m-0 p-3" ID="btnFiter"><i class="bi bi-funnel-fill"></i>   Filter </button>
                         </ChildContent>
                     </SfTooltip>
                     </div>
                 </div>
-                <div class="row col-2 text-center justify-content-center">
+                <div class="row col-4  m-0 p-0 text-center justify-content-center">
                     <div class=" ">
                         <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnSort">
                             <ContentTemplate>
@@ -95,18 +97,25 @@
                                 </div>
                             </ContentTemplate>
                             <ChildContent>
-                                <button class="btn" ID="btnSort"><i class="bi bi-arrow-down-up"></i>   Sort </button>
+                                <button class="btn m-0" ID="btnSort"><i class="bi bi-arrow-down-up"></i>   Sort </button>
                             </ChildContent>
                         </SfTooltip>
                     </div>
                 </div>
-                <div class="row col-2 text-center justify-content-center">
+                <div class="row col-4 m-0 p-0 text-center justify-content-center">
                     <_TagSearch selectedTags="selectedTags"></_TagSearch>
                 </div>
-                <div class="col-2">
-                    <button class="btn" @onclick="GetFilteredData">Apply</button>
                 </div>
 
+                <div class=" row col-3">
+                    <div class="col-10 align-content-center">
+                        <label>Search</label>
+                        <InputText @bind-Value="search" DisplayName="Search" class="input-textarea-style col-11" ></InputText>
+                    </div>
+                    <div class="col-1 m-0">
+                        <button class="btn" @onclick="GetFilteredData"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
             </div>
             
 
@@ -123,7 +132,7 @@
                     <div class="col-6">
                         @foreach (var item in filteredServices)
                         {
-                            <div style="background-color: @(item.Selected ? "yellow" : "white") " @onclick="(() => HandleParentServiceSelection(item))">
+                            <div style="box-shadow: @(item.Selected ? "0px 0px 15px #c4b991" : "") " @onclick="(() => HandleParentServiceSelection(item))">
                                 <h4>@item.ServiceDto.Name</h4>
                                 <p>@item.ServiceDto.MinimumPrice  -  @item.ServiceDto.MaximumPrice</p>
                                 <p>Rate: @item.ServiceDto.Rate</p>
@@ -157,7 +166,7 @@
     public SortingSettings sorting = new SortingSettings();
     private _Map? mapComponent;
     public List<Tag> selectedTags { get; set; } = new List<Tag>();
-
+    public string search = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -315,6 +324,10 @@
         if(selectedTags.Count > 0)
         {
             filters.Tags = selectedTags;
+        }
+        if (!String.IsNullOrEmpty(search))
+        {
+            filters.Name = search;
         }
         var res = await _searchService.GetFilteredData(filters);
         filteredServices.Clear();

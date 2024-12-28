@@ -35,7 +35,7 @@
         </div>
     </ContentTemplate>
     <ChildContent>
-        <button class="btn" ID="btnTags"><i class="bi bi-tags-fill"></i>   Tags </button>
+        <button class="btn m-0" ID="btnTags"><i class="bi bi-tags-fill"></i>   Tags </button>
     </ChildContent>
 </SfTooltip>
 
@@ -67,10 +67,6 @@
 
     public void filterTags()
     {
-        // filteredTags = allTags
-        // .Except(selectedTags)
-        // .Where(tag => tag.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
-        // .ToList();
         filteredTags = allTags
         .Where(tag => tag.Name.Contains(search, StringComparison.OrdinalIgnoreCase) &&
                       !selectedTags.Contains(tag))

@@ -9,6 +9,7 @@
         public double? Rate { get; set; }
         public float? MinPrice { get; set; }
         public float? MaxPrice { get; set; }
+        public string? Name { get; set; }
 
         public string Localization { get; set; } = "en";
         public FiltersModel() { }
