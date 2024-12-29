@@ -18,7 +18,7 @@
                     <div class="row text-center">
                         <h3 class="col-6 offset-3"><b>About me</b></h3>
                         <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
-                        <button type="submit" class="btn col-2 btn-func-success">Save</button>
+                        <button type="submit" class="btn col-2 btn-func-success" >Save</button>
                     </div>
                 }
            
@@ -42,18 +42,23 @@
 
                     <div class="row col-lg-12 m-3">
                         <div class="col-4 ms-4 mb-4 me-5">
-                            <h4>City</h4>
-                            <InputText @bind-Value="masterData.Contacts.City" 
-                            placeholder="@(masterData.Contacts.City != null ? masterData.Contacts.City : " - ")"
-                                    class="input-text-style" disabled="@(!IsEdit)" />
-                        </div>
-
-                        <div class="col-6 ms-4 mb-4 me-5">
-                            <h4>Address</h4>
-                            <InputText @bind-Value="masterData.Contacts.Address" 
-                            placeholder="@(masterData.Contacts.Address != null ? masterData.Contacts.Address : " - ")"
-                                        class="input-text-style" disabled="@(!IsEdit)" />
-                        </div>
+                            <h4>Location</h4>
+                            <h3>@(masterData.Contacts.City + ", " + masterData.Contacts.Address)</h3>
+                                @if (IsEdit)
+                                {
+                                    <button type="button" class="btn btn-func-success" @onclick="OpenModal">Edit</button>
+                                }
+                            </div>
+                            @if (IsModalOpen)
+                            {
+                                        <div>
+                                            <span class="close" @onclick="CloseModal">&times;</span>
+                                            <h2>Edit location</h2>
+                                        </div>
+                                        <_EditLocation Contacts="@masterData.Contacts"
+                                        CloseAndSubmit="CloseModal">
+                                        </_EditLocation>
+                            }
                     </div>
 
                     <div class="row col-lg-12 m-3">
@@ -86,6 +91,7 @@
     public GetGeneralMasterDto masterData { get; set; } = new GetGeneralMasterDto();
     private GetGeneralMasterDto initialMasterData { get; set; } = new GetGeneralMasterDto();
     public bool IsEdit = false;
+    private bool IsModalOpen = false;
 
     private void OnButtonClick()
     {
@@ -98,7 +104,7 @@
     {
         masterData.FirstName = initialMasterData.FirstName;
         masterData.LastName = initialMasterData.LastName;
-        masterData.Contacts = new GetContactsDto(initialMasterData.Contacts);
+        masterData.Contacts = initialMasterData.Contacts;
         OnButtonClick();
     }
 
@@ -122,8 +128,22 @@
     private void FillInitialData()
     {
         initialMasterData = new GetGeneralMasterDto(masterData);
-        initialMasterData.Contacts = new GetContactsDto(masterData.Contacts);
+        initialMasterData.Contacts = new ContactsDto(masterData.Contacts);
     }
 
-    
+    private void OpenModal()
+    {
+        IsModalOpen = true;
+    }
+
+    private void CloseModal()
+    {
+        IsModalOpen = false;
+        Console.WriteLine(masterData);
+        StateHasChanged();
+    }
+    private void AddLocation(MouseEventArgs e)
+    {
+        
+    }
 }

@@ -8,6 +8,7 @@ using PetCareApp.Interfaces;
 using PetCareApp.Mappings;
 using PetCareApp.Models;
 using System.Reflection.Metadata.Ecma335;
+using System.Text.Json;
 
 namespace PetCareApp.Services
 {
@@ -744,6 +745,9 @@ namespace PetCareApp.Services
                 return ex.Message;
             }
         }
+        
+        //!!!! make localization !!!!
+        
         public async Task<GetGeneralMasterDto> GetGeneralMasterData()
         {
             var res = new GetGeneralMasterDto();
@@ -755,10 +759,20 @@ namespace PetCareApp.Services
                     var userData = _dbContext.Users.Where(x => x.Id == user.Id)
                         .Include(x => x.Services)
                         .Include(x => x.Contacts)
+                        .ThenInclude(c => c.Location)
                         .FirstOrDefault();
                     if (userData != null)
                     {
-                        res.Contacts = _mapper.Map<GetContactsDto>(userData.Contacts);
+                        res.Contacts = ContactsMapping.MapContact(userData.Contacts);
+                        var city = _dbContext.Cities.FirstOrDefault(c => c.Id == userData.Contacts.CityId);
+                        if (city != null)
+                        {
+                            var localized = JsonSerializer.Deserialize<Dictionary<string, string>>(city.LocalizedName);
+                            if (localized != null)
+                            {
+                                res.Contacts.City = localized["en"] ?? string.Empty;
+                            }
+                        }
                         res.Services = _mapper.Map<List<GetServiceDto>>(userData.Services);
                         res.FirstName = user.FirstName;
                         res.LastName = user.LastName;
@@ -783,8 +797,10 @@ namespace PetCareApp.Services
                     user.FirstName = !String.IsNullOrEmpty(masterData.FirstName) ? masterData.FirstName : user.FirstName;
                     user.LastName = !String.IsNullOrEmpty(masterData.LastName) ? masterData.LastName : user.LastName;
                     _dbContext.Update(user);
-                    var contacts = _mapper.Map<Contacts>(masterData.Contacts);
-                    contacts.AppUserId = user.Id;
+                    var contacts = ContactsMapping.MapFromDto(masterData.Contacts);
+                    
+                    //find city
+                    contacts.CityId = findCity(contacts.Location, masterData.Contacts.City);
                     _dbContext.Update(contacts);
                     _dbContext.SaveChanges();
                 }
@@ -795,6 +811,17 @@ namespace PetCareApp.Services
                 return ex.Message;
             }
         }
+
+
+        private int findCity(Location location, string city)
+        {
+            var searchedCity = _dbContext.Cities
+            .FirstOrDefault(c => c.LocalizedName.Contains(city));
+
+            return searchedCity == null ? 0 : searchedCity.Id ;
+        }
+
+        private double DegToRad(double deg) => deg * (Math.PI / 180);
 
         public async Task<List<UpdateQuestionDto>> GetQuestionary(int serviceId)
         {

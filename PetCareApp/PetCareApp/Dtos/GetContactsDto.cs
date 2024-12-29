@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PetCareApp.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace PetCareApp.Dtos
 {
@@ -9,6 +10,7 @@ namespace PetCareApp.Dtos
         public string City { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
 
+        public LocationDto? Location { get; set; }
         public GetContactsDto()
         {
 
@@ -20,6 +22,7 @@ namespace PetCareApp.Dtos
             this.Address = dto.Address;
             this.City = dto.City;
             this.Phone = dto.Phone;
+            this.Location = dto.Location;
         }
 
         

@@ -1,0 +1,91 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div id="map-container">
+    <input id="searchBox" class="form-control mb-3" placeholder="Enter your address" />
+    <div id="map" style="width: 100%; height: 400px;"></div>
+    <button type="button" class="btn btn-primary mt-3" @onclick="SubmitAddress">Submit</button>
+</div>
+
+@code {
+    [Parameter]
+    public ContactsDto contacts { get; set; }
+    
+
+    [Parameter]
+    public EventCallback CloseAndSubmit { get; set; }
+
+    private async Task Close()
+    {
+        if (CloseAndSubmit.HasDelegate)
+        {
+            await CloseAndSubmit.InvokeAsync();
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initEditMap");
+        }
+    }
+
+    private async Task SubmitAddress()
+    {
+        // Fetch address details from JavaScript
+        var locationDetails = await JSRuntime.InvokeAsync<LocationDetails>("getLocationDetails");
+        if (locationDetails != null)
+        {
+            contacts.City = locationDetails.City;
+            contacts.Address = locationDetails.Address;
+            contacts.Location.Latitude = locationDetails.Latitude;
+            contacts.Location.Longitude = locationDetails.Longitude;
+        }
+        await Close();
+    }
+
+    public class LocationDetails
+    {
+        public string City { get; set; }
+        public string Address { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+    }
+}
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        z-index: 1020;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5); /* Тло напівпрозоре */
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        z-index: 1030;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>

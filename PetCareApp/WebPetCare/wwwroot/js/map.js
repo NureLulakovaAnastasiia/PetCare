@@ -49,3 +49,67 @@ function selectMarker(markerId) {
         }
     }
 }
+
+let marker, searchBox, geocoder;
+
+window.initEditMap = () => {
+    const mapOptions = {
+        center: { lat: 50.453186751694375, lng: 30.528526928029315 }, //Kyiv
+        zoom: 13,
+    };
+    map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+    const input = document.getElementById("searchBox");
+    searchBox = new google.maps.places.SearchBox(input);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+    geocoder = new google.maps.Geocoder();
+
+    marker = new google.maps.Marker({
+        map: map,
+        draggable: true,
+    });
+
+    searchBox.addListener("places_changed", () => {
+        const places = searchBox.getPlaces();
+        if (places.length === 0) return;
+
+        const place = places[0];
+        if (!place.geometry || !place.geometry.location) return;
+
+        map.setCenter(place.geometry.location);
+        map.setZoom(15);
+
+        marker.setPosition(place.geometry.location);
+        marker.setVisible(true);
+    });
+
+    marker.addListener("dragend", () => {
+        const position = marker.getPosition();
+        map.setCenter(position);
+    });
+};
+
+window.getLocationDetails = async () => {
+    const position = marker.getPosition();
+    if (!position) return null;
+
+    const lat = position.lat();
+    const lng = position.lng();
+
+    const response = await geocoder.geocode({ location: { lat, lng } });
+    if (response.results.length > 0) {
+        const addressComponents = response.results[0].address_components;
+        const cityComponent = addressComponents.find(c => c.types.includes("locality")) || {};
+        const city = cityComponent.long_name || "";
+
+        return {
+            City: city,
+            Address: response.results[0].formatted_address,
+            Latitude: lat,
+            Longitude: lng,
+        };
+    }
+
+    return null;
+};

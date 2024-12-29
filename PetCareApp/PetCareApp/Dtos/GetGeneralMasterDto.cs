@@ -8,7 +8,7 @@ namespace PetCareApp.Dtos
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public GetContactsDto Contacts { get; set; } = new GetContactsDto();
+        public ContactsDto Contacts { get; set; } = new ContactsDto();
         public List<GetServiceDto> Services { get; set; } = new List<GetServiceDto>();
 
         public GetGeneralMasterDto() { }
