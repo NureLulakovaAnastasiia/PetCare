@@ -1,4 +1,5 @@
-﻿@inject IServiceService _service
+﻿@using WebPetCare.Components.Pages.Search
+@inject IServiceService _service
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
 
@@ -43,6 +44,24 @@
                                                        placeholder="@(serviceDto.Description != null ? serviceDto.Description : " ")"
                                                        disabled=" @(!IsEdit)" class="input-textarea-style col-12"></InputTextArea>
                                     </div>
+                                    
+                                <div class="m-2 p-2">
+                                    <div class="row mb-3">
+                                        <h4 class="col-1">Tags</h4>
+                                     </div>
+                                    @if(IsEdit){
+                                        <_TagSearch selectedTags="serviceDto.Tags" updateSelectedTags="UpdateTags"></_TagSearch>
+                                    }else{
+                                        <div class="d-flex flex-wrap m-2">
+                                            @foreach(var tag in serviceDto.Tags)
+                                            {
+                                                <div class="badge text-white d-inline-flex align-items-center me-2 mt-1 p-2">
+                                                    @tag.Name
+                                                </div>
+                                        }
+                                        </div>
+                                    }
+                                </div>
                             </div>
                             <div class="col-3 text-center p-3 mb-2">
                                 <buttton class="btn btn-func" @onclick="ChangeServiceVisibility"><i class="bi bi-eye@(serviceDto.IsHidden ? "" : "-slash")"></i>@(serviceDto.IsHidden ? " Show" : " Hide")</buttton>
@@ -87,12 +106,15 @@
     public GetServiceDto serviceDto { get; set; } = new GetServiceDto();
     private GetServiceDto initialServiceDto = new GetServiceDto();
     public bool IsEdit = false;
-
-
+   
     private void OnButtonClick()
     {
         IsEdit = !IsEdit;
         FillInitialData();
+    }
+    public void UpdateTags()
+    {
+        StateHasChanged();    
     }
 
     private void CancelEdit(MouseEventArgs e)

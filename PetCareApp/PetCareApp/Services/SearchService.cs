@@ -140,6 +140,7 @@ namespace PetCareApp.Services
             var services = _dbContext.Services.Include(s => s.Reviews)
                     .Include(s => s.AppUser).ThenInclude(u => u.Contacts)
                     .Include(s => s.Tags)
+                    .Where(s => !s.IsHidden)
                     .ToList();
 
             services.ForEach(s =>

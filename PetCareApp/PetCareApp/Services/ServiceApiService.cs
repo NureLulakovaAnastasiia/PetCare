@@ -47,13 +47,21 @@ namespace PetCareApp.Services
 
         public string UpdateService(UpdateServiceDto serviceDto)
         {
+            var res = "";
             try
             {
                 var service = _mapper.Map<Models.Service>(serviceDto);
+                var updatedTags = service.Tags != null ? service.Tags.ToList() : null;
+                service.Tags = null;
                 if (service != null)
                 {
-                    var res = _dbContext.Update(service);
-                    return _dbContext.SaveChanges().ToString();
+                    _dbContext.Update(service);
+                    res = _dbContext.SaveChanges().ToString();
+                    if (updatedTags != null)
+                    {
+                        UpdateServiceTags(service.Id, updatedTags);
+                    }
+                    return res;
                 }
                 return "Error during updating";
             }
@@ -62,6 +70,33 @@ namespace PetCareApp.Services
                 return ex.Message;
             }
         }
+
+        private void UpdateServiceTags(int serviceId, List<Tag> tags)
+        {
+            var service = _dbContext.Services
+                .Include(s => s.Tags)
+                .FirstOrDefault(s => s.Id == serviceId);
+
+            if (service == null || service.Tags == null)
+            {
+                throw new Exception("Service not found");
+            }
+
+            var tagsToRemove = service.Tags.Except(tags);
+            var tagsToAdd = tags.Except(service.Tags);
+            if (tagsToRemove != null)
+            {
+                service.Tags.RemoveAll(t => tagsToRemove.Contains(t));
+            }
+            if (tagsToAdd != null)
+            {
+                service.Tags.AddRange(tagsToAdd);
+            }
+
+            _dbContext.SaveChanges();
+        }
+
+
 
         public async Task<List<GetServiceDto>> GetServices(string? masterId)
         {
@@ -103,11 +138,18 @@ namespace PetCareApp.Services
             {
                 var service = _dbContext.Services
                         .Where(x => x.Id == serviceId)
-                        .Include(x => x.Reviews).FirstOrDefault();
+                        .Include(x => x.Reviews)
+                        .Include(x => x.Tags)
+                        .FirstOrDefault();
 
                 if (service != null)
                 {
                     res = _mapper.Map<GetServiceDto>(service);
+                    if (service.Tags != null)
+                    {
+                        service.Tags.ForEach(t => t.Services = null);
+                    }
+                    service.Reviews.ForEach(r => r.Service = null);
                 }
 
                 return res;

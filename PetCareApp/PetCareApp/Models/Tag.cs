@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PetCareApp.Models
 {
@@ -10,8 +11,8 @@ namespace PetCareApp.Models
 
         public string Name { get; set; }
 
-       
-        public List<Service>? Services { get; set; }
+        [JsonIgnore]
+        public List<Service>? Services { get; set; } = null;
 
         public override bool Equals(object obj)
         {

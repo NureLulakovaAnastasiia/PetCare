@@ -23,6 +23,7 @@ namespace PetCareApp.Dtos
         public string? AppUserId { get; set; }
         public List<Review> Reviews { get; set; } = new List<Review>();
 
+        public List<Tag> Tags { get; set; } = new List<Tag>();
         public GetServiceDto() { }
         public GetServiceDto(GetServiceDto dto)
         {

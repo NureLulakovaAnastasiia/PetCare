@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PetCareApp.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace PetCareApp.Dtos
 {
@@ -19,5 +20,6 @@ namespace PetCareApp.Dtos
         public int MaximumTime { get; set; }
         public bool IsHidden { get; set; } 
         public string? AppUserId { get; set; }
+        public List<Tag>? Tags {  get; set; }
     }
 }

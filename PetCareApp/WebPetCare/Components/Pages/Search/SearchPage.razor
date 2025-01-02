@@ -103,7 +103,16 @@
                     </div>
                 </div>
                 <div class="row col-4 m-0 p-0 text-center justify-content-center">
-                    <_TagSearch selectedTags="selectedTags"></_TagSearch>
+                    <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnTags">
+                        <ContentTemplate>
+                            <div id='democontent'>
+                                <_TagSearch selectedTags="selectedTags"></_TagSearch>
+                            </div>
+                        </ContentTemplate>
+                        <ChildContent>
+                            <button class="btn m-0" ID="btnTags"><i class="bi bi-tags-fill"></i>   Tags </button>
+                        </ChildContent>
+                    </SfTooltip>
                 </div>
                 </div>
 

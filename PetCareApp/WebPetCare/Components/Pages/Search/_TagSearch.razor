@@ -3,41 +3,43 @@
 @inject ISearchService _searchService
 
 
-<SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnTags">
-    <ContentTemplate>
-        <div id='democontent'>
-            <div class="ms-0 text-center">
-                <SfTextBox @bind-Value="@search" CssClass="input-textarea-style" ValueChange="filterTags"></SfTextBox>
-                <div class="row">
-                    <div class="d-flex flex-wrap m-2">
-                    @foreach (var item in filteredTags)
-                    {
-                        <div class="badge text-white d-inline-flex align-items-center me-2 " @onclick="() => SelectTag(item.Id)">
-                            @item.Name
-                        </div>
-                    }
-                    </div>
+
+<div class="ms-0 text-center">
+    <SfTextBox @bind-Value="@search" CssClass="input-textarea-style" ValueChange="filterTags"></SfTextBox>
+    <div class="row">
+        <div class="d-flex flex-wrap m-2">
+            @foreach (var item in filteredTags)
+            {
+                <div class="badge text-white d-inline-flex align-items-center me-2 " @onclick="() => SelectTag(item.Id)">
+                    @item.Name
                 </div>
-                <hr/>
-                <div class="row text-start">
-                    <h6 class="offset-1 p-0"> Selected </h6>
-                    <div class="d-flex flex-wrap m-2">
-                        @foreach (var item in selectedTags)
-                        {
-                            <div class="badge text-white d-inline-flex align-items-center me-2 mt-1 p-2">
-                                @item.Name
-                                <button type="button" class="btn-close btn-close-white ms-2 " aria-label="Close" @onclick="() => DeleteTag(item.Id)"></button> 
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
+            }
         </div>
-    </ContentTemplate>
-    <ChildContent>
-        <button class="btn m-0" ID="btnTags"><i class="bi bi-tags-fill"></i>   Tags </button>
-    </ChildContent>
-</SfTooltip>
+    </div>
+    <hr />
+    
+        <div class="row text-start">
+        @if (selectedTags.Count == 0)
+        {
+            <h5 class="offset-2 p-0">No selected tags</h5>
+        }
+        else
+        {
+            <h6 class="offset-1 p-0"> Selected </h6>
+            <div class="d-flex flex-wrap m-2">
+                @foreach (var item in selectedTags)
+                {
+                    <div class="badge text-white d-inline-flex align-items-center me-2 mt-1 p-2">
+                        @item.Name
+                        <button type="button" class="btn-close btn-close-white ms-2 " aria-label="Close" @onclick="() => DeleteTag(item.Id)"></button>
+                    </div>
+                }
+            </div>
+            }
+        </div>
+    
+</div>
+
 
 @code {
     [Parameter]
@@ -47,6 +49,12 @@
 
     public List<Tag> filteredTags = new List<Tag>();
 
+    [Parameter]
+    public bool isSelectedShown { get; set; } = true;
+
+    [Parameter]
+    public EventCallback updateSelectedTags { get; set; } 
+
     public string search = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -54,7 +62,7 @@
         if (firstRender)
         {
             await GetAllTags();
-            foreach(var item in allTags)
+            foreach (var item in allTags)
             {
                 filteredTags.Add(new Tag
                     {
@@ -62,6 +70,15 @@
                         Name = item.Name
                     });
             }
+            filterTags();
+        }
+    }
+
+    private async Task UpdateSelected()
+    {
+        if (updateSelectedTags.HasDelegate)
+        {
+            await updateSelectedTags.InvokeAsync(null);
         }
     }
 
@@ -77,20 +94,24 @@
     public async Task GetAllTags()
     {
         var res = await _searchService.GetAllTags();
-        if(res != null)
+        if (res != null)
         {
             allTags = res;
         }
         StateHasChanged();
     }
 
-    private void SelectTag(int id)
+    private async Task SelectTag(int id)
     {
         var tmp = filteredTags.FirstOrDefault(t => t.Id == id);
-        if(tmp != null)
+        if (tmp != null)
         {
             selectedTags.Add(tmp);
             filteredTags.Remove(tmp);
+            if (!isSelectedShown)
+            {
+               await UpdateSelected();
+            }
         }
         StateHasChanged();
     }
@@ -98,7 +119,7 @@
     private void DeleteTag(int id)
     {
         var item = selectedTags.FirstOrDefault(t => t.Id == id);
-        if(item != null)
+        if (item != null)
         {
             selectedTags.Remove(item);
             filterTags();
