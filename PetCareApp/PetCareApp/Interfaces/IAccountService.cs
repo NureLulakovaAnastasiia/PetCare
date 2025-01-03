@@ -6,8 +6,10 @@ namespace PetCareApp.Interfaces
     {
         string SendEmail(EmailConfirmationDto emailConfirmationDto);
 
-        Task<List<string>> GetUserRole(string email);
+        Task<List<string>> GetUserRoleByEmail(string email);
 
         string SubmitEmail(string email);
+
+        public Task<string?> GetCurrentRole();
     }
 }

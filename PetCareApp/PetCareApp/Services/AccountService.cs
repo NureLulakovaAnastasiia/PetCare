@@ -6,20 +6,20 @@ using System.Reflection.PortableExecutable;
 using Microsoft.AspNetCore.Identity;
 using PetCareApp.Models;
 using PetCareApp.Data;
+using AutoMapper;
 
 namespace PetCareApp.Services
 {
-    public class AccountService : IAccountService
+    public class AccountService : BaseService, IAccountService
     {
-        private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDBContext _dBContext;
 
-        public AccountService(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDBContext dBContext)
+        public AccountService(UserManager<AppUser> userManager, IMapper mapper, ApplicationDBContext context,
+           IHttpContextAccessor httpContextAccessor,RoleManager<IdentityRole> roleManager) : base(userManager, httpContextAccessor)
         {
             _roleManager = roleManager;
-            _userManager = userManager;
-            _dBContext = dBContext;
+            _dBContext = context;
         }
 
         public string SendEmail(EmailConfirmationDto emailConfirmationDto)
@@ -59,7 +59,7 @@ namespace PetCareApp.Services
 
         }
 
-        public async Task<List<string>> GetUserRole(string email)
+        public async Task<List<string>> GetUserRoleByEmail(string email)
         {
             var identityUser = await _userManager.FindByEmailAsync(email);
             if (identityUser == null)
@@ -86,5 +86,9 @@ namespace PetCareApp.Services
             }
         }
 
+        public async Task<string?> GetCurrentRole()
+        {
+            return await GetCurrentUserRole();
+        }
     }
 }

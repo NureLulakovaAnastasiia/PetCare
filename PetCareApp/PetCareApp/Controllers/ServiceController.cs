@@ -71,6 +71,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("getServiceDetails")]
+        [AllowAnonymous]
         public IActionResult GetServiceDetails(int serviceId)
         {
             if (!ModelState.IsValid)
@@ -141,6 +142,24 @@ namespace PetCareApp.Controllers
                 dict[service.Id] = service.Name;
             }
             return Ok(dict);
+        }
+
+        [HttpGet("getMasterName")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetMasterName([FromQuery]int serviceId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var masterName = await _serviceService.GetMasterName(serviceId);
+            if (String.IsNullOrEmpty(masterName))
+            {
+                return NotFound();
+            }
+            
+            return Ok(masterName);
         }
     }
 }

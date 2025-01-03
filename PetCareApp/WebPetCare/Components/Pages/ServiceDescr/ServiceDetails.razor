@@ -1,9 +1,13 @@
 ﻿@page "/service-id={serviceId:int}"
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IServiceService _service
 @inject IJSRuntime _JSRuntime
 
-
-<_ServiceGeneralInfo serviceDto="@serviceDto"></_ServiceGeneralInfo>
+@if(String.IsNullOrEmpty(role) || role == "User"){
+    <_ServiceGeneralInfoUser serviceDto="@serviceDto" role="@role"></_ServiceGeneralInfoUser>
+}else{
+    <_ServiceGeneralInfo serviceDto="@serviceDto"></_ServiceGeneralInfo>
+}
 
 
 @code {
@@ -12,6 +16,8 @@
 
     [Parameter]
     public GetServiceDto? serviceDto { get; set; }
+
+    private string? role = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -23,13 +29,15 @@
                 if (res.IsSuccess)
                 {
                     serviceDto = res.Data;
-                    StateHasChanged();
                 }
                 else
                 {
                     await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res.ErrorMessage, "Error");
 
                 }
+
+                role = await _service.GetCurrentUserRole();
+                StateHasChanged();
             }
         }
     }

@@ -20,6 +20,20 @@ namespace PetCareApp.Services
             if (userEmail == null) return null;
             return await _userManager.FindByEmailAsync(userEmail);
         }
+
+        protected async Task<string?> GetCurrentUserRole()
+        {
+            var userEmail = _httpContextAccessor.HttpContext?.User.Identity?.Name;
+            if (userEmail == null) return null;
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if(user == null) return null;
+            var role = await _userManager.GetRolesAsync(user);
+            if(role != null && role.Count > 0)
+            {
+                return role[0];
+            }
+            return null;
+        }
     }
 
 }

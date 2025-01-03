@@ -96,8 +96,6 @@ namespace PetCareApp.Services
             _dbContext.SaveChanges();
         }
 
-
-
         public async Task<List<GetServiceDto>> GetServices(string? masterId)
         {
             if (masterId == null)
@@ -209,5 +207,26 @@ namespace PetCareApp.Services
             }
 
         }
+
+        public async Task<string> GetMasterName(int serviceId)
+        {
+            if(serviceId == 0)
+            {
+                return String.Empty;
+            }
+
+            var masterId = _dbContext.Services.Where(s => s.Id == serviceId).Select(s => s.AppUserId).FirstOrDefault();
+            if(masterId != null)
+            {
+                var res = await _userManager.FindByIdAsync(masterId);
+                if(res != null)
+                {
+                    return res.FirstName + " " + res.LastName;
+                }
+            }
+
+            return String.Empty;
+        }
+
     }
 }

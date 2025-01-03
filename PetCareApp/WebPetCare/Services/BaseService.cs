@@ -1,4 +1,8 @@
 ﻿using Microsoft.JSInterop;
+using PetCareApp.Dtos;
+using PetCareApp.Models;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace WebPetCare.Services
 {
@@ -21,5 +25,31 @@ namespace WebPetCare.Services
             return res;
         }
 
+        public async Task<string?> getCurrentRole()
+        {
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Account/getUserRole";
+
+                HttpResponseMessage response = await _httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    return result;
+                }
+                else
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            return string.Empty;
+        }
     }
 }

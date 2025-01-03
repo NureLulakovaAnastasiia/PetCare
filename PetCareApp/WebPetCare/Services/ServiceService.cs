@@ -368,5 +368,39 @@ namespace WebPetCare.Services
 
             return res;
         }
+
+        public async Task<Result<string>> GetMasterName(int serviceId)
+        {
+            var res = new Result<string>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Service/getMasterName?serviceId={serviceId}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    res.Data = result;
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<string?> GetCurrentUserRole()
+        {
+            var res = await getCurrentRole();
+            return res;
+        }
     }
 }

@@ -216,5 +216,18 @@ namespace PetCareApp.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpGet("getUserRole")]
+        public async Task<IActionResult> GetUserRole()
+        {
+            var res = await _userService.GetCurrentRole();
+            if (String.IsNullOrEmpty(res)){
+                return NotFound();
+            }
+            {
+                
+            }
+            return Ok(res);
+        }
     }
 }

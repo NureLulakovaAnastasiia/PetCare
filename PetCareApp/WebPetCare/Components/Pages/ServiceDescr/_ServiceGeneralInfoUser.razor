@@ -1,0 +1,109 @@
+﻿@inject IServiceService _service
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            @if (serviceDto != null)
+            {
+                <div class="row text-center">
+                    <h3 class="col-6 offset-3"><b>Service Details</b></h3>
+                </div>
+
+                <div class="text-start m-4 align-content-center">
+                    <div class="row col-12 mb-2 ms-3">
+                        <div class="col-9">
+                            <div class="row">
+                                <div class="col-9">
+                                    <div class="m-2 p-2">
+                                        <h4>Name</h4>
+                                        <h5>@serviceDto.Name</h5>
+                                    </div>
+                                    <div class="m-2 p-2">
+                                        <NavLink href="/targetpage" class="nav-link">@masterName</NavLink>
+                                    </div>
+                                </div>
+                                @if(!String.IsNullOrEmpty(role)){
+                                    <div class="col-2">
+                                        <button class="btn btn-success p-3">Apply</button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <h4>For applying to the procedure you need to sign in</h4>
+                                }
+                            </div>
+                            <div class="m-2 p-2">
+                                <h4>Description</h4>
+                                <h5>
+                                    @serviceDto.Description
+                                </h5>
+                            </div>
+
+                            <div class="m-2 p-2">
+                                <div class="row mb-3">
+                                    <h4 class="col-1">Tags</h4>
+                                </div>
+                                <div class="d-flex flex-wrap m-2">
+                                    @foreach (var tag in serviceDto.Tags)
+                                    {
+                                        <div class="badge text-white d-inline-flex align-items-center me-2 mt-1 p-2">
+                                            @tag.Name
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row col-12 justify-content-around">
+                        <div class="col-3 m-1">
+                            <h4>Minimum Price, UAN</h4>
+                            <h5>@serviceDto.MinimumPrice</h5>
+                        </div>
+                        <div class="col-3 m-1">
+                            <h4>Maximum Price, UAN</h4>
+                            <h5>@serviceDto.MaximumPrice</h5>
+                        </div>
+                        <div class="col-3 m-1">
+                            <h4>Time, min</h4>
+                            <h5>@serviceDto.RealTime</h5>
+                        </div>
+                    </div>
+
+                </div>
+
+            }
+            else
+            {
+                <h3>There is no such service</h3>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public GetServiceDto serviceDto { get; set; } = new GetServiceDto();
+
+    [Parameter]
+    public string? role { get; set; } = "";
+    private string masterName = "";
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        
+            if (serviceDto != null)
+            {
+                var data = await _service.GetMasterName(serviceDto.Id);
+                if (data.IsSuccess)
+                {
+                    masterName = data.Data;
+                }
+            }
+
+            StateHasChanged();
+        
+    }
+}
