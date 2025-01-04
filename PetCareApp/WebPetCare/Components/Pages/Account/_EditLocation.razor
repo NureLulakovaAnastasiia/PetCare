@@ -9,7 +9,7 @@
 @code {
     [Parameter]
     public ContactsDto contacts { get; set; }
-    
+
 
     [Parameter]
     public EventCallback CloseAndSubmit { get; set; }
@@ -37,6 +37,7 @@
         {
             contacts.City = locationDetails.City;
             contacts.Address = locationDetails.Address;
+            contacts.Location = new LocationDto();
             contacts.Location.Latitude = locationDetails.Latitude;
             contacts.Location.Longitude = locationDetails.Longitude;
         }

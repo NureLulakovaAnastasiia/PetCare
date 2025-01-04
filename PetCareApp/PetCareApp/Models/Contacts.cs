@@ -10,7 +10,7 @@ namespace PetCareApp.Models
         [StringLength(200)]
         public string Address { get; set; } = string.Empty;
 
-        public int CityId { get; set; }
+        public int? CityId { get; set; }
 
         public string Phone { get; set; } = string.Empty;
         public string AppUserId { get; set; }

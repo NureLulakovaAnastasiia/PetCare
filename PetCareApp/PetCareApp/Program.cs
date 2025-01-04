@@ -28,6 +28,8 @@ builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 builder.Services.AddScoped<IServiceApiService, ServiceApiService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddHttpClient();
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>

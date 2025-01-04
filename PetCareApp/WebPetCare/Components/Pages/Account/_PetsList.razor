@@ -2,23 +2,25 @@
 @inject IUserService _userService
 @inject IJSRuntime _JSRuntime
 
-
-<div class="d-flex justify-content-center">
-    <div class="col-lg-10 align-items-center text-center ">
+<div class="d-flex justify-content-center  mt-3">
+    <div class="col-lg-10 align-items-center text-center">
         <div class="form-custom-border bg-body-secondary p-3 ">
             @if (!IsEdit)
             {
                 <div class="row text-center">
-                    <h3 class="col-7 offset-2"><b>My portfolio</b></h3>
-                    <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    <h3 class="col-7 offset-2"><b>My pets</b></h3>
+                    @if (Pets.Count > 0)
+                    {
+                        <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    }
                     <button class="btn col-2 btn-func ms-2" @onclick="OpenModal"><i class="bi bi-plus"></i>   Add</button>
                 </div>
             }
-            <form method="post" @onsubmit="UpdatePortfolio">
+            <form method="post" @onsubmit="UpdatePets">
                 @if (IsEdit)
                 {
                     <div class="row text-center">
-                        <h3 class="col-7 offset-2"><b>My portfolio</b></h3>
+                        <h3 class="col-7 offset-2"><b>My pets</b></h3>
                         <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
                         <button type="submit" class="btn col-2 btn-func-success">Save</button>
                     </div>
@@ -26,31 +28,53 @@
 
                 <hr />
 
-                @if (portfolioDtos.Count > 0)
+                @if (Pets.Count > 0)
                 {
                     <div class="container my-4">
                         <div class="row">
-                            @foreach (var portfolio in portfolioDtos)
+                            @foreach (var pet in Pets)
                             {
                                 <div class="col-md-3 mb-4">
                                     <div class="card">
-                                       
-                                            @if (portfolio.Photo != null && portfolio.Photo.Length > 0)
+
+                                        @if (pet.Photo != null && pet.Photo.Length > 0)
+                                        {
+                                            var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(pet.Photo)}";
+                                            <img src="@base64Image" class="card-img-top" alt="Portfolio Image" />
+                                        }
+                                        else
+                                        {
+                                            <div class="card-body text-center">
+                                                <p>No image available</p>
+                                            </div>
+                                        }
+                                        <div class="card-body text-start">
+                                            <div>
+                                                <label>Name</label>
+                                                <InputText @bind-Value="pet.Name" placeholder="@pet.Name"
+                                                           class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
+                                            </div>
+
+                                            <div>
+                                                <label>Breed</label>
+                                                <InputText @bind-Value="pet.Breed" placeholder="@pet.Breed"
+                                                           class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
+                                            </div>
+                                            <div>
+                                                <label>Type</label>
+                                                <InputText @bind-Value="pet.Type" placeholder="@pet.Type"
+                                                           class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
+                                            </div>
+
+                                            <div>
+                                                <label>Description</label>
+                                                <InputTextArea @bind-Value="pet.Description" placeholder="@pet.Description"
+                                                               class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
+                                            </div>
+                                            @if (IsEdit)
                                             {
-                                                var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(portfolio.Photo)}";
-                                                <img src="@base64Image" class="card-img-top" alt="Portfolio Image" />
-                                            }
-                                            else
-                                            {
-                                                <div class="card-body text-center">
-                                                    <p>No image available</p>
-                                                </div>
-                                            }
-                                            <div class="card-body">
-                                            <InputTextArea @bind-Value="portfolio.Text" placeholder="@portfolio.Text"
-                                                           class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" @oninput="() => AddToUpdated(portfolio.Id)" />
-                                            @if(IsEdit){
-                                                <button class="btn btn-danger" @onclick="()=>DeletePortfolio(portfolio.Id)"><i class="bi bi-trash"></i></button>
+                                                <button type="button" class="btn btn-func-success" @onclick="() => AddToUpdated(pet.Id)">Save changes</button>
+                                                <button class="btn btn-danger" @onclick="()=>DeletePet(pet.Id)"><i class="bi bi-trash"></i></button>
                                             }
                                         </div>
                                     </div>
@@ -62,7 +86,7 @@
                 else
                 {
                     <div>
-                        <h3>You don't have portfolio yet.</h3>
+                        <h3>You don't have pets yet.</h3>
                     </div>
                 }
             </form>
@@ -73,16 +97,36 @@
                     <div class="modal-content">
                         <div>
                             <span class="close" @onclick="CloseModal">&times;</span>
-                            <h2>Add new item to portfolio</h2>
+                            <h2>Add new pet</h2>
                         </div>
                         <div class="row text-center">
                             <div class="col col-6 p-2">
-                                <label for="description" class="p-2">Description</label>
-                                <textarea id="description" @bind="Description" class="form-control"></textarea>
+                                <div>
+                                    <label>Name</label>
+                                    <InputText @bind-Value="newPet.Name"
+                                               class="input-textarea-style p-2 m-0 col-12"  />
+                                </div>
+
+                                <div>
+                                    <label>Breed</label>
+                                    <InputText @bind-Value="newPet.Breed"
+                                               class="input-textarea-style p-2 m-0 col-12"  />
+                                </div>
+                                <div>
+                                    <label>Type</label>
+                                    <InputText @bind-Value="newPet.Type"
+                                               class="input-textarea-style p-2 m-0 col-12" />
+                                </div>
+
+                                <div>
+                                    <label>Description</label>
+                                    <InputTextArea @bind-Value="newPet.Description"
+                                                   class="input-textarea-style p-2 m-0 col-12" />
+                                </div>
                             </div>
                             <div class="col-6 p-2 text-center">
                                 <label for="photo" class="d-block pb-2 pt-2">Photo</label>
-                                
+
                                 @if (UploadedImage != null)
                                 {
                                     <img src="@UploadedImage" class="pb-2" alt="Preview image" style="max-width: 200px;" />
@@ -93,27 +137,31 @@
                         </div>
                         <div class="mt-3">
                             <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CloseModal">Cancel</button>
-                            <button type="submit" class="btn col-2 btn-func-success" @onclick="AddPortfolio">Save</button>
+                            <button type="submit" class="btn col-2 btn-func-success" @onclick="AddPet">Save</button>
                         </div>
                     </div>
                 </div>
             }
-            
 
-         </div>
+
+        </div>
     </div>
 </div>
 
 
-@code{
+
+@code {
+
+    [Parameter]
+    public List<PetDto> Pets { get; set; } = new List<PetDto>();
+
     public bool IsEdit = false;
-    public List<PortfolioDto> portfolioDtos = new List<PortfolioDto>();
     private bool IsModalOpen = false;
     public List<int> itemsToUpdate = new List<int>();
-
-    private string Description { get; set; }
     private IBrowserFile SelectedFile;
     private string? UploadedImage;
+
+    public PetDto newPet = new PetDto();
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
@@ -133,13 +181,13 @@
         }
     }
 
-    private async Task UpdatePortfolio()
+    private async Task UpdatePets()
     {
-        var dataToUpdate = new List<PortfolioDto>();
-        foreach(var id in itemsToUpdate)
+        var dataToUpdate = new List<PetDto>();
+        foreach (var id in itemsToUpdate)
         {
-            var item = portfolioDtos.Find(p => p.Id == id);
-            if(item != null)
+            var item = Pets.Find(p => p.Id == id);
+            if (item != null)
             {
                 dataToUpdate.Add(item);
             }
@@ -147,12 +195,11 @@
 
         if (dataToUpdate.Count > 0)
         {
-            var res = await _userService.UpsertPortfolio(dataToUpdate);
+            var res = await _userService.UpdatePets(dataToUpdate);
             if (res.IsSuccess)
             {
-                showToastr("", "Portfolio was succesfully updated");
+                showToastr("", "Pets was succesfully updated");
                 itemsToUpdate.Clear();
-
                 IsEdit = false;
             }
             else
@@ -162,15 +209,15 @@
         }
     }
 
-    private async Task DeletePortfolio(int id)
+    private async Task DeletePet(int id)
     {
-        var item = portfolioDtos.FirstOrDefault(x => x.Id == id);
-        if(item != null)
+        var item = Pets.FirstOrDefault(x => x.Id == id);
+        if (item != null)
         {
-            var res = await _userService.DeletePortfolio(id);
+            var res = await _userService.DeletePet(id);
             if (String.IsNullOrEmpty(res))
             {
-                portfolioDtos.Remove(item);
+                Pets.Remove(item);
                 showToastr("", "Item was succefully deleted");
             }
             else
@@ -180,29 +227,25 @@
         }
     }
 
-    private async Task AddPortfolio()
+    private async Task AddPet()
     {
         if (SelectedFile != null)
         {
             using var stream = new MemoryStream();
             await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
 
-            var addPortfolio = new PortfolioDto
-                {
-                    Id = 0,
-                    Text = Description,
-                    Photo = stream.ToArray()
-                };
+            newPet.Photo = stream.ToArray();
+            newPet.Id = 0;
 
-            var list = new List<PortfolioDto> { addPortfolio };
-            var res = await _userService.UpsertPortfolio(list);
+            var res = await _userService.AddPet(newPet);
             if (res.IsSuccess)
             {
-                if (res.Data.Count > 0)
+                if (res.Data != 0)
                 {
-                    addPortfolio.Id = res.Data[0];
-                    portfolioDtos.Add(addPortfolio);
-                    showToastr("", "Portfolio was succesfully saved");
+                    newPet.Id = res.Data;
+                    Pets.Add(newPet);
+                    newPet = new PetDto();
+                    showToastr("", "Pet was succesfully added");
                     CloseModal();
                 }
                 else
@@ -229,41 +272,21 @@
     {
         IsModalOpen = true;
         UploadedImage = null;
-        Description = string.Empty;
     }
 
     private void CancelEdit()
     {
         IsEdit = false;
+        StateHasChanged();
     }
+
     private void CloseModal()
     {
         IsModalOpen = false;
         StateHasChanged();
     }
 
-    public async Task GetPortfolio()
-    {
-        var res = await _userService.GetMasterPortfolio();
-        if (res.IsSuccess)
-        {
-            portfolioDtos = res.Data;
-            StateHasChanged();
-            showToastr("", "Data were succefully gotten");
-        }
-        else
-        {
-            showToastr(res.ErrorMessage);
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await GetPortfolio();
-        }
-    }
+    
 
     private void OnButtonClick()
     {
@@ -281,8 +304,8 @@
             await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
         }
     }
-    
-    
+
+
 }
 
 <style>
@@ -323,3 +346,4 @@
         }
 
 </style>
+

@@ -50,6 +50,7 @@ namespace PetCareApp.Controllers
                     LastName = registerDto.LastName,
                     FirstName = registerDto.FirstName
                 };
+                appUser.Contacts = null;
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
 
                 if (createdUser.Succeeded) {

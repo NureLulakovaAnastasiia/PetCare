@@ -24,5 +24,13 @@ namespace WebPetCare.IServices
         public Task<string> DeletePortfolio(int portfolioId); 
 
         public Task<Result<List<GetServiceDto>>> GetMasterServices(string? masterId = null);
+
+        public Task<string?> GetCurrentUserRole();
+
+        public Task<Result<int>> AddPet(PetDto pet);
+
+        public Task<Result<string>> UpdatePets(List<PetDto> pets);
+
+        public Task<string> DeletePet(int petId);    
     }
 }

@@ -758,12 +758,17 @@ namespace PetCareApp.Services
                 {
                     var userData = _dbContext.Users.Where(x => x.Id == user.Id)
                         .Include(x => x.Services)
+                        .Include(x => x.Pets)
                         .Include(x => x.Contacts)
                         .ThenInclude(c => c.Location)
                         .FirstOrDefault();
                     if (userData != null)
                     {
                         res.Contacts = ContactsMapping.MapContact(userData.Contacts);
+                        if(res.Contacts.AppUserId == null)
+                        {
+                            res.Contacts.AppUserId = user.Id;
+                        }
                         var city = _dbContext.Cities.FirstOrDefault(c => c.Id == userData.Contacts.CityId);
                         if (city != null)
                         {
@@ -773,6 +778,7 @@ namespace PetCareApp.Services
                                 res.Contacts.City = localized["en"] ?? string.Empty;
                             }
                         }
+                        res.Pets = _mapper.Map<List<PetDto>>(userData.Pets);
                         res.Services = _mapper.Map<List<GetServiceDto>>(userData.Services);
                         res.FirstName = user.FirstName;
                         res.LastName = user.LastName;

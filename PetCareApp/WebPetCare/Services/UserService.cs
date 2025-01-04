@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.Json;
 using WebPetCare.IServices;
 using PetCareApp.Models;
+using WebPetCare.Components.Pages.Account;
 
 namespace WebPetCare.Services
 {
@@ -426,6 +427,99 @@ namespace WebPetCare.Services
                 res.ErrorMessage = ex.Message;
             }
 
+            return res;
+        }
+
+        public async Task<string?> GetCurrentUserRole()
+        {
+            var res = await getCurrentRole();
+            return res;
+        }
+
+        public async Task<Result<int>> AddPet(PetDto pet)
+        {
+            var res = new Result<int>();
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(pet, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/User/addPet";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    var data = int.TryParse(result, out int id);
+                    if (data)
+                    {
+                        res.Data = id;
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<Result<string>> UpdatePets(List<PetDto> pets)
+        {
+            var res = new Result<string>();
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(pets, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/User/updatePets";
+
+                HttpResponseMessage response = await _httpClient.PutAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    res.Data = result;
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> DeletePet(int petId)
+        {
+            var res = "";
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/User/deletePet?petId={petId}";
+
+                HttpResponseMessage response = await _httpClient.DeleteAsync(fullUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                res = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
             return res;
         }
     }

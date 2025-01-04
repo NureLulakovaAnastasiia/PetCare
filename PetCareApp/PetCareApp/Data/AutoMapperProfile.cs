@@ -29,6 +29,8 @@ namespace PetCareApp.Data
             CreateMap<Contacts, ContactsDto>();
             CreateMap<GetContactsDto, Contacts>();
             CreateMap<Models.Service, GetServiceDto>();
+            CreateMap<Pet,  PetDto>();
+            CreateMap<PetDto, Pet>();
         }
         
     }

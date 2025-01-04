@@ -14,7 +14,7 @@ namespace PetCareApp.Dtos
         [Required]
         public string Phone { get; set; }
 
-        public string AppUserId { get; set; }
+        public string AppUserId { get; set; } = "";
 
         public LocationDto? Location { get; set; }
 
