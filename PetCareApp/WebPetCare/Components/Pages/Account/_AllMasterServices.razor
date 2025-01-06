@@ -6,7 +6,7 @@
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border bg-body-secondary p-3 ">
-            @if(services.Count == 0)
+            @if(services == null || services.Count == 0)
             {
                 <h3>No services were found</h3>
             }
@@ -48,6 +48,8 @@
 
 
 @code {
+    [Parameter]
+    public string? masterId { get; set; }
     private List<GetServiceDto> services = new List<GetServiceDto>();
 
 
@@ -61,7 +63,7 @@
     }
     private async Task GetMasterServices()
     {
-        var res = await _userService.GetMasterServices();
+        var res = await _userService.GetMasterServices(masterId);
         if (res.IsSuccess)
         {
             services = res.Data;

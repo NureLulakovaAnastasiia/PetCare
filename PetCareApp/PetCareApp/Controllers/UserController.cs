@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
+using System.Runtime.CompilerServices;
 
 namespace PetCareApp.Controllers
 {
@@ -69,5 +70,38 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
+        [HttpGet("getMasterData")]
+        [AllowAnonymous]
+        public IActionResult GetMasterData([FromQuery]string masterId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var res = _userService.GetMasterData(masterId);
+            if (String.IsNullOrEmpty(res.Id))
+            {
+                return NotFound();
+            }
+
+            return Ok(res);
+        }
+
+        [HttpGet("getMasterReviews")]
+        [AllowAnonymous]
+        public IActionResult GetMasterReviews([FromQuery] string masterId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var res = _userService.GetMasterReviews(masterId);
+            if (res.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(res);
+        }
     }
 }

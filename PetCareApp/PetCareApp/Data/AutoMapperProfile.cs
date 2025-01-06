@@ -31,6 +31,8 @@ namespace PetCareApp.Data
             CreateMap<Models.Service, GetServiceDto>();
             CreateMap<Pet,  PetDto>();
             CreateMap<PetDto, Pet>();
+            CreateMap<Schedule, ScheduleDto>();
+            CreateMap<ScheduleDto, Schedule>();
         }
         
     }

@@ -1,4 +1,5 @@
 ﻿@inject IServiceService _service
+@inject NavigationManager Navigation
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
@@ -19,7 +20,8 @@
                                         <h5>@serviceDto.Name</h5>
                                     </div>
                                     <div class="m-2 p-2">
-                                        <NavLink href="/targetpage" class="nav-link">@masterName</NavLink>
+
+                                        <NavLink @onclick="GoToMasterPage" class="nav-link">Service provider: @masterName</NavLink>
                                     </div>
                                 </div>
                                 @if(!String.IsNullOrEmpty(role)){
@@ -29,7 +31,7 @@
                                 }
                                 else
                                 {
-                                    <h4>For applying to the procedure you need to sign in</h4>
+                                    <h4 class="alert-danger">For applying to the procedure you need to sign in</h4>
                                 }
                             </div>
                             <div class="m-2 p-2">
@@ -85,6 +87,13 @@
 @code {
     [Parameter]
     public GetServiceDto serviceDto { get; set; } = new GetServiceDto();
+    private string masterId
+    {
+        get
+        {
+            return serviceDto.AppUserId ?? "";
+        }
+    }
 
     [Parameter]
     public string? role { get; set; } = "";
@@ -93,17 +102,21 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        
-            if (serviceDto != null)
-            {
-                var data = await _service.GetMasterName(serviceDto.Id);
-                if (data.IsSuccess)
-                {
-                    masterName = data.Data;
-                }
-            }
 
-            StateHasChanged();
-        
+        if (serviceDto != null)
+        {
+            var data = await _service.GetMasterName(serviceDto.Id);
+            if (data.IsSuccess)
+            {
+                masterName = data.Data;
+            }
+        }
+
+        StateHasChanged();
+
+    }
+    private void GoToMasterPage()
+    {
+        Navigation.NavigateTo($"/master/{masterId}");
     }
 }

@@ -23,7 +23,7 @@ namespace PetCareApp.Models
         public List<Break> Breaks { get; set; } = new List<Break>();
         public List<Schedule> Schedules { get; set; } = new List<Schedule>();
         public List<Record> Records { get; set; } = new List<Record>();
-        public List<Review> Reviews { get; set; } = new List<Review>();
+        public List<Review> Reviews { get; set; } = new List<Review>(); //user written reviews
         public List<Portfolio> Portfolios { get; set; } = new List<Portfolio>();
         public List<RecordCancel> RecordCancels { get; set; } = new List<RecordCancel>();
     }

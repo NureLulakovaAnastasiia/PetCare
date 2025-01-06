@@ -1,0 +1,26 @@
+﻿@inject IJSRuntime _JSRuntime
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3">
+            
+            <div id="mapPlace" style="height: 500px; width: 100%;"></div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public LocationDto location { get; set; } = new LocationDto();
+    private string MapId = "mapPlace";
+    private DotNetObjectReference<_PlaceOnMap>? _objectReference;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        { 
+            var list = new List<LocationDto> { location };
+            _objectReference = DotNetObjectReference.Create(this);
+            await _JSRuntime.InvokeVoidAsync("registerMapInterop", _objectReference);
+            await _JSRuntime.InvokeVoidAsync("initMap", MapId, list);
+            StateHasChanged();
+        }
+    }
+    }

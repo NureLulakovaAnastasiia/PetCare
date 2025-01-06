@@ -335,6 +335,7 @@ namespace PetCareApp.Controllers
 
 
         [HttpGet("getPortfolio")] //if masterId is empty - search for portfolio of current user
+        [AllowAnonymous]
         public async Task<IActionResult> GetMasterPortfolio(string? masterId)
         {
             if (!ModelState.IsValid)
@@ -386,6 +387,7 @@ namespace PetCareApp.Controllers
 
 
         [HttpGet("getMasterServices")] //if masterId is empty - search for services of current user
+        [AllowAnonymous]
         public async Task<IActionResult> GetMasterServices(string? masterId)
         {
             if (!ModelState.IsValid)

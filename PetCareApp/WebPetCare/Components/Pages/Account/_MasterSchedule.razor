@@ -1,0 +1,35 @@
+﻿
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+
+            <div class="m-3">
+                @foreach (var time in schedule)
+                {
+                    var dayOrDate = time.DayOfWeek != null ? Enum.GetName(typeof(DayOfWeek), time.DayOfWeek) : time.Date.ToString();
+                    <div>
+                        <h4>
+                            @dayOrDate : @time.StartTime - @time.EndTime
+                        </h4>
+                    </div>
+                }
+
+
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public List<ScheduleDto> schedule { get; set; } = new List<ScheduleDto>();
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            schedule = schedule.OrderBy(s => s.DayOfWeek).ToList();
+        }
+    }
+
+}

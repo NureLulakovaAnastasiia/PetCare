@@ -1,0 +1,93 @@
+﻿@page "/master/{masterId}"
+@using WebPetCare.IServices
+@using WebPetCare.Components.Pages.Account
+@inject IUserService userService
+@inject NavigationManager Navigation
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 mb-5">
+            @if (!String.IsNullOrEmpty(masterData.Id))
+            {
+                <div>
+                    <h2>@masterData.FirstName   @masterData.LastName</h2>
+                </div>
+
+                <div class="row">
+                    <div class="col-7">
+                        <label>Address</label>
+                        <h4>@masterData.Contacts.Address</h4>
+                    </div>
+                    <div class="col-5">
+                        <label>Phone</label>
+                        <h4>@masterData.Contacts.Phone</h4>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<div class="row col-9 offset-2 mb-3 ">
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Schedule ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Schedule)">Schedule</button>
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Map ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Map)">Map</button>
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Services ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Services)">Services</button>
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Reviews ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Reviews)">Reviews</button>
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Portfolio ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Portfolio)">Portfolio</button>
+</div>
+
+@switch (options)
+{
+    case MasterDataOptions.Schedule:
+        <_MasterSchedule schedule="@masterData.Schedules"></_MasterSchedule>
+        break;
+    case MasterDataOptions.Portfolio:
+        <_MasterPortfolio PortfolioDtos="@masterData.Portfolios"></_MasterPortfolio>
+        break;
+    case MasterDataOptions.Map:
+        <_PlaceOnMap location="@masterData.Contacts.Location"></_PlaceOnMap>
+        break;
+    case MasterDataOptions.Services:
+        <_AllMasterServices masterId="@masterId"></_AllMasterServices>
+        break;
+
+    case MasterDataOptions.Reviews:
+        <_MasterReviews masterId="@masterId"></_MasterReviews>
+        break;
+
+}
+
+
+@code {
+    [Parameter]
+    public string masterId { get; set; }
+    public MasterDto masterData = new MasterDto();
+    private MasterDataOptions options = MasterDataOptions.Services;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!String.IsNullOrEmpty(masterId))
+            {
+                var res = await userService.GetMasterData(masterId);
+                if (res.IsSuccess)
+                {
+                    masterData = res.Data;
+                }
+            }
+            StateHasChanged();
+        }
+    }
+    public void ChangePage(MasterDataOptions option)
+    {
+        options = option;
+        StateHasChanged();
+    }
+
+    public enum MasterDataOptions
+    {
+        Schedule, Map, Services, Reviews, Portfolio
+    }
+}

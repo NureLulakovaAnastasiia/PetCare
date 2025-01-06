@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PetCareApp.Data;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
+using PetCareApp.Mappings;
 using PetCareApp.Models;
 
 namespace PetCareApp.Services
@@ -100,6 +102,50 @@ namespace PetCareApp.Services
             {
                 return ex.Message;
             }
+        }
+
+        public MasterDto GetMasterData(string masterId)
+        {
+            var res = new MasterDto();
+            var master = _dbContext.Users
+                .Where(u => u.Id == masterId)
+                .Include(u => u.Contacts)
+                .ThenInclude(c => c.Location)
+                .Include(u => u.Schedules)
+                .Include(u => u.Portfolios)
+                .FirstOrDefault();
+
+            if(master != null)
+            {
+                res.Id = master.Id;
+                res.FirstName = master.FirstName;
+                res.LastName = master.LastName;
+                res.Schedules = _mapper.Map<List<ScheduleDto>>(master.Schedules);
+                res.Contacts = ContactsMapping.MapContact(master.Contacts);
+                res.Portfolios = _mapper.Map<List<PortfolioDto>>(master.Portfolios);
+                res.Schedules = res.Schedules.Where(s => s.Date == null || s.Date > DateTime.Now).ToList();
+            }
+
+            return res;
+        }
+
+        public List<ReviewDto> GetMasterReviews(string masterId)
+        {
+            var res = new List<ReviewDto>();
+            var data = _dbContext.Reviews.Where(r => r.AppUserId == masterId)
+                .Include(r => r.AppUser)
+                .Include(r => r.Comments)
+                .ThenInclude(c => c.AppUser)
+                .ToList();
+            if (data.Count > 0)
+            {
+                foreach (var item in data)
+                {
+                    res.Add(ReviewMapping.MapReview(item));
+                }
+            }
+
+            return res;
         }
     }
 }

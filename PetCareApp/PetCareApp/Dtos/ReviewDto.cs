@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetCareApp.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace PetCareApp.Models
+namespace PetCareApp.Dtos
 {
-    public class Review
+    public class ReviewDto
     {
-        [Key]
         public int Id { get; set; }
         [StringLength(500)]
         public string Text { get; set; } = string.Empty;
@@ -13,11 +13,9 @@ namespace PetCareApp.Models
         [Range(1, 5)]
         public int Rate { get; set; }
         public string? AppUserId { get; set; }
-        [DeleteBehavior(DeleteBehavior.ClientCascade)]
-        public AppUser? AppUser { get; set; }
+        public string? AppUserName { get; set; }
         public int? ServiceId { get; set; }
-        [DeleteBehavior(DeleteBehavior.Cascade)]
-        public Service? Service { get; set; }
-        public List<ReviewComment> Comments { get; set; } = new List<ReviewComment>();
+        public string? ServiceName { get; set; }
+        public List<ReviewCommentDto> Comments { get; set; } = new List<ReviewCommentDto>();
     }
 }

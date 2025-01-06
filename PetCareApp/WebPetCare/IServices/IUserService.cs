@@ -31,6 +31,10 @@ namespace WebPetCare.IServices
 
         public Task<Result<string>> UpdatePets(List<PetDto> pets);
 
-        public Task<string> DeletePet(int petId);    
+        public Task<string> DeletePet(int petId);
+
+        public Task<Result<MasterDto>> GetMasterData(string masterId);
+        
+        public Task<Result<List<ReviewDto>>> GetMasterReviews(string masterId);
     }
 }
