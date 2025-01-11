@@ -1,0 +1,77 @@
+﻿@inject IJSRuntime _JSRuntime
+@inject IUserService _userService
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3">
+            @if (data != null && slots.Count > 0)
+            {
+                <h4>Estimated time: @data.Time min</h4>
+                <hr/>
+                <h4>Choose needed slot</h4>
+                @foreach(var key in slots)
+                {
+                    <div>
+                        <h4>@key.Key.ToString("dddd, dd MMMM yyyy")</h4>
+                        <div class="row">
+                            <div class="d-flex flex-wrap m-2 justify-content-center">
+                                @foreach (var item in key.Value)
+                                {
+                                    <div class="badge text-white d-inline-flex align-items-center m-2"
+                                         style="@(chosenSlot == item ? "box-shadow: 0px 0px 3px; background-color: #d63384; border: #c71c71": "") "
+                                    @onclick="() => ChooseSlot(item)">
+                                        @item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+            }
+            else
+            {
+                <h3>No available time</h3>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public QuestionaryAnalisysDto data { get; set; }
+    [Parameter]
+    public TimeSlot chosenSlot { get; set; }
+
+    public Dictionary<DateTime, List<TimeSlot>> slots = new Dictionary<DateTime, List<TimeSlot>>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && data != null)
+        {
+            if (data.Slots != null && data.Slots.Count > 0)
+            {
+                var dates = data.Slots.Select(s => s.Date.Date).Distinct().ToList();
+                foreach(var date in dates)
+                {
+                    slots[date] = new List<TimeSlot>();
+                }
+
+                foreach (var slot in data.Slots)
+                {
+                    slots[slot.Date.Date].Add(slot);
+                }
+
+                StateHasChanged();
+            }
+
+        }
+    }
+
+    private void ChooseSlot(TimeSlot slot)
+    {
+        chosenSlot = slot;
+        StateHasChanged();
+    }
+}

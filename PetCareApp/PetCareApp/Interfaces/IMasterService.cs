@@ -19,7 +19,7 @@ namespace PetCareApp.Interfaces
             where TAnswer : IAnswerDto;
 
         public List<TimeSlot> GetWorkTimeSlots(string masterId);
-        public List<TimeSlot> GetFreeTimeSlots(string masterId, int time, int serviceId);
+        public List<TimeSlot> GetFreeTimeSlots(int time, int serviceId, string? masterId = null);
 
         public Task<string> MakeAppointment(RecordDto recordDto);
 
@@ -42,5 +42,7 @@ namespace PetCareApp.Interfaces
         public Task<Result<List<int>>> UpsertPortfolio(List<PortfolioDto> portfolio);
         public Task<string> DeletePortfolio(int portfolioId);
         public Task<Result<List<GetServiceDto>>> GetMasterServices(string? masterId);
+
+        public Result<List<GetQuestionDto>> GetQuestionaryForUser(int serviceId);
     } 
 }

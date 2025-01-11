@@ -36,5 +36,9 @@ namespace WebPetCare.IServices
         public Task<Result<MasterDto>> GetMasterData(string masterId);
         
         public Task<Result<List<ReviewDto>>> GetMasterReviews(string masterId);
+
+        public Task<Result<List<GetQuestionDto>>> GetServiceQuestionary(int serviceId);
+
+        public Task<Result<QuestionaryAnalisysDto>> AnalizeQuestionary(List<QuestionDto> questionary, int serviceId);
     }
 }

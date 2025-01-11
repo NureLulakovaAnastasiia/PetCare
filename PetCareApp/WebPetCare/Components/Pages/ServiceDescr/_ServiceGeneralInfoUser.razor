@@ -26,7 +26,7 @@
                                 </div>
                                 @if(!String.IsNullOrEmpty(role)){
                                     <div class="col-2">
-                                        <button class="btn btn-success p-3">Apply</button>
+                                        <button class="btn btn-success p-3" @onclick="MakeRecord">Apply</button>
                                     </div>
                                 }
                                 else
@@ -118,5 +118,9 @@
     private void GoToMasterPage()
     {
         Navigation.NavigateTo($"/master/{masterId}");
+    }
+    private void MakeRecord()
+    {
+        Navigation.NavigateTo($"/record/{serviceDto.Id}/{serviceDto.Name}");
     }
 }

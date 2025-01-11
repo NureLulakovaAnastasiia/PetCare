@@ -6,7 +6,7 @@
         public byte[] Photo { get; set; } 
         public int Time { get; set; }
         public bool IsTimeMinimum { get; set; }
-        public bool IsTimeMaximum { get; set; } 
-        public bool IsTimeFixed { get; set; } 
+        public bool IsTimeMaximum { get; set; }
+        public bool IsTimeFixed { get; set; }
     }
 }

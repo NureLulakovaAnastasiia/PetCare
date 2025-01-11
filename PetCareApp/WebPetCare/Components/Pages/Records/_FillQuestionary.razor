@@ -1,0 +1,129 @@
+﻿@inject IJSRuntime _JSRuntime
+@inject IUserService _userService
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3">
+            @if (questionary != null && questionary.Count > 0)
+            {
+                <form method="post" @onsubmit="SubmitAnswers">
+                    <ol>
+                        @foreach (var question in questionary)
+                        {
+                            <li class="mb-3 text-start">
+                                <div>
+                                    <h5 class="form-check-label">@question.Name</h5>
+                                </div>
+                                <div>
+                                    @foreach(var answer in question.Answers)
+                                    {
+                                        <div class="row m-1">
+                                            <input type="radio" class="col-1" name="@question.Name" value="@answer.IsSelected"
+                                            @onchange="() => UpdateSelection(question, answer)" />
+                                            <h6 class="col-8">@answer.Text</h6>
+                                        </div>
+                                    }
+                                </div>
+                            </li>
+                        }
+                    </ol>
+                    <button type="submit" class="btn btn-success">Next</button>
+                </form>
+            }
+            else
+            {
+                <h4>No questionary for this service</h4>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int serviceId { get; set; }
+    public List<GetQuestionDto> questionary { get; set; }
+    [Parameter]
+    public EventCallback ToNextStep { get; set; }
+    [Parameter]
+    public EventCallback<QuestionaryAnalisysDto> OnAnalisysChanged { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender || questionary == null)
+        {
+            var res = await _userService.GetServiceQuestionary(serviceId);
+            if (res.IsSuccess)
+            {
+                questionary = res.Data;
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitAnswers()
+    {
+        questionary.ForEach(q => q.Answers.RemoveAll(a => !a.IsSelected));
+        var mappedData = MapQuestionary();
+        if(mappedData.Count > 0)
+        {
+            var res = await _userService.AnalizeQuestionary(mappedData, serviceId);
+            if (res.IsSuccess)
+            {
+                if (OnAnalisysChanged.HasDelegate)
+                {
+                    await OnAnalisysChanged.InvokeAsync(res.Data);
+                }
+                await ToNextPage();
+            }
+        }
+    }
+
+    private void UpdateSelection(GetQuestionDto question, GetAnswerDto selectedAnswer)
+    {
+        foreach (var answer in question.Answers)
+        {
+            answer.IsSelected = false;
+        }
+
+        selectedAnswer.IsSelected = true;
+        StateHasChanged();
+    }
+
+    private async Task ToNextPage()
+    {
+        if (ToNextStep.HasDelegate)
+        {
+            await ToNextStep.InvokeAsync();
+        }
+    }
+
+    private List<QuestionDto> MapQuestionary()
+    {
+        var res = new List<QuestionDto>();
+        foreach(var question in questionary)
+        {
+            var dto = new QuestionDto
+                {
+                    Name = question.Name,
+                    HasAnswerWithFixedTime = question.HasAnswerWithFixedTime
+                };
+            if(question.Answers.Count == 1)
+            {
+                dto.Answer = MapAnswer(question.Answers[0]);
+                res.Add(dto);
+            }
+        }
+        return res;
+    }
+
+    private AnswerDto MapAnswer(GetAnswerDto answer)
+    {
+        return new AnswerDto
+            {
+                Text = answer.Text,
+                Time = answer.Time,
+                IsTimeFixed = answer.IsTimeFixed,
+                IsTimeMaximum = answer.IsTimeMaximum,
+                IsTimeMinimum = answer.IsTimeMinimum
+            };
+    }
+}

@@ -100,5 +100,37 @@ namespace PetCareApp.Mappings
 
             return res;
         }
+
+        public static List<GetQuestionDto> MapUserQuestionary(List<Question> questionary)
+        {
+            var res = new List<GetQuestionDto>();
+            foreach (var question in questionary)
+            {
+                var questionDto = new GetQuestionDto
+                {
+                    Id = question.Id,
+                    Name = question.Name,
+                    HasAnswerWithFixedTime = question.HasAnswerWithFixedTime,
+                };
+                questionDto.Answers = new List<GetAnswerDto>();
+
+                foreach (Answer answer in question.Answers)
+                {
+                    questionDto.Answers.Add(new GetAnswerDto
+                    {
+                        Id = answer.Id,
+                        Text = answer.Text,
+                        Photo = answer.Photo,
+                        Time = answer.Time,
+                        IsTimeFixed = answer.IsTimeFixed, 
+                        IsTimeMaximum = answer.IsTimeMaximum, 
+                        IsTimeMinimum = answer.IsTimeMinimum
+                    });
+                }
+                res.Add(questionDto);
+            }
+
+            return res;
+        }
     }
 }

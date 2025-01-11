@@ -1,0 +1,78 @@
+﻿@page "/record/{serviceId:int}/{serviceName}"
+@using Microsoft.AspNetCore.Html
+@using Syncfusion.Blazor.Navigations
+
+<div class="container justify-content-center">
+    <div class="offset-3 col-6 text-center">
+        <h2>Record</h2>
+        <h4>For service: @serviceName</h4>
+        @if(analisysDto != null && analisysDto.Description != null)
+        {
+            <div style="white-space: pre-line;">
+                <h5>@analisysDto.Description</h5>
+            </div>
+        }
+        <SfStepper ActiveStep="@step" CssClass="mt-3">
+            <StepperSteps>
+                <StepperStep Disabled="true"></StepperStep>
+                <StepperStep Disabled="true"></StepperStep>
+                <StepperStep Disabled="true"></StepperStep>
+            </StepperSteps>
+        </SfStepper>
+    </div>
+
+    <div>
+        <button class="btn btn-danger" @onclick="GoBack">Back</button>
+        @switch (step)
+        {
+            case 1:
+                <_TimeSlotsChoice data="analisysDto" chosenSlot="chosenSlot"></_TimeSlotsChoice>
+                break;
+            case 2:
+
+                break;
+            default:
+                <_FillQuestionary serviceId="@serviceId" OnAnalisysChanged="UpdateAnalisys" ToNextStep="GoNext"></_FillQuestionary>
+                break;
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int serviceId { get; set; }
+    [Parameter]
+    public string serviceName { get; set; } = string.Empty;
+    public int step { get; set; } = 0;
+
+    public QuestionaryAnalisysDto analisysDto { get; set; } = new QuestionaryAnalisysDto();
+
+    public TimeSlot chosenSlot { get; set; } = new TimeSlot();
+
+    public void GoBack()
+    {
+        if(step > 0)
+        {
+            step--;
+            StateHasChanged();
+        }
+        else
+        {
+            //navigate to previous page
+        }
+    }
+    private void UpdateAnalisys(QuestionaryAnalisysDto updatedAnalisys)
+    {
+        analisysDto = updatedAnalisys;
+    }
+
+    public void GoNext()
+    {
+        if (step < 2)
+        {
+            step++;
+            StateHasChanged();
+        }
+        
+    }
+}

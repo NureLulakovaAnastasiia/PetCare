@@ -393,7 +393,7 @@ namespace PetCareApp.Services
                 }
 
             }
-
+            timeSlots.RemoveAll(s => s.Date < DateTime.Now);
             return timeSlots.OrderBy(x => x.Date).ToList();
         }
 
@@ -536,9 +536,21 @@ namespace PetCareApp.Services
         }
 
         //creates slots for some amount of time from empty slots for some procedure
-        public List<TimeSlot> GetFreeTimeSlots(string masterId, int time, int serviceId)
+        public List<TimeSlot> GetFreeTimeSlots(int time, int serviceId, string? masterId = null)
         {
             var resSlots = new List<TimeSlot>();
+            if (masterId == null)
+            {
+                var service = _dbContext.Services.FirstOrDefault(s => s.Id == serviceId);
+                if (service != null)
+                {
+                    masterId = service.AppUserId;
+                }
+                else
+                {
+                    return resSlots;
+                }
+            }
             var workSlots = GetAllEmptySlots(masterId);
             var limitations = _dbContext.ServiceLimitations.Where(x => x.ServiceId == serviceId &&
                                                                 x.Date > DateTime.Now).ToList();
@@ -617,7 +629,7 @@ namespace PetCareApp.Services
             string res = "";
             for (int i = 0; i < questionary.Count; i++)
             {
-                res += $"{i + 1}. {questionary[i].Name} \n - {questionary[i].Answer.Text}";
+                res += $"{i + 1}. {questionary[i].Name}  - {questionary[i].Answer.Text} \n";
             }
             return res;
         }
@@ -1103,6 +1115,30 @@ namespace PetCareApp.Services
             return res;
         }
 
+        public Result<List<GetQuestionDto>> GetQuestionaryForUser(int serviceId)
+        {
+            var res = new Result<List<GetQuestionDto>>();
+            try
+            {
+                
+                var service = _dbContext.Services.FirstOrDefault(s => s.Id == serviceId);
+                if (service == null)
+                {
+                    res.ErrorMessage = "No such service were found";
+                }
+                var questionary = _dbContext.Questions.Where(s => s.ServiceId == serviceId)
+                    .Include(s => s.Answers)
+                    .ToList();
+
+                res.Data = QuestionMappings.MapUserQuestionary(questionary);
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
     }   
 
 }

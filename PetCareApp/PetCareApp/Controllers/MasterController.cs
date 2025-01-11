@@ -250,7 +250,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("analizeQuestionary")]
-        public IActionResult AnalizeQuestionaryGetSlots(List<QuestionDto> questionary, int serviceId, string masterId)
+        public IActionResult AnalizeQuestionaryGetSlots(List<QuestionDto> questionary, [FromQuery]int serviceId, string? masterId = null)
         {
             var descr = _masterService.GetQuestionaryDescription(questionary);
             var time = _masterService.AnalizeQuestionary(questionary, serviceId);
@@ -258,7 +258,7 @@ namespace PetCareApp.Controllers
             {
                 return StatusCode(500, "Error during analizing questionary");
             }
-            var slots = _masterService.GetFreeTimeSlots(masterId, time, serviceId);
+            var slots = _masterService.GetFreeTimeSlots(time, serviceId, masterId);
             if (!slots.Any())
             {
                 return StatusCode(500, "Error during getting timeslots");
@@ -396,6 +396,22 @@ namespace PetCareApp.Controllers
             }
 
             var data = await _masterService.GetMasterServices(masterId);
+            if (data.IsSuccess)
+            {
+                return Ok(data.Data);
+            }
+            return StatusCode(500, data.ErrorMessage);
+        }
+
+        [HttpGet("getUserQuestionary")] 
+        public IActionResult GetUserQuestionary([FromQuery]int serviceId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = _masterService.GetQuestionaryForUser(serviceId);
             if (data.IsSuccess)
             {
                 return Ok(data.Data);
