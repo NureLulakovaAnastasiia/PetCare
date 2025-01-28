@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
+using PetCareApp.Models;
 using System.Runtime.CompilerServices;
 
 namespace PetCareApp.Controllers
@@ -89,19 +90,60 @@ namespace PetCareApp.Controllers
 
         [HttpGet("getMasterReviews")]
         [AllowAnonymous]
-        public IActionResult GetMasterReviews([FromQuery] string masterId)
+        public  async Task<IActionResult> GetMasterReviews([FromQuery] string masterId = "")
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-            var res = _userService.GetMasterReviews(masterId);
+            
+            var res =  await _userService.GetMasterReviews(masterId);
             if (res.Count == 0)
             {
                 return NotFound();
             }
 
             return Ok(res);
+        }
+
+        [HttpGet("getUserRecords")]
+        public async Task<IActionResult> GetUserRecords()
+        {
+            var data = await _userService.GetUserRecords();
+            if(data == null || data.Count == 0)
+            {
+                return NotFound("No records were found");
+            }
+
+            return Ok(data);
+        }
+
+        [HttpPatch("userCancelRecord")]
+        public async Task<IActionResult> CancelRecord([FromQuery] int recordId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var res = await _userService.CancelRecord(recordId);
+            if (res.IsSuccess)
+            {
+                return Ok();
+            }
+            return BadRequest(res.ErrorMessage);
+        }
+
+        [HttpPost("addReview")]
+        public async Task<IActionResult> AddReview([FromBody] ReviewDto review)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var res = await _userService.AddReview(review);
+            if (res.IsSuccess)
+            {
+                return Ok();
+            }
+            return BadRequest(res.ErrorMessage);
         }
     }
 }

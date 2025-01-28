@@ -19,5 +19,7 @@ namespace WebPetCare.IServices
         public Task<Result<string>> GetMasterName(int serviceId);
 
         public Task<string?> GetCurrentUserRole();
+
+        public Task<List<ReviewDto>> GetReviews(int serviceId);
     }
 }

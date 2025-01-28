@@ -11,5 +11,7 @@ namespace PetCareApp.Interfaces
         public Task<string> DeleteService(int serviceId);
         public Task<string> ChangeServiceVisibility(int serviceId);
         public Task<string> GetMasterName(int serviceId);
+
+        public Task<List<ReviewDto>> GetServiceReviews(int serviceId);
     }
 }

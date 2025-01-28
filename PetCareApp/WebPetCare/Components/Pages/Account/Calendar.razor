@@ -82,9 +82,15 @@
                         <tr>
                             <td class="e-textlabel">Status</td>
                             <td colspan="4">
-                                <SfDropDownList TValue="int" TItem="Status" Placeholder="Change status" DataSource="@StatusData" @bind-Value="@data.Status.Id">
-                                    <DropDownListFieldSettings Value="Id" Text="Name" ></DropDownListFieldSettings>
-                                </SfDropDownList>
+                                <div>
+                                    @if (data.Status.Id == 3)
+                                    {
+                                        <h4 class="text-danger">Cancelled</h4>
+                                    }
+                                    <SfDropDownList TValue="int" TItem="Status" Placeholder="Change status" DataSource="@StatusData" @bind-Value="@data.Status.Id">
+                                        <DropDownListFieldSettings Value="Id" Text="Name" ></DropDownListFieldSettings>
+                                    </SfDropDownList>
+                                </div>
                             </td>
                         </tr>
                     }
@@ -150,7 +156,7 @@
     {
         foreach (var avDate in availableDates)
         {
-            if (avDate.Month == avDate.Month && avDate.Year == avDate.Year)
+            if (avDate.Month == date.Month && avDate.Year == date.Year)
             {
                 return;
             }

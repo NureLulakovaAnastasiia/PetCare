@@ -1,23 +1,28 @@
 ﻿@page "/record/{serviceId:int}/{serviceName}"
 @using Microsoft.AspNetCore.Html
 @using Syncfusion.Blazor.Navigations
+@inject IJSRuntime _JSRuntime
+@inject IUserService _userService
+@inject NavigationManager Navigation
 
 <div class="container justify-content-center">
     <div class="offset-3 col-6 text-center">
         <h2>Record</h2>
         <h4>For service: @serviceName</h4>
-        @if(analisysDto != null && analisysDto.Description != null)
+        @if (analisysDto != null && analisysDto.Description != null)
         {
             <div style="white-space: pre-line;">
                 <h5>@analisysDto.Description</h5>
             </div>
         }
-        <SfStepper ActiveStep="@step" CssClass="mt-3">
-            <StepperSteps>
-                <StepperStep Disabled="true"></StepperStep>
-                <StepperStep Disabled="true"></StepperStep>
-                <StepperStep Disabled="true"></StepperStep>
-            </StepperSteps>
+            <SfStepper ID="stepper" ActiveStep="@step" CssClass="custom-stepper mt-3">
+                <ChildContent>
+                    <StepperSteps >
+                        <StepperStep Disabled="true"></StepperStep>
+                        <StepperStep Disabled="true"></StepperStep>
+                        <StepperStep Disabled="true"></StepperStep>
+                    </StepperSteps>
+                </ChildContent>
         </SfStepper>
     </div>
 
@@ -26,10 +31,23 @@
         @switch (step)
         {
             case 1:
-                <_TimeSlotsChoice data="analisysDto" chosenSlot="chosenSlot"></_TimeSlotsChoice>
+                <_TimeSlotsChoice data="analisysDto" OnSlotSubmit="SubmitSlot" ToNextStep="GoNext"></_TimeSlotsChoice>
                 break;
             case 2:
-
+                <div class="d-flex justify-content-center">
+                    <div class="col-lg-10 align-items-center text-center ">
+                        <div class="form-custom-border bg-body-secondary p-3">
+                            <h3>Submit record</h3>
+                            <h4>Chosen time: @chosenSlot.Date.ToString("dddd, dd MMMM yyyy"), @chosenSlot.StartTime.ToString(@"hh\:mm") - @chosenSlot.EndTime.ToString(@"hh\:mm")</h4>
+                            <hr />
+                            <div class=" d-flex flex-column align-items-center">
+                                <label>You can write comment to your record</label>
+                                <InputTextArea class="input-textarea-style col-8" @bind-Value="comment"></InputTextArea>
+                                <button class="btn btn-submit mt-4" @onclick="SubmitRecord">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 break;
             default:
                 <_FillQuestionary serviceId="@serviceId" OnAnalisysChanged="UpdateAnalisys" ToNextStep="GoNext"></_FillQuestionary>
@@ -48,17 +66,17 @@
     public QuestionaryAnalisysDto analisysDto { get; set; } = new QuestionaryAnalisysDto();
 
     public TimeSlot chosenSlot { get; set; } = new TimeSlot();
-
+    public string comment { get; set; } = "";
     public void GoBack()
     {
-        if(step > 0)
+        if (step > 0)
         {
             step--;
             StateHasChanged();
         }
         else
         {
-            //navigate to previous page
+            Navigation.NavigateTo($"/service-id={serviceId}");
         }
     }
     private void UpdateAnalisys(QuestionaryAnalisysDto updatedAnalisys)
@@ -73,6 +91,53 @@
             step++;
             StateHasChanged();
         }
-        
+
+    }
+
+    private void SubmitSlot(TimeSlot slot)
+    {
+        chosenSlot = slot;
+    }
+
+    private async Task SubmitRecord()
+    {
+        if(analisysDto != null && chosenSlot != null)
+        {
+            var record = new RecordDto
+                {
+                    ServiceId = serviceId,
+                    StartTime = chosenSlot.Date.Date + chosenSlot.StartTime,
+                    EndTime = chosenSlot.Date.Date + chosenSlot.EndTime,
+                    Description = analisysDto.Description,
+                    Comment = comment
+                };
+            var res = await _userService.AddRecord(record);
+            if (String.IsNullOrEmpty(res))
+            {
+                Navigation.NavigateTo($"/service-id={serviceId}");
+            }
+            else
+            {
+                showToastr(res);
+            }
+        }
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
     }
 }
+
+<style>
+    
+
+   
+</style>

@@ -40,5 +40,12 @@ namespace WebPetCare.IServices
         public Task<Result<List<GetQuestionDto>>> GetServiceQuestionary(int serviceId);
 
         public Task<Result<QuestionaryAnalisysDto>> AnalizeQuestionary(List<QuestionDto> questionary, int serviceId);
+
+        public Task<Result<List<RecordInfoDto>>> GetUserRecords();
+
+        public Task<string> CancelRecord(int recordId);
+
+        public Task<string> AddReview(ReviewDto review);
+
     }
 }

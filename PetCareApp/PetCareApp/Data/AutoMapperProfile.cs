@@ -33,6 +33,7 @@ namespace PetCareApp.Data
             CreateMap<PetDto, Pet>();
             CreateMap<Schedule, ScheduleDto>();
             CreateMap<ScheduleDto, Schedule>();
+            CreateMap<ReviewDto, Review>();
         }
         
     }

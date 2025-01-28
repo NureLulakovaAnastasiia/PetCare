@@ -32,11 +32,14 @@
                 break;
 
             case menuOptions.Reviews:
+                <_MasterServiceReviews masterId="" serviceId="@(null)"></_MasterServiceReviews>
                 break;
 
             case menuOptions.General:
                 <_GeneralAccount masterData="masterData"></_GeneralAccount>
                 <_MyServicesGeneral services="@masterData.Services"></_MyServicesGeneral>
+                <_PetsList Pets="@masterData.Pets"></_PetsList>
+                <_UserRecords></_UserRecords>
                 break;
         }
 
@@ -44,10 +47,11 @@
     else if (role == "User")
     {
         <_GeneralAccount masterData="masterData"></_GeneralAccount>
-
+        <_PetsList Pets="@masterData.Pets"></_PetsList>
+        <_UserRecords></_UserRecords>
     }
 
-    <_PetsList Pets="@masterData.Pets"></_PetsList>
+    
 </div>
 
 

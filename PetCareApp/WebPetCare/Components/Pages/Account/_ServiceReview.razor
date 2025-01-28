@@ -1,0 +1,138 @@
+﻿@using LabelPosition = Syncfusion.Blazor.Inputs.LabelPosition
+@inject SfDialogService DialogService
+@inject IUserService userService
+@inject IJSRuntime _JSRuntime
+
+<SfDialog ShowCloseIcon="true" IsModal="true" Width="700px" @bind-Visible="@IsReview">
+        <DialogTemplates>
+            <Header>
+                <div class="text-center">
+                    <h2>Add review to service</h2>
+                    <h4> @serviceName</h4>
+                </div>
+            </Header>
+            <Content>
+                <div class="row text-center">
+                    <div class="col col-6 p-2">
+                        <label for="rate" class="p-2">Rate</label>
+                        <div>
+                            <SfRating @bind-Value=Rate ShowLabel=true ShowTooltip="false" LabelPosition="LabelPosition.Left">
+                                <FullTemplate>
+                                    <img src=@fullTemplateImage widht="30" height="30" />
+                                </FullTemplate>
+                                <EmptyTemplate>
+                                    <img src=@emptyTemplateImage widht="30" height="30" />
+                                </EmptyTemplate>
+                                <LabelTemplate>@context+</LabelTemplate>
+                            </SfRating>
+                        </div>
+                        <hr />
+
+                        <label for="description" class="p-2">Description</label>
+                        <textarea id="description" @bind="Description" class="form-control"></textarea>
+                    </div>
+                    <div class="col-6 p-2 text-center">
+                        <label for="photo" class="d-block pb-2 pt-2">Photo</label>
+
+                        @if (UploadedImage != null)
+                        {
+                            <img src="@UploadedImage" class="pb-2" alt="Preview image" style="max-width: 200px;" />
+                        }
+
+                        <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
+                    </div>
+                </div>
+            </Content>
+        </DialogTemplates>
+        
+        <DialogButtons>
+            <DialogButton Content="Add" IsPrimary="true" OnClick="@AddReview" />
+            <DialogButton Content="Cancel" OnClick="@CloseModal" />
+        </DialogButtons>
+</SfDialog>
+@code {
+    [Parameter]
+    public string serviceName { get; set; } = string.Empty; 
+    [Parameter]
+    public int serviceId { get; set; }
+    [Parameter]
+    public bool IsReview { get; set; } = false;
+    [Parameter]
+    public EventCallback PageUpdate { get; set; }
+
+    [Parameter]
+    public EventCallback CancelReview { get; set; }
+    private double Rate { get; set; } = 4;
+    private string Description { get; set; } = string.Empty;
+    private IBrowserFile SelectedFile;
+    private string? UploadedImage;
+    private string fullTemplateImage = "Images/star-fill.svg";
+    private string emptyTemplateImage = "Images/star.svg";
+
+    private async Task ReloadPage()
+    {
+        if (PageUpdate.HasDelegate)
+        {
+            await PageUpdate.InvokeAsync();
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        SelectedFile = e.File;
+
+        using var stream = new MemoryStream();
+        await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+        UploadedImage = $"data:{SelectedFile.ContentType};base64,{Convert.ToBase64String(stream.ToArray())}";
+        StateHasChanged();
+    }
+
+    private async Task CloseModal()
+    {
+        if (CancelReview.HasDelegate)
+        {
+            await CancelReview.InvokeAsync();
+        }
+    }
+
+
+    private async Task AddReview()
+    {
+        var review = new ReviewDto
+            {
+                Id = 0,
+                Text = Description,
+                Rate = (int)Rate,
+                ServiceId = serviceId
+            };
+        if (SelectedFile != null)
+        {
+            using var stream = new MemoryStream();
+            await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+            review.Photo = stream.ToArray();
+        }
+
+        var res = await userService.AddReview(review);
+        if (String.IsNullOrEmpty(res))
+        {
+            await CloseModal();
+            await ReloadPage();
+        }
+        else
+        {
+            showToastr(res);
+        }
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+}

@@ -402,5 +402,41 @@ namespace WebPetCare.Services
             var res = await getCurrentRole();
             return res;
         }
+
+        public async Task<List<ReviewDto>> GetReviews(int serviceId)
+        {
+                var res = new List<ReviewDto>();
+                try
+                {
+                    httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                    string fullUrl = $"{_apiUrl}/api/Service/getServiceReviews?serviceId={serviceId}";
+
+                    HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string result = await response.Content.ReadAsStringAsync();
+                        JsonSerializerOptions options = new JsonSerializerOptions
+                        {
+                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                        };
+                        var data = JsonSerializer.Deserialize<List<ReviewDto>>(result, options);
+                        if (data != null)
+                        {
+                            return data;
+                        }
+                    }
+                    else
+                    {
+                           return res;
+                    }
+                }
+                catch (Exception ex)
+                {
+                   
+                }
+
+                return res;
+        }
     }
 }

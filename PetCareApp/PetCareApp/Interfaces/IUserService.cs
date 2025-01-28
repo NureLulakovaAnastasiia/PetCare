@@ -10,6 +10,10 @@ namespace PetCareApp.Interfaces
         public Task<string> RemovePet(int petId);
         public MasterDto GetMasterData(string masterId);
 
-        public List<ReviewDto> GetMasterReviews(string masterId);
+        public Task<List<ReviewDto>> GetMasterReviews(string masterId);
+
+        public Task<List<RecordInfoDto>> GetUserRecords();
+        public Task<Result<bool>> CancelRecord(int recordId);
+        public Task<Result<bool>> AddReview(ReviewDto review);
     }
 }

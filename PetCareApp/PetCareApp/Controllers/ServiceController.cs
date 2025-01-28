@@ -161,5 +161,23 @@ namespace PetCareApp.Controllers
             
             return Ok(masterName);
         }
+
+        [HttpGet("getServiceReviews")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetServiceReviews([FromQuery] int serviceId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var reviews = await _serviceService.GetServiceReviews(serviceId);
+            if (reviews == null || reviews.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(reviews);
+        }
     }
 }

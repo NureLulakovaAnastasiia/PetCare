@@ -6,9 +6,9 @@
             @if (data != null && slots.Count > 0)
             {
                 <h4>Estimated time: @data.Time min</h4>
-                <hr/>
+                <hr />
                 <h4>Choose needed slot</h4>
-                @foreach(var key in slots)
+                @foreach (var key in slots)
                 {
                     <div>
                         <h4>@key.Key.ToString("dddd, dd MMMM yyyy")</h4>
@@ -17,8 +17,8 @@
                                 @foreach (var item in key.Value)
                                 {
                                     <div class="badge text-white d-inline-flex align-items-center m-2"
-                                         style="@(chosenSlot == item ? "box-shadow: 0px 0px 3px; background-color: #d63384; border: #c71c71": "") "
-                                    @onclick="() => ChooseSlot(item)">
+                                         style="@(chosenSlot == item ? "box-shadow: 0px 0px 3px #c71c71; background-color: #d63384; border: #c71c71": "") "
+                                         @onclick="() => ChooseSlot(item)">
                                         @item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")
                                     </div>
                                 }
@@ -26,7 +26,9 @@
                         </div>
                     </div>
                 }
-                
+                <div>
+                    <button class="btn btn-success" @onclick="SubmitSlot">Submit</button>
+                </div>
             }
             else
             {
@@ -38,11 +40,16 @@
 </div>
 
 
+
 @code {
     [Parameter]
     public QuestionaryAnalisysDto data { get; set; }
+    public TimeSlot chosenSlot { get; set; } = new TimeSlot();
+
     [Parameter]
-    public TimeSlot chosenSlot { get; set; }
+    public EventCallback ToNextStep { get; set; }
+    [Parameter]
+    public EventCallback<TimeSlot> OnSlotSubmit { get; set; }
 
     public Dictionary<DateTime, List<TimeSlot>> slots = new Dictionary<DateTime, List<TimeSlot>>();
 
@@ -53,7 +60,7 @@
             if (data.Slots != null && data.Slots.Count > 0)
             {
                 var dates = data.Slots.Select(s => s.Date.Date).Distinct().ToList();
-                foreach(var date in dates)
+                foreach (var date in dates)
                 {
                     slots[date] = new List<TimeSlot>();
                 }
@@ -73,5 +80,25 @@
     {
         chosenSlot = slot;
         StateHasChanged();
+    }
+
+    public async Task SubmitSlot()
+    {
+        if (chosenSlot != null && chosenSlot.Date != null)
+        {
+            if (OnSlotSubmit.HasDelegate)
+            {
+                await OnSlotSubmit.InvokeAsync(chosenSlot);
+                await ToNextPage();
+            }
+        }
+    }
+
+    private async Task ToNextPage()
+    {
+        if (ToNextStep.HasDelegate)
+        {
+            await ToNextStep.InvokeAsync();
+        }
     }
 }

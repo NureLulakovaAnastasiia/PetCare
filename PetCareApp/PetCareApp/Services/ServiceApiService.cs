@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PetCareApp.Data;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
+using PetCareApp.Mappings;
 using PetCareApp.Models;
 
 namespace PetCareApp.Services
@@ -136,10 +137,9 @@ namespace PetCareApp.Services
             {
                 var service = _dbContext.Services
                         .Where(x => x.Id == serviceId)
-                        .Include(x => x.Reviews)
                         .Include(x => x.Tags)
                         .FirstOrDefault();
-
+               
                 if (service != null)
                 {
                     res = _mapper.Map<GetServiceDto>(service);
@@ -228,5 +228,25 @@ namespace PetCareApp.Services
             return String.Empty;
         }
 
+        public async Task<List<ReviewDto>> GetServiceReviews(int serviceId)
+        {
+            var res = new List<ReviewDto>();
+            var reviews = _dbContext.Reviews.Where(x => x.ServiceId == serviceId)
+                   .Include(r => r.Comments)
+                   .ThenInclude(c => c.AppUser)
+                   .Include(r => r.AppUser)
+                   .ToList();
+
+            if(reviews != null)
+            {
+                foreach (var review in reviews)
+                {
+                    var mapped = ReviewMapping.MapReview(review);
+                    res.Add(mapped);
+                }
+            }
+
+            return res;
+        }
     }
 }

@@ -1,0 +1,162 @@
+﻿@using WebPetCare.IServices
+@inject IUserService userService
+@inject NavigationManager Navigation
+@inject IJSRuntime _JSRuntime
+@inject SfDialogService DialogService
+
+<div class="d-flex justify-content-center  mt-3">
+    <div class="col-lg-10 align-items-center text-center">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            <h3 class="col-7 offset-2"><b>My records</b></h3>
+            <hr />
+            
+            @if(records.Count > 0)
+            {
+                <div class="container my-4 align-content-center">
+                    <div class="row text-start">
+                        @foreach(var record in records)
+                        {
+                            <_ServiceReview serviceName="@record.ServiceName" IsReview="IsReview"
+                            CancelReview="CancelReview" PageUpdate="ReloadData" serviceId="@(record.ServiceId ?? 0)"
+                            ></_ServiceReview>
+                            <div class="card col-md-10 mb-4 offset-1 p-2">
+                                <div class="card-header row"> 
+                                    <h4 class="col-8">@record.ServiceName</h4>
+                                   
+                                    <div class="col-3 text-center">
+                                        @record.StartTime.ToString("D")
+                                        <h3>@record.StartTime.ToString("HH:mm") - @record.EndTime.ToString("HH:mm")</h3>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="row m-2">
+                                        <h5 class="col-2">Status : </h5>
+                                        <h3 class="@(record.Status == "Created" ? "text-success" : "text-primary") col-8">@record.Status</h3>
+                                    </div>
+                                    @if (!String.IsNullOrEmpty(record.RecordCancelReason))
+                                    {
+                                        <div class="row m-2">
+                                            <h5 class="col-3">Cancel Reason: </h5>
+                                            <h4 class="text-danger col-8">@record.RecordCancelReason</h4>
+                                        </div>
+                                        
+                                    }
+                                </div>
+
+                                @if (!String.IsNullOrEmpty(record.Comment)){
+                                    <h5>Comment: @record.Comment</h5>
+                                }
+                                <div class="input-textarea-style ps-2" style="white-space: pre-line;">Description: @record.Description</div>
+                                @if (!String.IsNullOrEmpty(record.PetName))
+                                {
+                                    <h3 class="text-danger">@record.PetName</h3>
+                                }
+
+                                <div class="m-2 text-end">
+                                    @if(record.Status == "Finished")
+                                    {
+                                        if (record.IsReviewed)
+                                        {
+                                            <label class="ps-3">You already have reviews to this service</label>
+                                        }
+                                        <button class="btn btn-success" @onclick="WriteReview">Add Review</button>
+                                    }
+                                    else if (record.Status == "Created")
+                                    {
+                                        if (DateTime.UtcNow < record.StartTime)
+                                        {
+                                            var interval = DateTime.UtcNow - record.StartTime;
+                                            if (interval.TotalHours > 2)
+                                            {
+                                                <button class="btn btn-danger" @onclick="() => CancelRecord(record.Id)">Cancel Record</button>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <h3>No records were found</h3>
+            }
+        
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public List<RecordInfoDto> records = new List<RecordInfoDto>();
+    private bool IsReview { get; set; } = false;
+    private bool IsCancel { get; set; } = false;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var data = await userService.GetUserRecords();
+            if (data.IsSuccess)
+            {
+                records = data.Data;
+                StateHasChanged();
+            }
+            else
+            {
+                showToastr(data.ErrorMessage);
+            }
+
+        }
+    }
+
+    public async Task CancelRecord(int recordId)
+    {
+        bool isConfirm = await DialogService.ConfirmAsync("Are you sure you want to cancel this record?", "Cancel Record");
+        if (isConfirm)
+        {
+            var res = await userService.CancelRecord(recordId);
+            if (String.IsNullOrEmpty(res))
+            {
+                showToastr("", "Record was succesfully cancelled");
+                ReloadData();
+            }
+            else
+            {
+                showToastr(res);
+            }
+        }
+    }
+
+
+    public void CancelReview()
+    {
+        IsReview = false;
+        StateHasChanged();
+    }
+
+    public async void ReloadData()
+    {
+        await OnAfterRenderAsync(true);
+    }
+    
+    
+    public void WriteReview()
+    {
+        IsReview = true;
+        StateHasChanged();
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+}

@@ -6,6 +6,7 @@ using System.Text.Json;
 using WebPetCare.IServices;
 using PetCareApp.Models;
 using WebPetCare.Components.Pages.Account;
+using System.Collections.Generic;
 
 namespace WebPetCare.Services
 {
@@ -662,6 +663,99 @@ namespace WebPetCare.Services
             catch (Exception ex)
             {
                 res.ErrorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<Result<List<RecordInfoDto>>> GetUserRecords()
+        {
+            var res = new Result<List<RecordInfoDto>>();
+            
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+
+                string fullUrl = $"{_apiUrl}/api/User/getUserRecords";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<RecordInfoDto>> (result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> CancelRecord(int recordId)
+        {
+            var res = string.Empty;
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/User/userCancelRecord?recordId={recordId}";
+
+                HttpResponseMessage response = await httpClient.PatchAsync(fullUrl, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<string> AddReview(ReviewDto review)
+        {
+            var res = string.Empty;
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(review, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/User/addReview";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
             }
             return res;
         }

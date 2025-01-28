@@ -129,13 +129,28 @@ namespace PetCareApp.Services
             return res;
         }
 
-        public List<ReviewDto> GetMasterReviews(string masterId)
+        public async Task<List<ReviewDto>> GetMasterReviews(string masterId)
         {
+           
             var res = new List<ReviewDto>();
-            var data = _dbContext.Reviews.Where(r => r.AppUserId == masterId)
+            if (String.IsNullOrEmpty(masterId))
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    masterId = user.Id;
+                }
+                else
+                {
+                    return res;
+                }
+            }
+            var data = _dbContext.Reviews
                 .Include(r => r.AppUser)
+                .Include(r => r.Service)
                 .Include(r => r.Comments)
                 .ThenInclude(c => c.AppUser)
+                .Where(r => r.Service.AppUserId == masterId)
                 .ToList();
             if (data.Count > 0)
             {
@@ -143,6 +158,134 @@ namespace PetCareApp.Services
                 {
                     res.Add(ReviewMapping.MapReview(item));
                 }
+            }
+
+            return res;
+        }
+
+        public async Task<List<RecordInfoDto>> GetUserRecords()
+        {
+            var res = new List<RecordInfoDto>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return res;
+                }
+                var records = _dbContext.Records.Where(r => r.AppUserId == user.Id)
+                    .Include(r => r.Service)
+                    .Include(r => r.RecordCancel)
+                    .Include(r => r.Pet)
+                    .ToList();
+                var services = _dbContext.Services.Where(s => s.AppUserId == user.Id).Select(s => s.Id).ToList();
+                var servicesWithReviews = _dbContext.Reviews.Where(r => r.AppUserId == user.Id).Select(r => r.ServiceId).Distinct().ToList();
+                if (services.Count > 0)
+                {
+                    records = records.Where(r => !services.Contains(r.ServiceId ?? 0)).ToList();
+                }
+                if (records != null && records.Count > 0)
+                {
+                    foreach(var record in records)
+                    {
+                        var mapped = RecordMapping.MapRecordToInfo(record);
+                        if (servicesWithReviews.Contains(mapped.ServiceId))
+                        {
+                            mapped.IsReviewed = true;
+                        }
+                        res.Add(mapped);
+                    } 
+                }
+            }
+            catch (Exception ex)
+            {
+                
+            }
+
+            return res;
+        }
+
+        public async Task<Result<bool>> CancelRecord(int recordId)
+        {
+            var res = new Result<bool>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    res.ErrorMessage = "There is no such user";
+                    return res;
+                }
+                var record = _dbContext.Records.FirstOrDefault(r => r.Id == recordId);
+                if (record != null)
+                {
+                    if(record.AppUserId == user.Id)
+                    {
+                        var cancel = new RecordCancel
+                        {
+                            AppUserId = user.Id,
+                            RecordId = recordId,
+                            Reason = "Cancelled by user",
+                            Date = DateTime.UtcNow
+                        };
+                        record.Status = "Cancelled";
+                        _dbContext.Add(cancel);
+                        _dbContext.Update(record);
+                        res.Data = _dbContext.SaveChanges() > 1;
+
+                    }
+                    else
+                    {
+                        res.ErrorMessage = "You don't have an access to this record";
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "Record was not found";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.ToString();
+            }
+
+            return res;
+        }
+
+        public async Task<Result<bool>> AddReview(ReviewDto review)
+        {
+            var res = new Result<bool>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    res.ErrorMessage = "There is no such user";
+                    return res;
+                }
+                var service = _dbContext.Services.FirstOrDefault(r => r.Id == review.ServiceId);
+                if (service != null)
+                {
+                    var reviewToAdd = _mapper.Map<Review>(review);
+                    if (reviewToAdd != null)
+                    {
+                        reviewToAdd.AppUserId = user.Id;
+                        _dbContext.Add(reviewToAdd);
+                        res.Data = _dbContext.SaveChanges() == 1;
+                    }
+                    else
+                    {
+                        res.ErrorMessage = "Error during mapping";
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "Service was not found";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.ToString();
             }
 
             return res;

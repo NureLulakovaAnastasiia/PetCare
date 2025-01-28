@@ -1,5 +1,5 @@
 ﻿@page "/service-id={serviceId:int}"
-
+@using WebPetCare.Components.Pages.Account
 @inject IServiceService _service
 @inject IJSRuntime _JSRuntime
 
@@ -8,7 +8,7 @@
 }else{
     <_ServiceGeneralInfo serviceDto="@serviceDto"></_ServiceGeneralInfo>
 }
-
+<_MasterServiceReviews masterId="@(null)" serviceId="@serviceId"></_MasterServiceReviews>
 
 @code {
     [Parameter]
