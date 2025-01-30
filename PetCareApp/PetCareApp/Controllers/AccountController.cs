@@ -57,7 +57,14 @@ namespace PetCareApp.Controllers
                     var roleResult = await _userManager.AddToRoleAsync(appUser, role);
                     if (roleResult.Succeeded)
                     {
-                       
+                        if (role == "Organization")
+                        {
+                            var res = _userService.CreateOrganization(appUser.Id);
+                            if (!int.TryParse(res, out var num))
+                            {
+                                return StatusCode(500, "Error during organization creation");
+                            }
+                        }
                         return Ok(new NewUserDto
                         {
                             Role = role,
@@ -67,6 +74,7 @@ namespace PetCareApp.Controllers
                     }
                     else
                     {
+                        await _userManager.DeleteAsync(appUser);
                         return StatusCode(500, roleResult.Errors);
                     }
                 }

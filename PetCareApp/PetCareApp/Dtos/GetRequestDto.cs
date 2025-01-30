@@ -9,5 +9,6 @@ namespace PetCareApp.Dtos
         public string Status { get; set; }
         public DateTime Date { get; set; } 
         public string AppUserId { get; set; }
+        public string UserName { get; set; } = string.Empty;
     }
 }

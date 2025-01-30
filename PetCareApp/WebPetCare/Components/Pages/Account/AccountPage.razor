@@ -1,6 +1,9 @@
 ﻿@page "/account"
 @using WebPetCare.IServices
+@using WebPetCare.Components.Pages.Organization
 @inject IUserService userService
+@inject IOrganizationService orgService
+@inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
 
 <PageTitle>Account</PageTitle>
@@ -49,6 +52,38 @@
         <_GeneralAccount masterData="masterData"></_GeneralAccount>
         <_PetsList Pets="@masterData.Pets"></_PetsList>
         <_UserRecords></_UserRecords>
+    }else if(role == "Organization")
+    {
+        <div class="row col-9 offset-2 mb-3 ">
+            <button class="btn col-lg-2 me-3  btn-nav@(orgOptions == organizationOptions.General ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.General)">General</button>
+            <button class="btn col-lg-2 me-3 btn-nav@(orgOptions == organizationOptions.Requests ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Requests)">Requests</button>
+            <button class="btn col-lg-2 me-3 btn-nav@(orgOptions == organizationOptions.Services ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Services)">Services</button>
+            <button class="btn col-lg-2 me-3 btn-nav@(orgOptions == organizationOptions.Calendar ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Calendar)">Calendar</button>
+            <button class="btn col-lg-2 me-3 btn-nav@(orgOptions == organizationOptions.Portfolio ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Portfolio)">Portfolio</button>
+
+        </div>
+        @switch (orgOptions)
+        {
+            case organizationOptions.Calendar:
+                <Calendar></Calendar>
+                break;
+            case organizationOptions.Portfolio:
+                
+                break;
+            case organizationOptions.Services:
+                
+                break;
+
+            case organizationOptions.Requests:
+                 <_RequestsPage></_RequestsPage>
+                break;
+
+            case organizationOptions.General:
+                <_OrganizationData orgInfo="@organizationInfo"></_OrganizationData>
+                <_GeneralAccount masterData="masterData"></_GeneralAccount>
+                break;
+        }
+        
     }
 
     
@@ -61,12 +96,16 @@
 
     public string Error { get; set; } = "";
     private menuOptions options = menuOptions.General;
-
+    public OrganizationInfo organizationInfo { get; set; } = new OrganizationInfo();
+    private organizationOptions orgOptions = organizationOptions.General;
     public enum menuOptions
     {
         General, Calendar, Services, Reviews, Portfolio
     }
-
+    public enum organizationOptions
+    {
+        General, Requests, Calendar, Services, Portfolio
+    }
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -86,6 +125,18 @@
             {
                 Navigation.NavigateTo("/login");
             }
+            if(role == "Organization")
+            {
+                var data = await orgService.GetOrganizationInfo();
+                if (data.IsSuccess)
+                {
+                    organizationInfo = data.Data;
+                }
+                else
+                {
+                    showToastr(data.ErrorMessage);
+                }
+            }
             StateHasChanged();
         }
     }
@@ -94,5 +145,23 @@
     {
         options = option;
         StateHasChanged();
+    }
+
+    public void ChangeOrgPage(organizationOptions option)
+    {
+        orgOptions = option;
+        StateHasChanged();
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
     }
 }

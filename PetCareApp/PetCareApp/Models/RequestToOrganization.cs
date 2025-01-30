@@ -8,7 +8,7 @@ namespace PetCareApp.Models
         public int Id { get; set; }
 
         [Required]
-        public string Status { get; set; } = "New";
+        public string Status { get; set; } = "New";  //Rejected, Accepted
 
         [Required]
         public DateTime Date { get; set; } = DateTime.UtcNow;

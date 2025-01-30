@@ -1,0 +1,71 @@
+﻿@inject IOrganizationService orgService
+@inject IJSRuntime _JSRuntime
+@inject NavigationManager Navigation
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            @if(requests != null  && requests.Count > 0)
+            {
+                @foreach(var request in requests)
+                {
+                    <div class="row">
+                        <div class="col-8 text-start offset-1">
+                            <h4>Request №@request.Id</h4>
+                            <NavLink  @onclick="() => GoToMasterPage(request.AppUserId)" class="nav-link ">From: @request.UserName</NavLink>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-func-success col-12">Accept</button>
+                            <button class="btn btn-func-danger col-12">Reject</button>
+
+                        </div>
+                        
+                    </div>
+                }
+            }
+            else
+            {
+                <h3>No data was found</h3>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    public List<GetRequestDto> requests { get; set; } = new List<GetRequestDto>();
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var data = await orgService.GetRequests();
+            if(data != null)
+            {
+                requests = data;
+            }
+            else
+            {
+                showToastr("Error during getting data");
+            }
+            StateHasChanged();
+        }
+    }
+    private void GoToMasterPage(string masterId)
+    {
+        Navigation.NavigateTo($"/master/{masterId}");
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+}

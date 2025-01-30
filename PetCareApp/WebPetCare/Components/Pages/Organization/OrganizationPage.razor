@@ -1,0 +1,152 @@
+﻿@page "/organization/{id:int}"
+@using WebPetCare.Components.Pages.Account
+@inject IOrganizationService orgService
+@inject IJSRuntime _JSRuntime
+@inject NavigationManager Navigation
+@inject SfDialogService DialogService
+
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 ">
+            @if (data != null && data.Contacts != null)
+            {
+                <div class="row text-center">
+                    <h3 class="col-6 offset-3"><b>@data.Name</b></h3>
+                </div>
+                <hr/>
+
+                <div class="row">
+                    <div class="col-6">
+                        <label>Address</label>
+                        <h4>@data.Contacts.Address</h4>
+                    </div>
+
+                    <div class="col-6">
+                        <label>Phone</label>
+                        <h4>@data.Contacts.Phone</h4>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <label>Description</label>
+                    <h4 class="col-8 offset-2 text-primary">@data.Description</h4>
+                </div>
+                
+                @if(role == "Master")
+                {
+                    <div class="mt-2">
+                        <button class="btn btn-primary" @onclick="MakeRequest">Make request to organization</button>
+                    </div>
+                }
+            }
+            else
+            {
+                <h3>There is no such organization</h3>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="container align-items-center mt-5">
+        <div class="col-1"></div>
+        <div class="row col-9 offset-3 mb-3 ">
+        <button class="btn col-lg-2 me-3 btn-nav@(options == OrganizationOptions.Map ? "-active" : "")" @onclick="() => ChangePage(OrganizationOptions.Map)">On map</button>
+        <button class="btn col-lg-2 me-3 btn-nav@(options == OrganizationOptions.Services ? "-active" : "")" @onclick="() => ChangePage(OrganizationOptions.Services)">Services</button>
+            <button class="btn col-lg-2 me-3 btn-nav@(options == OrganizationOptions.Schedule ? "-active" : "")" @onclick="() => ChangePage(OrganizationOptions.Schedule)">Schedule</button>
+            <button class="btn col-lg-2 me-3 btn-nav@(options == OrganizationOptions.Portfolio ? "-active" : "")" @onclick="() => ChangePage(OrganizationOptions.Portfolio)">Portfolio</button>
+
+        </div>
+
+        @switch (options)
+        {
+            case OrganizationOptions.Map:
+            @if ( data != null && data.Contacts != null){
+                <_PlaceOnMap location="@data.Contacts.Location"></_PlaceOnMap>
+            }
+            else
+            {
+                <h3>Cannot locate place on map</h3>
+            }
+            break;
+            case OrganizationOptions.Portfolio:
+                
+                break;
+            case OrganizationOptions.Services:
+
+                break;
+
+            case OrganizationOptions.Schedule:
+
+                break;
+           
+        }
+
+    </div>
+
+
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    public OrganizationDetailsDto data = new OrganizationDetailsDto();
+    private OrganizationOptions options = OrganizationOptions.Map;
+    private string? role = "";
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var dto = await orgService.GetOrganizationDetails(id);
+            if (dto.IsSuccess)
+            {
+                dto.Data.Contacts.Address = dto.Data.Contacts.Address
+                .Remove(dto.Data.Contacts.Address.LastIndexOf(","));
+                data = dto.Data;
+            }
+            else
+            {
+
+            }
+            role = await orgService.GetCurrentUserRole();
+            StateHasChanged();
+        }
+    }
+
+    public void ChangePage(OrganizationOptions option)
+    {
+        options = option;
+        StateHasChanged();
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+    public enum OrganizationOptions
+    {
+        Portfolio, Services, Map, Schedule
+    }
+    private async Task MakeRequest()
+    {
+        bool isConfirm = await DialogService.ConfirmAsync("Are you sure you want to make request to this organization?", "Make request");
+        if (isConfirm)
+        {
+            var res = await orgService.MakeRequest(id);
+            if (String.IsNullOrEmpty(res))
+            {
+                showToastr("", "You have succesfully made a request");
+            }
+            else
+            {
+                showToastr(res);
+            }
+        }
+    }
+}

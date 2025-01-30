@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 using PetCareApp.Data;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
+using PetCareApp.Mappings;
 using PetCareApp.Models;
 
 namespace PetCareApp.Services
@@ -67,7 +70,7 @@ namespace PetCareApp.Services
             }
         }
 
-        public async Task<List<GetRequestDto>> GetNewRequests()
+        public async Task<List<GetRequestDto>> GetRequests()
         {
             var res = new List<GetRequestDto>();
             try
@@ -79,7 +82,10 @@ namespace PetCareApp.Services
                     if (organization != null)
                     {
                         var requests = _dbContext.RequestsToOrganization
-                            .Where(x => x.OrganizationId == organization.Id && x.Status == "New").ToList();
+                            .Where(x => x.OrganizationId == organization.Id)
+                            .Include(x => x.AppUser)
+                            .ToList();
+                       
                         res = _mapper.Map<List<GetRequestDto>>(requests);
                     }
                 }
@@ -191,6 +197,127 @@ namespace PetCareApp.Services
                 }
             }
             return false;
+        }
+
+        public async Task<string> UpdateOrgInfo(OrganizationInfo info)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null) { 
+                    var organization = _dbContext.Organizations.FirstOrDefault(o => o.AppUserId == user.Id);
+                    if (organization != null)
+                    {
+                        if(!String.IsNullOrEmpty(info.Name))
+                        {
+                            organization.Name = info.Name;
+                        }
+
+                        if (!String.IsNullOrEmpty(info.Description))
+                        {
+                            organization.Description = info.Description;
+                        }
+
+                        _dbContext.Organizations.Update(organization);
+                        return _dbContext.SaveChanges().ToString();
+                    }
+                    else {
+                        organization = new Organization
+                        {
+                            AppUserId = user.Id,
+                            Name = info.Name,
+                            Description = info.Description,
+                            Id = 0
+                        };
+                        _dbContext.Organizations.Add(organization);
+                        return _dbContext.SaveChanges().ToString();
+                    }
+                }
+                else
+                {
+                    return "User was not found";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public async Task<Result<OrganizationInfo>> GetOrganizationInfo()
+        {
+            var res = new Result<OrganizationInfo>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var organization = _dbContext.Organizations.FirstOrDefault(o => o.AppUserId == user.Id);
+                    if (organization != null)
+                    {
+                        res.Data = new OrganizationInfo
+                        {
+                            Id = organization.Id,
+                            Name = organization.Name,
+                            Description = organization.Description
+                        };
+                    }
+                    else
+                    {
+                        res.Data = new OrganizationInfo();
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "User was not found";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public Result<OrganizationDetailsDto> GetOrganizationDetails(int organizationId)
+        {
+            var res = new Result<OrganizationDetailsDto>();
+            try
+            {
+                var organization = _dbContext.Organizations.Where(o => o.Id == organizationId)
+                   .Include(o => o.AppUser) 
+                   .ThenInclude(u => u.Contacts)
+                   .ThenInclude(c => c.Location)
+                   .FirstOrDefault();
+
+                if(organization != null)
+                {
+                    var data = new OrganizationDetailsDto
+                    {
+                        Id = organization.Id,
+                        Name = organization.Name,
+                        Description = organization.Description
+                    };
+                    if (organization.AppUser != null)
+                    {
+                        var contacts = ContactsMapping.MapContact(organization.AppUser.Contacts);
+                        data.Contacts = _mapper.Map<GetContactsDto>(contacts);
+                    }
+                    else
+                    {
+                        data.Contacts = new GetContactsDto();
+                    }
+
+                    res.Data = data;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
         }
     }
 }

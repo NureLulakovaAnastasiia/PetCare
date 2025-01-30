@@ -90,5 +90,19 @@ namespace PetCareApp.Services
         {
             return await GetCurrentUserRole();
         }
+
+        public string CreateOrganization(string userId)
+        {
+            var organization = new Organization { AppUserId = userId };
+            try
+            {
+                _dBContext.Add(organization);
+                return _dBContext.SaveChanges().ToString();
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }

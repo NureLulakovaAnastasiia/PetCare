@@ -11,5 +11,7 @@ namespace PetCareApp.Interfaces
         string SubmitEmail(string email);
 
         public Task<string?> GetCurrentRole();
+
+        public string CreateOrganization(string userId);
     }
 }

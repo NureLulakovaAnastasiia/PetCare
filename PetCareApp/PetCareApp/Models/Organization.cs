@@ -15,6 +15,6 @@ namespace PetCareApp.Models
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public AppUser? AppUser { get; set; }
         public List<OrganizationEmployee> OrganizationEmployees { get; set; } = new List<OrganizationEmployee>();
-
+        public List<OrganizationPorfolio> Portfolios { get; set; } = new List<OrganizationPorfolio>(); //masters portfolios
     }
 }

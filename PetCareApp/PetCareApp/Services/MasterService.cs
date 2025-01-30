@@ -648,12 +648,24 @@ namespace PetCareApp.Services
                 {
                     return "No such organization";
                 }
-                _dbContext.Add(new RequestToOrganization
+
+                var request = _dbContext.RequestsToOrganization
+                    .Where(r => r.OrganizationId == organizationId && r.AppUserId == user.Id && r.Status == "New")
+                    .OrderBy(r => r.Date)
+                    .FirstOrDefault();
+                if (request == null)
                 {
-                    AppUserId = user.Id,
-                    OrganizationId = organizationId
-                });
-                return _dbContext.SaveChanges().ToString();
+                    _dbContext.Add(new RequestToOrganization
+                    {
+                        AppUserId = user.Id,
+                        OrganizationId = organizationId
+                    });
+                    return _dbContext.SaveChanges().ToString();
+                }
+                else
+                {
+                    return "You've already made request to this organization";
+                }
             }
             catch (Exception ex)
             {

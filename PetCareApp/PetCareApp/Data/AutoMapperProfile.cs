@@ -14,6 +14,9 @@ namespace PetCareApp.Data
             CreateMap<UpdateServiceDto, Models.Service>();
             CreateMap<Models.Service, GetServiceDto>();
             CreateMap<GetRequestDto, RequestToOrganization>();
+            CreateMap<RequestToOrganization, GetRequestDto>()
+                .ForMember(dest => dest.UserName, opt => opt
+                .MapFrom(src => src.AppUser != null ?(src.AppUser.LastName + " " + src.AppUser.FirstName) : ""));
             CreateMap<AddAnswerDto, Answer>();
             CreateMap<AddQuestionDto, Question>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers));
@@ -34,6 +37,9 @@ namespace PetCareApp.Data
             CreateMap<Schedule, ScheduleDto>();
             CreateMap<ScheduleDto, Schedule>();
             CreateMap<ReviewDto, Review>();
+            CreateMap<Organization, OrganizationDetailsDto>();
+            CreateMap<ContactsDto, GetContactsDto>();
+            CreateMap<ContactsDto, GetContactsDto>();
         }
         
     }

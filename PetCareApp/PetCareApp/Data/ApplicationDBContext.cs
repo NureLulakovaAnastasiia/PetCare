@@ -34,6 +34,8 @@ namespace PetCareApp.Data
         public DbSet<City> Cities { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<OrganizationPorfolio> OrganizationPorfolios { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

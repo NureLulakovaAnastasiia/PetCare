@@ -1,4 +1,6 @@
-﻿using PetCareApp.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using PetCareApp.Dtos;
+using PetCareApp.Models;
 
 namespace PetCareApp.Interfaces
 {
@@ -6,10 +8,14 @@ namespace PetCareApp.Interfaces
     {
         public string AcceptMasterRequest(int requestId);
         public string RejectMasterRequest(int requestId);
-        public Task<List<GetRequestDto>> GetNewRequests();
+        public Task<List<GetRequestDto>> GetRequests();
 
         public Task<string> UpsertMasterSchedule(List<ScheduleDto> scheduleDto, string masterId);
         public Task<string> UpsertMasterBreaks(List<BreakDto> breakDto, string masterId);
+        public Task<Result<OrganizationInfo>> GetOrganizationInfo(); 
+        public Task<string> UpdateOrgInfo(OrganizationInfo info);
+        public Result<OrganizationDetailsDto> GetOrganizationDetails(int organizationId);
+
     }
 
 

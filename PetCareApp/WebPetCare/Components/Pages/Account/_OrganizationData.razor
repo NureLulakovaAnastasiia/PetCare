@@ -1,0 +1,107 @@
+﻿@inject IOrganizationService orgService
+@inject IJSRuntime _JSRuntime
+
+<div class="d-flex justify-content-center">
+    <div class="col-lg-10 align-items-center text-center ">
+        <div class="form-custom-border bg-body-secondary p-3 mb-3">
+                @if (!IsEdit)
+                {
+                    <div class="row text-center">
+                        <h3 class="col-8 offset-2"><b>About organization</b></h3>
+                        <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    </div>
+                }
+
+            <form method="post" @onsubmit="UpdateOrganizationData">
+                @if (IsEdit)
+                {
+                    <div class="row text-center">
+                        <h3 class="col-6 offset-3"><b>About organization</b></h3>
+                        <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
+                        <button type="submit" class="btn col-2 btn-func-success" >Save</button>
+                    </div>
+                }
+           
+                <hr />
+
+                 <div class="text-center">
+                    @if (orgInfo != null)
+                    {
+                            <div class="ms-4 mb-4 me-5">
+                                <h4>Name</h4>
+                            <InputText @bind-Value="@orgInfo.Name" placeholder="@orgInfo.Name"
+                                       class="input-text-style col-10" disabled="@(!IsEdit)" />
+                            </div>
+
+                            <div class="ms-4 mb-4 me-5">
+                                <h4>Description</h4>
+                            <InputTextArea @bind-Value="@orgInfo.Description" placeholder="@orgInfo.Description"
+                                class="input-textarea-style col-10" disabled="@(!IsEdit)" />
+                        </div>
+                    }
+                    else
+                    {
+                        <h2>No data was found</h2>
+                    }
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public bool IsEdit = false;
+    public OrganizationInfo initialInfo = new OrganizationInfo();
+    [Parameter]
+    public OrganizationInfo orgInfo { get; set; } = new OrganizationInfo();
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && orgInfo != null)
+        {
+            initialInfo.Name = orgInfo.Name;
+            initialInfo.Description = orgInfo.Description;
+            initialInfo.Id = orgInfo.Id;
+        }
+    }
+
+    private void OnButtonClick()
+    {
+        IsEdit = !IsEdit;
+    }
+    private async Task UpdateOrganizationData(EventArgs e)
+    {
+        var res = await orgService.UpdateOrganizationInfo(orgInfo);
+        if (String.IsNullOrEmpty(res))
+        {
+            initialInfo.Name = orgInfo.Name;
+            initialInfo.Description = orgInfo.Description;
+            OnButtonClick();
+        }
+        else
+        {
+            showToastr(res);
+        }
+    }
+
+    private void CancelEdit()
+    {
+        orgInfo.Name = initialInfo.Name;
+        orgInfo.Description = initialInfo.Description;
+        OnButtonClick();
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+}

@@ -273,8 +273,8 @@ namespace PetCareApp.Controllers
             });
         }
 
-        [HttpPost("makeRequest")]
-        public async Task<IActionResult> MakeRequest(int organizationId)
+        [HttpPatch("makeRequest")]
+        public async Task<IActionResult> MakeRequest([FromQuery]int organizationId)
         {
             var res = await _masterService.MakeRequestToOrganization(organizationId);
             if (int.TryParse(res, out int num))
