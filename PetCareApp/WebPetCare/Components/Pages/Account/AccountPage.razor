@@ -13,13 +13,13 @@
     {
 
         <div class="col-1"></div>
-        <div class="row col-9 offset-2 mb-3 ">
-            <button class="btn col-lg-2 me-3  btn-nav@(options == menuOptions.General ? "-active" : "")" @onclick="() => ChangePage(menuOptions.General)">General</button>
-            <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Calendar ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Calendar)">Calendar</button>
-            <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Services ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Services)">My services</button>
-            <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Reviews ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Reviews)">Reviews</button>
-            <button class="btn col-lg-2 me-3 btn-nav@(options == menuOptions.Portfolio ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Portfolio)">Portfolio</button>
-
+        <div class="row col-8 offset-3 mb-3">
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.General ? "-active" : "")" @onclick="() => ChangePage(menuOptions.General)">General</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Calendar ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Calendar)">Calendar</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Services ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Services)">My services</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Reviews ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Reviews)">Reviews</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Portfolio ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Portfolio)">Portfolio</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Requests ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Requests)">My requests</button>
         </div>
 
         @switch (options)
@@ -43,6 +43,9 @@
                 <_MyServicesGeneral services="@masterData.Services"></_MyServicesGeneral>
                 <_PetsList Pets="@masterData.Pets"></_PetsList>
                 <_UserRecords></_UserRecords>
+                break;
+            case menuOptions.Requests:
+                <_RequestsPage role="@role"></_RequestsPage>
                 break;
         }
 
@@ -75,7 +78,7 @@
                 break;
 
             case organizationOptions.Requests:
-                 <_RequestsPage></_RequestsPage>
+                 <_RequestsPage role="@role"></_RequestsPage>
                 break;
 
             case organizationOptions.General:
@@ -100,7 +103,7 @@
     private organizationOptions orgOptions = organizationOptions.General;
     public enum menuOptions
     {
-        General, Calendar, Services, Reviews, Portfolio
+        General, Calendar, Services, Reviews, Portfolio, Requests
     }
     public enum organizationOptions
     {

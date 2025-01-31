@@ -11,5 +11,8 @@ namespace WebPetCare.IServices
         public Task<string> UpdateOrganizationInfo(OrganizationInfo organizationInfo);
         public Task<Result<OrganizationDetailsDto>> GetOrganizationDetails(int organizationId);
         public Task<List<GetRequestDto>> GetRequests();
+        public Task<string> AcceptRequest(int requestId);
+        public Task<string> RejectRequest(int requestId);
+
     }
 }

@@ -182,5 +182,57 @@ namespace WebPetCare.Services
 
             return res;
         }
+
+        public async Task<string> AcceptRequest(int requestId)
+        {
+            var res = "";
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Organization/acceptRequest?requestId={requestId}";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> RejectRequest(int requestId)
+        {
+            var res = "";
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Organization/rejectRequest?requestId={requestId}";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
     }
 }

@@ -4,24 +4,37 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 ">
-            @if(requests != null  && requests.Count > 0)
+        <div class="form-custom-border bg-body-secondary p-3 justify-content-center">
+            <div class="row text-center">
+                <h3 class="col-8 offset-2"><b>Requests</b></h3>
+                <hr />
+            </div>
+            @if (requests != null && requests.Count > 0)
             {
-                @foreach(var request in requests)
-                {
-                    <div class="row">
-                        <div class="col-8 text-start offset-1">
-                            <h4>Request №@request.Id</h4>
-                            <NavLink  @onclick="() => GoToMasterPage(request.AppUserId)" class="nav-link ">From: @request.UserName</NavLink>
-                        </div>
-                        <div class="col-3">
-                            <button class="btn btn-func-success col-12">Accept</button>
-                            <button class="btn btn-func-danger col-12">Reject</button>
+                <div class="align-items-center justify-content-center">
+                    @foreach (var request in requests)
+                    {
+                        <div class="row col-10 offset-1 form-custom-border p-3 ">
+                            <div class="col-8 text-start offset-1">
+                                <h4>Request №@request.Id</h4>
+                                <NavLink @onclick="() => GoToMasterPage(request.AppUserId)" class="nav-link ">From: @request.UserName</NavLink>
+                                <p>Date: @request.Date.ToString("F")</p>
+                            </div>
+                            <div class="col-3 align-items-center">
+                                @if (request.Status == "New" && role == "Organization")
+                                {
+                                    <button class="btn btn-func-success col-12 mb-1" @onclick="() => AcceptRequest(request.Id)">Accept</button>
+                                    <button class="btn btn-func-danger col-12" @onclick="() => RejectRequest(request.Id)">Reject</button>
+                                }
+                                else
+                                {
+                                    <h5 style="color: @(ChooseColor(request.Status))">Status: @request.Status</h5>
+                                }
+                            </div>
 
                         </div>
-                        
-                    </div>
-                }
+                    }
+                </div>
             }
             else
             {
@@ -33,7 +46,8 @@
 
 
 @code {
-
+    [Parameter]
+    public string role { get; set; } = "Master";
     public List<GetRequestDto> requests { get; set; } = new List<GetRequestDto>();
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
@@ -41,7 +55,7 @@
         if (firstRender)
         {
             var data = await orgService.GetRequests();
-            if(data != null)
+            if (data != null)
             {
                 requests = data;
             }
@@ -52,11 +66,63 @@
             StateHasChanged();
         }
     }
+
     private void GoToMasterPage(string masterId)
     {
         Navigation.NavigateTo($"/master/{masterId}");
     }
 
+    private async Task AcceptRequest(int requestId)
+    {
+        var res = await orgService.AcceptRequest(requestId);
+        if (String.IsNullOrEmpty(res))
+        {
+            showToastr("", "Request was succefully accepted");
+            var ind = requests.FindIndex(r => r.Id == requestId);
+            if (ind != -1)
+            {
+                requests[ind].Status = "Accepted";
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            showToastr(res);
+        }
+    }
+
+    private async Task RejectRequest(int requestId)
+    {
+        var res = await orgService.RejectRequest(requestId);
+        if (String.IsNullOrEmpty(res))
+        {
+            showToastr("", "Request was succefully rejected");
+            var ind = requests.FindIndex(r => r.Id == requestId);
+            if (ind != -1)
+            {
+                requests[ind].Status = "Rejected";
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            showToastr(res);
+        }
+    }
+
+    private string ChooseColor(string status)
+    {
+        switch (status)
+        {
+            case "Accepted":
+                return "green";
+            case "Rejected":
+                return "red";
+            default:
+                return "blue";
+        }
+
+    }
     private async void showToastr(string res, string successMessage = "")
     {
         if (String.IsNullOrEmpty(res))

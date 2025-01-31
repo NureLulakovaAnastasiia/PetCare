@@ -160,6 +160,10 @@
                 showToastr(res.ErrorMessage);
             }
         }
+        else
+        {
+            IsEdit = false;
+        }
     }
 
     private async Task DeletePortfolio(int id)

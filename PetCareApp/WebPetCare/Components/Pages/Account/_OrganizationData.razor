@@ -27,16 +27,16 @@
                  <div class="text-center">
                     @if (orgInfo != null)
                     {
-                            <div class="ms-4 mb-4 me-5">
+                        <div class="ms-4 mb-4 me-5 ">
                                 <h4>Name</h4>
                             <InputText @bind-Value="@orgInfo.Name" placeholder="@orgInfo.Name"
-                                       class="input-text-style col-10" disabled="@(!IsEdit)" />
+                                       class="input-text-style col-10 text-center" disabled="@(!IsEdit)" />
                             </div>
 
-                            <div class="ms-4 mb-4 me-5">
+                        <div class="ms-4 mb-4 me-5 text-center">
                                 <h4>Description</h4>
                             <InputTextArea @bind-Value="@orgInfo.Description" placeholder="@orgInfo.Description"
-                                class="input-textarea-style col-10" disabled="@(!IsEdit)" />
+                                           class="input-textarea-style col-10 text-center" disabled="@(!IsEdit)" />
                         </div>
                     }
                     else

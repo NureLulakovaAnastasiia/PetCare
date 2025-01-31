@@ -21,14 +21,28 @@ namespace PetCareApp.Services
             _mapper = mapper;
         }
 
-        public string AcceptMasterRequest(int requestId)
+        public async Task<string> AcceptMasterRequest(int requestId)
         {
             try
             {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User was not found";
+                }
+                var organization  = _dbContext.Organizations.FirstOrDefault(x => x.AppUserId == user.Id);
+                if (organization == null)
+                {
+                    return "You don't have access to this function";
+                }
+
                 var request = _dbContext.RequestsToOrganization.FirstOrDefault(x => x.Id == requestId);
                 if (request == null)
                 {
                     return "Request is not found";
+                }else if(request.OrganizationId != organization.Id)
+                {
+                    return "You don't have access to this function";
                 }
                 request.Status = "Accepted";
                 _dbContext.Update(request);
@@ -51,14 +65,29 @@ namespace PetCareApp.Services
             }
         }
 
-        public string RejectMasterRequest(int requestId)
+        public async Task<string> RejectMasterRequest(int requestId)
         {
             try
             {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    return "User was not found";
+                }
+                var organization = _dbContext.Organizations.FirstOrDefault(x => x.AppUserId == user.Id);
+                if (organization == null)
+                {
+                    return "You don't have access to this function";
+                }
+
                 var request = _dbContext.RequestsToOrganization.FirstOrDefault(x => x.Id == requestId);
                 if (request == null)
                 {
                     return "Request is not found";
+                }
+                else if (request.OrganizationId != organization.Id)
+                {
+                    return "You don't have access to this function";
                 }
                 request.Status = "Rejected";
                 _dbContext.Update(request);
@@ -78,16 +107,10 @@ namespace PetCareApp.Services
                 var user = await GetCurrentUserAsync();
                 if (user != null)
                 {
-                    var organization = _dbContext.Organizations.FirstOrDefault(x => x.AppUserId == user.Id);
-                    if (organization != null)
-                    {
                         var requests = _dbContext.RequestsToOrganization
-                            .Where(x => x.OrganizationId == organization.Id)
                             .Include(x => x.AppUser)
                             .ToList();
-                       
                         res = _mapper.Map<List<GetRequestDto>>(requests);
-                    }
                 }
                 return res;
             }

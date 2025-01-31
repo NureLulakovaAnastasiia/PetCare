@@ -8,7 +8,7 @@ namespace PetCareApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Organization, Admin")]
+    [Authorize]
     public class OrganizationController : ControllerBase
     {
         private readonly IOrganizationService _organizationService;
@@ -18,9 +18,10 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("acceptRequest")]
-        public IActionResult AcceptRequest(int requestId)
+        [Authorize(Roles = "Organization")]
+        public async Task<IActionResult> AcceptRequest([FromQuery]int requestId)
         {
-            var res = _organizationService.AcceptMasterRequest(requestId);
+            var res =  await _organizationService.AcceptMasterRequest(requestId);
             if (res == "Success")
             {
                 return Ok(res);
@@ -29,9 +30,11 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("rejectRequest")]
-        public IActionResult RejectRequest(int requestId)
+        [Authorize(Roles = "Organization")]
+
+        public async Task<IActionResult> RejectRequest([FromQuery] int requestId)
         {
-            var res = _organizationService.RejectMasterRequest(requestId);
+            var res = await _organizationService.RejectMasterRequest(requestId);
             if (int.TryParse(res, out int num))
             {
                 return Ok(num);
@@ -40,6 +43,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("getRequests")]
+        [Authorize(Roles = "Master, Organization")]
         public async Task<IActionResult> GetRequests()
         {
             var res = await _organizationService.GetRequests();
@@ -55,6 +59,8 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("getOrganizationData")]
+        [Authorize(Roles = "Organization")]
+
         public async Task<IActionResult> GetOrgData()
         {
             var res = await _organizationService.GetOrganizationInfo();
@@ -66,6 +72,8 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("updateOrganizationInfo")]
+        [Authorize(Roles = "Organization")]
+
         public async Task<IActionResult> UpdateOrgInfo(OrganizationInfo info)
         {
             var res = await _organizationService.UpdateOrgInfo(info);
