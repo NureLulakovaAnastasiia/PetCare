@@ -1,6 +1,7 @@
 ﻿@inject IOrganizationService orgService
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
+@inject SfDialogService DialogService
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
@@ -17,8 +18,15 @@
                         <div class="row col-10 offset-1 form-custom-border p-3 ">
                             <div class="col-8 text-start offset-1">
                                 <h4>Request №@request.Id</h4>
-                                <NavLink @onclick="() => GoToMasterPage(request.AppUserId)" class="nav-link ">From: @request.UserName</NavLink>
+                                @if (role == "Organization")
+                                {
+                                    <NavLink @onclick="() => GoToMasterPage(request.AppUserId)" class="nav-link ">From: @request.UserName</NavLink>
+                                }
+                                else{
+                                    <NavLink @onclick="() => GoToOrgPage(request.OrganizationId)" class="nav-link ">Organization: @request.OrganizationName</NavLink>
+                                }
                                 <p>Date: @request.Date.ToString("F")</p>
+
                             </div>
                             <div class="col-3 align-items-center">
                                 @if (request.Status == "New" && role == "Organization")
@@ -72,41 +80,56 @@
         Navigation.NavigateTo($"/master/{masterId}");
     }
 
+    private void GoToOrgPage(int orgId)
+    {
+        Navigation.NavigateTo($"/organization/{orgId}");
+    }
+
+
     private async Task AcceptRequest(int requestId)
     {
-        var res = await orgService.AcceptRequest(requestId);
-        if (String.IsNullOrEmpty(res))
+        bool isConfirm = await DialogService.ConfirmAsync("Are you sure you want to accept this request?", "Accept request");
+        if (isConfirm)
         {
-            showToastr("", "Request was succefully accepted");
-            var ind = requests.FindIndex(r => r.Id == requestId);
-            if (ind != -1)
+
+            var res = await orgService.AcceptRequest(requestId);
+            if (String.IsNullOrEmpty(res))
             {
-                requests[ind].Status = "Accepted";
-                StateHasChanged();
+                showToastr("", "Request was succefully accepted");
+                var ind = requests.FindIndex(r => r.Id == requestId);
+                if (ind != -1)
+                {
+                    requests[ind].Status = "Accepted";
+                    StateHasChanged();
+                }
             }
-        }
-        else
-        {
-            showToastr(res);
+            else
+            {
+                showToastr(res);
+            }
         }
     }
 
     private async Task RejectRequest(int requestId)
     {
-        var res = await orgService.RejectRequest(requestId);
-        if (String.IsNullOrEmpty(res))
+        bool isConfirm = await DialogService.ConfirmAsync("Are you sure you want to reject this request?", "Reject request");
+        if (isConfirm)
         {
-            showToastr("", "Request was succefully rejected");
-            var ind = requests.FindIndex(r => r.Id == requestId);
-            if (ind != -1)
+            var res = await orgService.RejectRequest(requestId);
+            if (String.IsNullOrEmpty(res))
             {
-                requests[ind].Status = "Rejected";
-                StateHasChanged();
+                showToastr("", "Request was succefully rejected");
+                var ind = requests.FindIndex(r => r.Id == requestId);
+                if (ind != -1)
+                {
+                    requests[ind].Status = "Rejected";
+                    StateHasChanged();
+                }
             }
-        }
-        else
-        {
-            showToastr(res);
+            else
+            {
+                showToastr(res);
+            }
         }
     }
 

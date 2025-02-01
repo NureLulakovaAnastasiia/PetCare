@@ -16,7 +16,9 @@ namespace PetCareApp.Data
             CreateMap<GetRequestDto, RequestToOrganization>();
             CreateMap<RequestToOrganization, GetRequestDto>()
                 .ForMember(dest => dest.UserName, opt => opt
-                .MapFrom(src => src.AppUser != null ?(src.AppUser.LastName + " " + src.AppUser.FirstName) : ""));
+                .MapFrom(src => src.AppUser != null ?(src.AppUser.LastName + " " + src.AppUser.FirstName) : ""))
+                .ForMember(dest => dest.OrganizationName, opt => opt
+                .MapFrom(src => src.Organization != null ? src.Organization.Name : ""));
             CreateMap<AddAnswerDto, Answer>();
             CreateMap<AddQuestionDto, Question>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers));
@@ -40,7 +42,15 @@ namespace PetCareApp.Data
             CreateMap<Organization, OrganizationDetailsDto>();
             CreateMap<ContactsDto, GetContactsDto>();
             CreateMap<ContactsDto, GetContactsDto>();
+            CreateMap<OrganizationEmployee, GetEmployeeDto>()
+                .ForMember(dest => dest.Name, opt => opt
+                .MapFrom(src => src.AppUser != null ? (src.AppUser.LastName + " " + src.AppUser.FirstName) : ""))
+                .ForMember(dest => dest.masterId, opt => opt
+                .MapFrom(src => src.AppUser != null ? src.AppUser.Id : ""))
+                .ForMember(dest => dest.OrganizationName, opt => opt
+                .MapFrom(src => src.Organization != null ? src.Organization.Name : ""));
+
         }
-        
+
     }
 }

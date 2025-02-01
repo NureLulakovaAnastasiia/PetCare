@@ -95,5 +95,31 @@ namespace PetCareApp.Controllers
             }
             return StatusCode(500, res.ErrorMessage);
         }
+
+        [HttpGet("getOrganizationEmployees")]
+        [AllowAnonymous]
+        public IActionResult GetOrganizationEmployees([FromQuery] int orgId)
+        {
+            var res =  _organizationService.GetOrgEmployees(orgId);
+            if (res != null && res.IsSuccess)
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res.ErrorMessage);
+        }
+
+        [HttpPatch("dismissEmployee")]
+        [Authorize(Roles = "Organization")]
+
+        public IActionResult DismissEmployee([FromQuery] int employeeId)
+        {
+            var res = _organizationService.DismissEmployee(employeeId);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+            return StatusCode(500, res);
+        }
+
     }
 }

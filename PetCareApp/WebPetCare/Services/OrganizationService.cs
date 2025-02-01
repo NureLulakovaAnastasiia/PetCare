@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using Azure.Core;
+using Microsoft.JSInterop;
 using PetCareApp.Dtos;
 using PetCareApp.Models;
 using System.Text.Json;
@@ -217,6 +218,65 @@ namespace WebPetCare.Services
                 string fullUrl = $"{_apiUrl}/api/Organization/rejectRequest?requestId={requestId}";
 
                 HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<Result<List<GetEmployeeDto>>> GetEmployees(int orgId)
+        {
+            var res = new Result<List<GetEmployeeDto>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Organization/getOrganizationEmployees?orgId={orgId}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<GetEmployeeDto>>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<string> DismissEmployee(int employeeId)
+        {
+            var res = "";
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Organization/dismissEmployee?employeeId={employeeId}";
+
+                HttpResponseMessage response = await _httpClient.PatchAsync(fullUrl, null);
 
                 if (response.IsSuccessStatusCode)
                 {

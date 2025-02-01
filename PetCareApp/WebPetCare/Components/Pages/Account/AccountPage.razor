@@ -57,13 +57,13 @@
         <_UserRecords></_UserRecords>
     }else if(role == "Organization")
     {
-        <div class="row col-9 offset-2 mb-3 ">
-            <button class="btn col-lg-2 me-3  btn-nav@(orgOptions == organizationOptions.General ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.General)">General</button>
-            <button class="btn col-lg-2 me-3 btn-nav@(orgOptions == organizationOptions.Requests ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Requests)">Requests</button>
-            <button class="btn col-lg-2 me-3 btn-nav@(orgOptions == organizationOptions.Services ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Services)">Services</button>
-            <button class="btn col-lg-2 me-3 btn-nav@(orgOptions == organizationOptions.Calendar ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Calendar)">Calendar</button>
-            <button class="btn col-lg-2 me-3 btn-nav@(orgOptions == organizationOptions.Portfolio ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Portfolio)">Portfolio</button>
-
+        <div class="row col-8 offset-3 mb-3 ">
+            <button class="btn col-lg-3 mb-3 me-3  btn-nav@(orgOptions == organizationOptions.General ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.General)">General</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Requests ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Requests)">Requests</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Services ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Services)">Services</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Calendar ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Calendar)">Calendar</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Portfolio ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Portfolio)">Portfolio</button>
+            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Employees ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Employees)">Employees</button>
         </div>
         @switch (orgOptions)
         {
@@ -76,7 +76,9 @@
             case organizationOptions.Services:
                 
                 break;
-
+            case organizationOptions.Employees:
+                <_OrgEmployees orgId="@organizationInfo.Id"></_OrgEmployees>
+                break;
             case organizationOptions.Requests:
                  <_RequestsPage role="@role"></_RequestsPage>
                 break;
@@ -107,7 +109,7 @@
     }
     public enum organizationOptions
     {
-        General, Requests, Calendar, Services, Portfolio
+        General, Requests, Calendar, Services, Portfolio, Employees
     }
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {

@@ -13,6 +13,8 @@ namespace WebPetCare.IServices
         public Task<List<GetRequestDto>> GetRequests();
         public Task<string> AcceptRequest(int requestId);
         public Task<string> RejectRequest(int requestId);
+        public Task<Result<List<GetEmployeeDto>>> GetEmployees(int orgId);
 
+        public Task<string> DismissEmployee(int employeeId);
     }
 }

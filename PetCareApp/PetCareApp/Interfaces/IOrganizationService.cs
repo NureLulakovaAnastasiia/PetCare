@@ -15,6 +15,9 @@ namespace PetCareApp.Interfaces
         public Task<Result<OrganizationInfo>> GetOrganizationInfo(); 
         public Task<string> UpdateOrgInfo(OrganizationInfo info);
         public Result<OrganizationDetailsDto> GetOrganizationDetails(int organizationId);
+        public Result<List<GetEmployeeDto>> GetOrgEmployees(int orgId);
+        public string DismissEmployee(int employeeId);
+
 
     }
 

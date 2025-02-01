@@ -109,6 +109,7 @@ namespace PetCareApp.Services
                 {
                         var requests = _dbContext.RequestsToOrganization
                             .Include(x => x.AppUser)
+                            .Include(x => x.Organization)
                             .ToList();
                         res = _mapper.Map<List<GetRequestDto>>(requests);
                 }
@@ -341,6 +342,68 @@ namespace PetCareApp.Services
             }
 
             return res;
+        }
+
+        public Result<List<GetEmployeeDto>> GetOrgEmployees(int orgId)
+        {
+            var res = new Result<List<GetEmployeeDto>>();
+            try
+            {
+                var organization = _dbContext.Organizations.FirstOrDefault(o => o.Id == orgId);
+                if (organization != null)
+                {
+                    var employees = _dbContext.OrganizationEmployees.Where(e => e.OrganizationId == orgId)
+                        .Include(e => e.AppUser)
+                        .Include(e => e.Organization)
+                        .ToList();
+
+                    if (employees != null)
+                    {
+                        res.Data = _mapper.Map<List<GetEmployeeDto>>(employees);
+                    }
+                    else
+                    {
+                        res.Data = new List<GetEmployeeDto>();
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "This organization was not found";
+                }
+            }catch(Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public string DismissEmployee(int employeeId)
+        {
+            try
+            {
+                var employee = _dbContext.OrganizationEmployees.FirstOrDefault(e => e.Id == employeeId);
+                if (employee != null)
+                {
+                    var portfolios = _dbContext.Portfolios.Where(p => p.AppUserId == employee.AppUserId)
+                        .Select(p => p.Id).ToList();
+                    if (portfolios != null)
+                    {
+                        var orgPortfolios = _dbContext.OrganizationPorfolios.Where(p => portfolios.Contains(p.PortfolioId)).ToList();
+                        if (orgPortfolios != null)
+                        {
+                            _dbContext.RemoveRange(orgPortfolios);
+                        }
+                    }
+                    employee.DismissalDate = DateTime.UtcNow;  
+                    _dbContext.Update(employee);
+                    return _dbContext.SaveChanges().ToString();
+                }
+                return "Error during getting employee";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
     }
 }
