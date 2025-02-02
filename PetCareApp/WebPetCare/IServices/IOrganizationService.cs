@@ -16,5 +16,11 @@ namespace WebPetCare.IServices
         public Task<Result<List<GetEmployeeDto>>> GetEmployees(int orgId);
 
         public Task<string> DismissEmployee(int employeeId);
+
+        public Task<Result<List<OrganizationPortfolioDto>>> getOrganizationPortfolio(int orgId);
+        public Task<Result<List<OrganizationPortfolioDto>>> getOrgMastersPortfolios(int orgId);
+
+        public Task<string> AddOrgPortfolios(List<int> orgPortfolioIds);
+        public Task<string> RemoveOrgPortfolio(int portfolioId);
     }
 }

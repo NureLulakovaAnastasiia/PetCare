@@ -87,6 +87,14 @@ namespace PetCareApp.Services
                             _dbContext.Portfolios.Remove(item);
                         }
                     }
+                    var orgPortfolios = _dbContext.OrganizationPorfolios
+                        .Where(p => portfolioIds.Contains(p.PortfolioId))
+                        .ToList();
+
+                    if (orgPortfolios != null)
+                    {
+                        _dbContext.RemoveRange(orgPortfolios);
+                    }
                     return _dbContext.SaveChanges().ToString();
                 }
                 return "Error during deleting";

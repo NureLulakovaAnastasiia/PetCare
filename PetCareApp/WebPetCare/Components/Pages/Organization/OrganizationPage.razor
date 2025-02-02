@@ -70,7 +70,7 @@
             }
             break;
             case OrganizationOptions.Portfolio:
-                
+                <_OrganizationPortfolio orgId="@id"></_OrganizationPortfolio>
                 break;
             case OrganizationOptions.Services:
 
@@ -105,7 +105,7 @@
             }
             else
             {
-
+                showToastr(dto.ErrorMessage);
             }
             role = await orgService.GetCurrentUserRole();
             StateHasChanged();

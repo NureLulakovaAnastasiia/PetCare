@@ -17,7 +17,11 @@ namespace PetCareApp.Interfaces
         public Result<OrganizationDetailsDto> GetOrganizationDetails(int organizationId);
         public Result<List<GetEmployeeDto>> GetOrgEmployees(int orgId);
         public string DismissEmployee(int employeeId);
+        public Result<List<OrganizationPortfolioDto>> GetOrganizationPortfolio(int orgId);
+        public Result<List<OrganizationPortfolioDto>> GetOrgMastersPortfolios(int orgId);
 
+        public Task<string> DeleteOrgPortfolio(int portfolioId);
+        public Task<string> AddOrgPortfolio(List<int> portfolioIds);
 
     }
 

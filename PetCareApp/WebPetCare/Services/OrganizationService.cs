@@ -294,5 +294,129 @@ namespace WebPetCare.Services
             }
             return res;
         }
+
+        public async Task<Result<List<OrganizationPortfolioDto>>> getOrganizationPortfolio(int orgId)
+        {
+            var res = new Result<List<OrganizationPortfolioDto>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Organization/getOrganizationPortfolio?orgId={orgId}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<OrganizationPortfolioDto>>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<List<OrganizationPortfolioDto>>> getOrgMastersPortfolios(int orgId)
+        {
+            var res = new Result<List<OrganizationPortfolioDto>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Organization/getAllOrgMastersPortfolio?orgId={orgId}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<OrganizationPortfolioDto>>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<string> AddOrgPortfolios(List<int> orgPortfolioIds)
+        {
+            var res = "";
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(orgPortfolioIds, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Organization/addOrgPorfolios";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<string> RemoveOrgPortfolio(int portfolioId)
+        {
+            var res = "";
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/Organization/removeOrgPortfolio?portfolioId={portfolioId}";
+
+                HttpResponseMessage response = await _httpClient.DeleteAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+            return res;
+        }
     }
 }

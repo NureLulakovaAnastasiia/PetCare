@@ -121,5 +121,54 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res);
         }
 
+        [HttpGet("getOrganizationPortfolio")]
+        [AllowAnonymous]
+        public IActionResult GetOrganizationPortfolio([FromQuery] int orgId)
+        {
+            var res = _organizationService.GetOrganizationPortfolio(orgId);
+            if (res != null && res.IsSuccess)
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res.ErrorMessage);
+        }
+
+        [HttpGet("getAllOrgMastersPortfolio")]
+        [AllowAnonymous]
+        public IActionResult getAllOrgMastersPortfolio([FromQuery] int orgId)
+        {
+            var res = _organizationService.GetOrgMastersPortfolios(orgId);
+            if (res != null && res.IsSuccess)
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res.ErrorMessage);
+        }
+
+        [HttpDelete("removeOrgPortfolio")]
+        [Authorize(Roles = "Organization")]
+
+        public async Task<IActionResult> RemoveOrgPortfolio([FromQuery] int portfolioId)
+        {
+            var res = await _organizationService.DeleteOrgPortfolio(portfolioId);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+            return StatusCode(500, res);
+        }
+
+        [HttpPost("addOrgPorfolios")]
+        [Authorize(Roles = "Organization")]
+
+        public async Task<IActionResult> AddOrgPortfolio([FromBody] List<int> portfoliosIds)
+        {
+            var res = await _organizationService.AddOrgPortfolio(portfoliosIds);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok(num);
+            }
+            return StatusCode(500, res);
+        }
     }
 }

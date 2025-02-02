@@ -405,5 +405,168 @@ namespace PetCareApp.Services
                 return ex.Message;
             }
         }
+
+        public Result<List<OrganizationPortfolioDto>> GetOrganizationPortfolio(int orgId)
+        {
+            var res = new Result<List<OrganizationPortfolioDto>>();
+            try
+            {
+                var organization = _dbContext.Organizations
+                    .Where(o => o.Id == orgId)
+                    .Include(o => o.Portfolios)
+                    .FirstOrDefault();
+                if (organization != null)
+                {
+                    var portfoliosIds = organization.Portfolios.Select(p => p.PortfolioId).ToList();
+                    if (portfoliosIds != null)
+                    {
+                        var portfolios = _dbContext.Portfolios
+                            .Where(p => portfoliosIds.Contains(p.Id))
+                            .Include(p => p.AppUser)
+                            .ToList();
+                        if (portfolios != null)
+                        {
+                            res.Data = _mapper.Map<List<OrganizationPortfolioDto>>(portfolios);
+                        }
+                        else
+                        {
+                            res.Data= new List<OrganizationPortfolioDto>();
+                        }
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "Error during finding organization";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+            }
+
+            return res;
+        }
+
+        public Result<List<OrganizationPortfolioDto>> GetOrgMastersPortfolios(int orgId)
+        {
+            var res = new Result<List<OrganizationPortfolioDto>>();
+            try
+            {
+                var organization = _dbContext.Organizations
+                    .Where(o => o.Id == orgId)
+                    .Include(o => o.OrganizationEmployees)
+                    .FirstOrDefault();
+                if (organization != null)
+                {
+                    var employeesIds = organization.OrganizationEmployees
+                        .Where(e => e.DismissalDate == null).Select(o => o.AppUserId).ToList();
+                    if(employeesIds != null)
+                    {
+                        var portfolios = _dbContext.Portfolios
+                            .Where(p => employeesIds.Contains(p.AppUserId))
+                            .Include(p => p.AppUser)
+                            .ToList();
+                        if (portfolios != null)
+                        {
+                            res.Data = _mapper.Map<List<OrganizationPortfolioDto>>(portfolios);
+                        }
+                        else
+                        {
+                            res.Data = new List<OrganizationPortfolioDto>();
+                        }
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "Error during finding organization";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<string> DeleteOrgPortfolio(int portfolioId)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var organization = _dbContext.Organizations.FirstOrDefault(o => o.AppUserId == user.Id);
+                    if (organization == null) {
+                        return "Your organization was not found";
+                    }
+                    var orgPortfolio = _dbContext.OrganizationPorfolios.FirstOrDefault(p => p.PortfolioId == portfolioId);
+                    if (orgPortfolio != null)
+                    {
+                        if(orgPortfolio.OrganizationId == organization.Id)
+                        {
+                            _dbContext.Remove(orgPortfolio);
+                            return _dbContext.SaveChanges().ToString();
+                        }
+                        
+                            return "You don't have acces to this action";
+                    }
+                        return "Portfolio was not found";
+                }
+                    return "User was not found";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public async Task<string> AddOrgPortfolio(List<int> portfolioIds)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var organization = _dbContext.Organizations.Where(o => o.AppUserId == user.Id)
+                        .Include(o => o.OrganizationEmployees)
+                        .FirstOrDefault();
+                    if (organization == null)
+                    {
+                        return "Your organization was not found";
+                    }
+                    var portfoliosToAdd = _dbContext.Portfolios.Where(p => portfolioIds.Contains(p.Id)).ToList();
+                    if (portfoliosToAdd != null)
+                    {
+                        var users = portfoliosToAdd.Select(p => p.AppUserId).Distinct().ToList();
+                        var employees = organization.OrganizationEmployees
+                            .Where(e => e.DismissalDate == null)
+                            .Select(e => e.AppUserId)
+                            .Distinct().ToList();
+                        if(users != null && employees != null && users.All(item => employees.Contains(item)))
+                        {
+                            var items = new List<OrganizationPorfolio>();
+                            foreach (var p in portfoliosToAdd)
+                            {
+                                items.Add(new OrganizationPorfolio
+                                {
+                                    OrganizationId = organization.Id,
+                                    PortfolioId = p.Id,
+                                });
+                            }
+                            _dbContext.AddRange(items);
+                            return _dbContext.SaveChanges().ToString();
+                        }
+                        return "You are trying to add portfolio of non-employee master";
+                    }
+                    return "Portfolios was not found";
+                }
+                return "User was not found";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }
