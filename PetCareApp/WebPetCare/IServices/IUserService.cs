@@ -9,16 +9,16 @@ namespace WebPetCare.IServices
 
         public Task<string> UpdateGeneralMasterData(GetGeneralMasterDto dto);
 
-        public Task<Result<List<BreakDto>>> getMasterBreaks();
+        public Task<Result<List<BreakDto>>> getMasterBreaks(string? masterId);
 
         public Task<string> UpdateAppointments(List<GetRecordDto> records);
-        public Task<string> UpsertBreaks(List<BreakDto> breaks);
+        public Task<string> UpsertBreaks(List<BreakDto> breaks, string? masterId = null);
         public Task<string> AddRecord(RecordDto record);
         public Task<string> DeleteBreaks(List<int> breaks);
         public Task<string> CancelAppointment(int appointmentId, string reason);
 
         public Task<Result<List<PortfolioDto>>> GetMasterPortfolio(string? masterId = null);
-        public Task<Result<Dictionary<int, string>>> GetMasterServicesNames();
+        public Task<Result<Dictionary<int, string>>> GetMasterServicesNames(string? masterId = null);
         public Task<Result<List<int>>> UpsertPortfolio(List<PortfolioDto> portfolio);
 
         public Task<string> DeletePortfolio(int portfolioId); 

@@ -8,11 +8,20 @@
 @using Syncfusion.Blazor.SplitButtons
 @inject SfDialogService DialogService
 @inject IServiceService service
+@inject IOrganizationService orgService
 @inject IJSRuntime _JSRuntime
 @inject IUserService _userService
 @rendermode InteractiveAuto
 
-
+@if(isOrganization && employeesList != null)
+{
+    <div class="mb-3 col-5 offset-4">
+        <SfDropDownList ID="dropdown"  TValue="string" TItem="ShortEmployeeDto" Placeholder="Select a master" DataSource="@employeesList" @bind-Value="@selectedMaster.Id">
+        <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+            <DropDownListEvents TValue="string" TItem="ShortEmployeeDto" ValueChange="ChangeMaster"></DropDownListEvents>
+    </SfDropDownList>
+    </div>
+}
 <SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" EnableAdaptiveUI="true" StartHour="6:00" ShowQuickInfo="false" EnableAllDayScroll="true" Height="700"
             SelectedDateChanged="DateRangeChanged">
     <ScheduleTemplates>
@@ -132,25 +141,48 @@
     private List<ServiceName> serviceNames = new List<ServiceName>();
     private bool isRecord = true;
     private bool isBreak = false;
+    [Parameter]
+    public bool isOrganization { get; set; } = false;
+    private List<ShortEmployeeDto> employeesList = new List<ShortEmployeeDto>();
+    private ShortEmployeeDto selectedMaster = new ShortEmployeeDto();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            breaks.Clear();
-            events.Clear();
-            availableDates.Clear();
-            var res = await _userService.getMasterBreaks();
+            if (isOrganization)
+            {
+                var empl = await orgService.GetShortEmployees();
+                if (empl.IsSuccess && empl.Data != null)
+                {
+                    employeesList = empl.Data;
+                    if (String.IsNullOrEmpty(selectedMaster.Id))
+                    {
+                        selectedMaster = employeesList[0];
+                    }
+                }
+            }
+            await ChangeMaster();
+        }
+    }
+
+    private async Task ChangeMaster()
+    {
+        breaks.Clear();
+        events.Clear();
+        availableDates.Clear();
+        serviceNames.Clear();
+        var res = await _userService.getMasterBreaks(selectedMaster.Id);
             if (res.IsSuccess)
             {
                 breaks = res.Data;
                 UpdateBreaks();
                 GetMasterServicesNames();
                 DateRangeChanged(DateTime.Now);
-                //StateHasChanged();
+                StateHasChanged();
             }
-        }
     }
+
 
     private async void DateRangeChanged(DateTime date)
     {
@@ -161,7 +193,7 @@
                 return;
             }
         }
-        var recordsResult = await service.getMasterRecordForMonth(date);
+        var recordsResult = await service.getMasterRecordForMonth(date, selectedMaster.Id);
         if (recordsResult.IsSuccess)
         {
 
@@ -295,7 +327,7 @@
             }
 
             var res = await _userService.UpdateAppointments(changedEvents);
-            var breakRes = await _userService.UpsertBreaks(changedBreaks);
+            var breakRes = await _userService.UpsertBreaks(changedBreaks, selectedMaster.Id);
 
             if (String.IsNullOrEmpty(res) || String.IsNullOrEmpty(breakRes))
             {
@@ -372,7 +404,7 @@
         if(breaksToAdd.Count > 0)
         {
             breaksToAdd.ForEach(x => x.Id = 0);
-            temp += await _userService.UpsertBreaks(breaksToAdd);
+            temp += await _userService.UpsertBreaks(breaksToAdd, selectedMaster.Id);
         }
 
         if (String.IsNullOrEmpty(temp))
@@ -387,7 +419,7 @@
 
     private async void GetMasterServicesNames()
     {
-        var names = await _userService.GetMasterServicesNames();
+        var names = await _userService.GetMasterServicesNames(selectedMaster.Id);
         if (names.IsSuccess)
         {
             foreach(var item in names.Data)

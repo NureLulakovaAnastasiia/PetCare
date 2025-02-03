@@ -22,7 +22,7 @@ namespace PetCareApp.Interfaces
 
         public Task<string> DeleteOrgPortfolio(int portfolioId);
         public Task<string> AddOrgPortfolio(List<int> portfolioIds);
-
+        public Task<Result<List<ShortEmployeeDto>>> GetEmployeesNames();
     }
 
 

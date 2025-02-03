@@ -105,13 +105,28 @@ namespace PetCareApp.Services
             try
             {
                 var user = await GetCurrentUserAsync();
+                
                 if (user != null)
                 {
+                    var organization = _dbContext.Organizations.FirstOrDefault(o => o.AppUserId == user.Id);
+                    if (organization == null)
+                    {
                         var requests = _dbContext.RequestsToOrganization
+                            .Where(r => r.AppUserId == user.Id)
                             .Include(x => x.AppUser)
                             .Include(x => x.Organization)
                             .ToList();
                         res = _mapper.Map<List<GetRequestDto>>(requests);
+                    }
+                    else
+                    {
+                        var requests = _dbContext.RequestsToOrganization
+                            .Where(r => r.OrganizationId == organization.Id)
+                            .Include(x => x.AppUser)
+                            .Include(x => x.Organization)
+                            .ToList();
+                        res = _mapper.Map<List<GetRequestDto>>(requests);
+                    }
                 }
                 return res;
             }
@@ -567,6 +582,37 @@ namespace PetCareApp.Services
             {
                 return ex.Message;
             }
+        }
+
+        public async Task<Result<List<ShortEmployeeDto>>> GetEmployeesNames()
+        {
+            var res = new Result<List<ShortEmployeeDto>>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var organization = _dbContext.Organizations
+                        .Where(o => o.AppUserId == user.Id)
+                        .Include(o => o.OrganizationEmployees)
+                        .ThenInclude(e => e.AppUser)
+                        .FirstOrDefault();
+                    if (organization != null)
+                    {
+                        var employees = organization.OrganizationEmployees.Where(e => e.DismissalDate == null).Distinct();
+                        res.Data = _mapper.Map<List<ShortEmployeeDto>>(employees);
+                        return res;
+                    }
+                    res.ErrorMessage = "There is no such organization";
+                }
+                res.ErrorMessage = "Cannot find user";
+            }
+            catch(Exception ex) 
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
         }
     }
 }

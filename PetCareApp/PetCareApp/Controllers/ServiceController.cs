@@ -124,14 +124,14 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("getMasterServicesNames")]
-        public async Task<IActionResult> GetMasterServicesNames()
+        public async Task<IActionResult> GetMasterServicesNames(string? masterId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var services = await _serviceService.GetServices(null);
+            var services = await _serviceService.GetServices(masterId);
             if (services == null || services.Count == 0)
             {
                 return NotFound();

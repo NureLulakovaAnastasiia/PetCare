@@ -333,13 +333,14 @@ namespace WebPetCare.Services
             return res;
         }
 
-        public async Task<Result<List<GetRecordDto>>> getMasterRecordForMonth(DateTime startDate)
+        public async Task<Result<List<GetRecordDto>>> getMasterRecordForMonth(DateTime startDate, string? masterId = null)
         {
             var res = new Result<List<GetRecordDto>>();
             try
             {
                 httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
-                string fullUrl = $"{_apiUrl}/api/Master/getMasterRecordsForMonth?month={startDate.Month}&year={startDate.Year}";
+                var strToAdd = !String.IsNullOrEmpty(masterId) ? $"&masterId={masterId}" : "";
+                string fullUrl = $"{_apiUrl}/api/Master/getMasterRecordsForMonth?month={startDate.Month}&year={startDate.Year}{strToAdd}";
 
                 HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
 

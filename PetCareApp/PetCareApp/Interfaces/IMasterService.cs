@@ -8,7 +8,7 @@ namespace PetCareApp.Interfaces
         public Task<string> AddContacts(AddContactsDto contacts);
         public Task<string> UpdateContacts(ContactsDto contacts);
         public Task<string> UpsertSchedule(List<ScheduleDto> schedule);
-        public Task<string> UpsertBreaks(List<BreakDto> breaks);
+        public Task<string> UpsertBreaks(List<BreakDto> breaks, string? masterId = null);
         public Task<string> DeleteBreaks(List<int> breaksId);
         public Task<string> AddQuestionary(List<AddQuestionDto> questionary, int serviceId);
         public Task<string> UpdateQuestionary(List<UpdateQuestionDto> questionary);
@@ -35,8 +35,8 @@ namespace PetCareApp.Interfaces
         public Task<GetGeneralMasterDto> GetGeneralMasterData();
         public Task<string> UpdateGeneralMasterData(GetGeneralMasterDto masterData);
 
-        public Task<Result<List<GetRecordDto>>> GetRecordsForMonth(int month, int year);
-        public Task<Result<List<BreakDto>>> GetMasterBreaks();
+        public Task<Result<List<GetRecordDto>>> GetRecordsForMonth(int month, int year, string? masterId);
+        public Task<Result<List<BreakDto>>> GetMasterBreaks(string? masterId);
 
         public Task<Result<List<PortfolioDto>>> GetMasterPortfolio(string? masterId);
         public Task<Result<List<int>>> UpsertPortfolio(List<PortfolioDto> portfolio);

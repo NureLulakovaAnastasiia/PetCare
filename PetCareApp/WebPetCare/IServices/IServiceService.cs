@@ -14,7 +14,7 @@ namespace WebPetCare.IServices
         public Task<string> UpdateQuestionary(List<UpdateQuestionDto> questionaryDto);
         public Task<Result<List<UpdateQuestionDto>>> GetQuestionary(int serviceId);
         public Task<string> DeleteQuestionary(int serviceId);
-        public Task<Result<List<GetRecordDto>>> getMasterRecordForMonth(DateTime startDate);
+        public Task<Result<List<GetRecordDto>>> getMasterRecordForMonth(DateTime startDate, string? masterId=null);
 
         public Task<Result<string>> GetMasterName(int serviceId);
 

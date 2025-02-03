@@ -159,7 +159,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("upsertSchedule")]
-        [Authorize(Roles = "Master,Admin")]
+        [Authorize(Roles = "Master,Organization,Admin")]
         public async Task<IActionResult> UpsertSchedule(List<ScheduleDto> scheduleDto)
         {
             if (!ModelState.IsValid)
@@ -177,15 +177,15 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("upsertBreaks")]
-        [Authorize(Roles = "Master,Admin")]
-        public async Task<IActionResult> UpsertBreaks(List<BreakDto> breakDto)
+        [Authorize(Roles = "Master,Organization,Admin")]
+        public async Task<IActionResult> UpsertBreaks(List<BreakDto> breakDto, [FromQuery] string? masterId = null)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var res = await _masterService.UpsertBreaks(breakDto);
+            var res = await _masterService.UpsertBreaks(breakDto, masterId);
             if (int.TryParse(res, out int num))
             {
                 return Ok("Breaks were successfully added or updated!");
@@ -195,7 +195,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("deleteBreaks")]
-        [Authorize(Roles = "Master,Admin")]
+        [Authorize(Roles = "Master,Organization,Admin")]
         public async Task<IActionResult> DeleteBreaks(List<int> breaksIds)
         {
             if (!ModelState.IsValid)
@@ -302,14 +302,14 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("getMasterRecordsForMonth")]
-        public async Task<IActionResult> GetMasterRecordsForMonth(int month, int year)
+        public async Task<IActionResult> GetMasterRecordsForMonth(int month, int year, string? masterId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var data = await _masterService.GetRecordsForMonth(month, year);
+            var data = await _masterService.GetRecordsForMonth(month, year, masterId);
             if (data.IsSuccess)
             {
                 return Ok(data.Data);
@@ -318,14 +318,14 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("getMasterBreaks")]
-        public async Task<IActionResult> GetMasterBreaks()
+        public async Task<IActionResult> GetMasterBreaks([FromQuery]string? masterId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var data = await _masterService.GetMasterBreaks();
+            var data = await _masterService.GetMasterBreaks(masterId);
             if (data.IsSuccess)
             {
                 return Ok(data.Data);

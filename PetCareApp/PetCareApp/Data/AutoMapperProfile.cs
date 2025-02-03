@@ -51,8 +51,15 @@ namespace PetCareApp.Data
                 .MapFrom(src => src.Organization != null ? src.Organization.Name : ""));
             CreateMap<Portfolio, OrganizationPortfolioDto>()
                 .ForMember(dest => dest.masterName, opt => opt
+                .MapFrom(src => src.AppUser != null ? (src.AppUser.LastName + " " + src.AppUser.FirstName) : ""));
+
+            CreateMap<OrganizationEmployee, ShortEmployeeDto>()
+                .ForMember(dest => dest.Name, opt => opt
                 .MapFrom(src => src.AppUser != null ? (src.AppUser.LastName + " " + src.AppUser.FirstName) : ""))
-;
+                .ForMember(dest => dest.Id, opt => opt
+                .MapFrom(src => src.AppUser != null ? src.AppUser.Id : ""));
+                
+            
         }
 
     }

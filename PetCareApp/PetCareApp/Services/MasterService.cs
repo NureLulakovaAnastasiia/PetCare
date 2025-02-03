@@ -244,7 +244,7 @@ namespace PetCareApp.Services
             }
         }
 
-        public async Task<string> UpsertBreaks(List<BreakDto> breaksDto)
+        public async Task<string> UpsertBreaks(List<BreakDto> breaksDto, string? masterId = null)
         {
             if (breaksDto.Count == 0)
             {
@@ -253,19 +253,22 @@ namespace PetCareApp.Services
 
             try
             {
-                var user = await GetCurrentUserAsync();
-                if (user == null)
+                if (masterId == null)
                 {
-                    return "User not found";
+                    var user = await GetCurrentUserAsync();
+                    if (user == null)
+                    {
+                        return "User not found";
+                    }
+                    masterId = user.Id;
                 }
-
                 var breaks = _mapper.Map<List<Break>>(breaksDto);
                 if (breaks != null)
                 {
                     var updatedIds = new List<int>();
                     foreach (var item in breaks)
                     {
-                        item.AppUserId = user.Id;
+                        item.AppUserId = masterId;
                         if (updatedIds.Contains(item.Id) || item.Id == 0)
                         {
                             item.Id = 0;
@@ -831,6 +834,11 @@ namespace PetCareApp.Services
                     
                     //find city
                     contacts.CityId = findCity(contacts.Location, masterData.Contacts.City);
+                    var location = _dbContext.Locations.AsNoTracking().FirstOrDefault(x => x.ContactsId == contacts.Id);
+                    if (location != null)
+                    {
+                        contacts.Location.Id = location.Id;
+                    }
                     _dbContext.Update(contacts);
                     _dbContext.SaveChanges();
                 }
@@ -911,18 +919,22 @@ namespace PetCareApp.Services
             return "Error during deleting questionary";
         }
 
-        public async Task<Result<List<GetRecordDto>>> GetRecordsForMonth(int month, int year)
+        public async Task<Result<List<GetRecordDto>>> GetRecordsForMonth(int month, int year, string? masterId)
         {
             var res = new Result<List<GetRecordDto>>();    
             try
             {
-                var user = await GetCurrentUserAsync();
-                if (user == null)
+                if (masterId == null)
                 {
-                    res.ErrorMessage = "User not found";
-                    return res;
+                    var user = await GetCurrentUserAsync();
+                    if (user == null)
+                    {
+                        res.ErrorMessage = "User not found";
+                        return res;
+                    }
+                    masterId = user.Id;
                 }
-                var services = _dbContext.Services.Where(s => s.AppUserId == user.Id).ToList();
+                var services = _dbContext.Services.Where(s => s.AppUserId == masterId).ToList();
                 var servicesIds = services.Select(s => s.Id).ToList();
                 if (services == null || !services.Any())
                 {
@@ -956,12 +968,20 @@ namespace PetCareApp.Services
             return res;
         }
 
-        public async Task<Result<List<BreakDto>>> GetMasterBreaks()
+        public async Task<Result<List<BreakDto>>> GetMasterBreaks(string? masterId)
         {
             var res = new Result<List<BreakDto>>();
             try
             {
-                var user = await GetCurrentUserAsync();
+                var user = new AppUser();
+                if (masterId == null)
+                {
+                    user = await GetCurrentUserAsync();
+                }
+                else
+                {
+                    user = _dbContext.Users.FirstOrDefault(u => u.Id == masterId);
+                }
                 if (user == null)
                 {
                     res.ErrorMessage = "User not found";

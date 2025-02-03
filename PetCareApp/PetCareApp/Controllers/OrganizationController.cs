@@ -170,5 +170,18 @@ namespace PetCareApp.Controllers
             }
             return StatusCode(500, res);
         }
+
+        [HttpGet("getOrgShortEmployees")]
+        [AllowAnonymous]
+        public async Task<IActionResult> getOrgShortEmployees()
+        {
+            var res = await _organizationService.GetEmployeesNames();
+            if (res != null && res.IsSuccess)
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res.ErrorMessage);
+        }
+
     }
 }

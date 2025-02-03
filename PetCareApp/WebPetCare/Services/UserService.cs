@@ -89,13 +89,14 @@ namespace WebPetCare.Services
             return res;
         }
 
-        public async Task<Result<List<BreakDto>>> getMasterBreaks()
+        public async Task<Result<List<BreakDto>>> getMasterBreaks(string? masterId)
         {
             var res = new Result<List<BreakDto>>();
             try
             {
                 httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
-                string fullUrl = $"{_apiUrl}/api/Master/getMasterBreaks";
+                var strToAdd = !String.IsNullOrEmpty(masterId) ? $"?masterId={masterId}" : "";
+                string fullUrl = $"{_apiUrl}/api/Master/getMasterBreaks{strToAdd}";
 
                 HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
 
@@ -152,7 +153,7 @@ namespace WebPetCare.Services
             return res;
         }
 
-        public async Task<string> UpsertBreaks(List<BreakDto> breaks)
+        public async Task<string> UpsertBreaks(List<BreakDto> breaks, string? masterId = null)
         {
             var res = "";
             JsonSerializerOptions options = new JsonSerializerOptions
@@ -163,7 +164,8 @@ namespace WebPetCare.Services
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             try
             {
-                string fullUrl = $"{_apiUrl}/api/Master/upsertBreaks";
+                var strToAdd = !String.IsNullOrEmpty(masterId) ? $"?masterId={masterId}" : "";
+                string fullUrl = $"{_apiUrl}/api/Master/upsertBreaks{strToAdd}";
 
                 HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
                 if (response.IsSuccessStatusCode)
@@ -259,13 +261,14 @@ namespace WebPetCare.Services
             }
             return res;
         }
-        public async Task<Result<Dictionary<int, string>>> GetMasterServicesNames()
+        public async Task<Result<Dictionary<int, string>>> GetMasterServicesNames(string? masterId = null)
         {
             var res = new Result<Dictionary<int, string>>();
             try
             {
                 httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
-                string fullUrl = $"{_apiUrl}/api/Service/getMasterServicesNames";
+                var strToAdd = !String.IsNullOrEmpty(masterId) ? $"?masterId={masterId}" : "";
+                string fullUrl = $"{_apiUrl}/api/Service/getMasterServicesNames{strToAdd}";
 
                 HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
 

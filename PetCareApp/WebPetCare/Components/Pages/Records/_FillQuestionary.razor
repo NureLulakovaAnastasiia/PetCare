@@ -32,6 +32,7 @@
             else
             {
                 <h4>No questionary for this service</h4>
+                <button type="submit" class="btn btn-success" @onclick="SubmitAnswers">Next</button>
             }
         </div>
     </div>
@@ -63,7 +64,7 @@
     {
         questionary.ForEach(q => q.Answers.RemoveAll(a => !a.IsSelected));
         var mappedData = MapQuestionary();
-        if(mappedData.Count > 0)
+        if(mappedData != null)
         {
             var res = await _userService.AnalizeQuestionary(mappedData, serviceId);
             if (res.IsSuccess)
@@ -76,6 +77,7 @@
             }
         }
     }
+
 
     private void UpdateSelection(GetQuestionDto question, GetAnswerDto selectedAnswer)
     {
