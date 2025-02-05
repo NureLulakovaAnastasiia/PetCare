@@ -418,5 +418,70 @@ namespace PetCareApp.Controllers
             }
             return StatusCode(500, data.ErrorMessage);
         }
+
+        [HttpGet("getMasterSchedule")] //if masterId is empty - search for schedule of current user
+        [AllowAnonymous]
+        public async Task<IActionResult> GetMasterSchedule(string? masterId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await _masterService.GetMasterSchedule(masterId);
+            if (data.IsSuccess)
+            {
+                return Ok(data.Data);
+            }
+            return StatusCode(500, data.ErrorMessage);
+        }
+
+        [HttpPut("updateSchedule")]
+        [Authorize(Roles = "Master,Organization")]
+        public IActionResult UpdateSchedule([FromBody] List<ScheduleDto> scheduleDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var res =  _masterService.UpdateMasterSchedule(scheduleDto);
+            if (res.IsSuccess)
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res.ErrorMessage);
+        }
+
+        [HttpDelete("deleteSchedule")]
+        [Authorize(Roles = "Master,Organization")]
+        public async Task<IActionResult> DeleteSchedule([FromQuery]int scheduleId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var res = await _masterService.DeleteSchedule(scheduleId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res.ErrorMessage);
+        }
+
+        [HttpPost("addSchedule")]
+        [Authorize(Roles = "Master,Organization")]
+        public async Task<IActionResult> AddSchedule([FromBody] ScheduleDto scheduleDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var res = await _masterService.AddMasterSchedule(scheduleDto);
+            if (res.IsSuccess)
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res.ErrorMessage);
+        }
     }
 }

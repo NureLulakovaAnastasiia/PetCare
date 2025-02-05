@@ -44,5 +44,11 @@ namespace PetCareApp.Interfaces
         public Task<Result<List<GetServiceDto>>> GetMasterServices(string? masterId);
 
         public Result<List<GetQuestionDto>> GetQuestionaryForUser(int serviceId);
+
+        public Task<Result<List<ScheduleDto>>> GetMasterSchedule(string? masterId);
+
+        public Result<bool> UpdateMasterSchedule(List<ScheduleDto> schedule);
+        public Task<Result<bool>> DeleteSchedule(int scheduleId);
+        public Task<Result<bool>> AddMasterSchedule(ScheduleDto schedule);
     } 
 }

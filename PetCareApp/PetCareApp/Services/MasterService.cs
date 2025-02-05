@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using PetCareApp.Data;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
@@ -1178,6 +1179,160 @@ namespace PetCareApp.Services
             }
 
             return res;
+        }
+
+        public async Task<Result<List<ScheduleDto>>> GetMasterSchedule(string? masterId)
+        {
+            var res = new Result<List<ScheduleDto>>();
+
+            try
+            {
+                if (masterId == null)
+                {
+                    var user = await GetCurrentUserAsync();
+                    if (user == null)
+                    {
+                        res.ErrorMessage = "User was not found";
+                        return res;
+                    }
+                    else
+                    {
+                        masterId = user.Id;
+                    }
+                }
+
+                var schedule = _dbContext.Schedules
+                    .Where(s => s.AppUserId == masterId 
+                        && (s.Date != null ? 
+                            (s.Date > DateTime.UtcNow && s.Date < DateTime.UtcNow.AddDays(daysAhead)) : true))
+                    .ToList();
+                if (schedule != null)
+                {
+                    res.Data = _mapper.Map<List<ScheduleDto>>(schedule);
+                }
+                else
+                {
+                    res.ErrorMessage = "No schedule was found";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+            }
+            return res;
+        }
+
+        public Result<bool> UpdateMasterSchedule(List<ScheduleDto> schedule)
+        {
+            var res = new Result<bool>();
+            try
+            {
+                var scheduleToUpdate = _mapper.Map<List<Schedule>>(schedule);
+                if (scheduleToUpdate != null)
+                {
+                    _dbContext.UpdateRange(scheduleToUpdate);
+                    res.Data = _dbContext.SaveChanges() > 0;
+                }
+                else
+                {
+                    res.ErrorMessage = "No data to update";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+            }
+            return res;
+        }
+
+        public async Task<Result<bool>> DeleteSchedule(int scheduleId)
+        {
+            var res = new Result<bool>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var scheduleToDelete = _dbContext.Schedules.FirstOrDefault(s => s.Id == scheduleId && s.AppUserId != null);
+                    if(scheduleToDelete != null)
+                    {
+                        var isWorker = IsInOrganization(user.Id, scheduleToDelete.AppUserId);
+                        if (scheduleToDelete.AppUserId == user.Id || isWorker)
+                        {
+                            _dbContext.Remove(scheduleToDelete);
+                            res.Data = _dbContext.SaveChanges() > 0;
+                        }
+                        else
+                        {
+                            res.ErrorMessage = "You don't have access to this action";
+                        }
+                    }
+                    else
+                    {
+                        res.ErrorMessage = "THere is no such schedule";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<bool>> AddMasterSchedule(ScheduleDto schedule)
+        {
+            var res = new Result<bool>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var organization = _dbContext.Organizations
+                       .FirstOrDefault(x => x.AppUserId == user.Id);
+                    var isWorker = IsInOrganization(user.Id, schedule.AppUserId ?? "");
+                    if(organization == null || isWorker)
+                    {
+                        if(organization == null)
+                        {
+                            schedule.AppUserId = user.Id;
+                        }
+                        var scheduleToAdd = _mapper.Map<Schedule>(schedule);
+                        _dbContext.Add(scheduleToAdd);
+                        res.Data = _dbContext.SaveChanges() > 0;
+                    }
+                    else
+                    {
+                        res.ErrorMessage = "You don't have access to this action";
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "Error with schedule owner";
+                }
+            }
+            catch(Exception ex) 
+            { 
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        private bool IsInOrganization(string orgOwnerId, string masterId)
+        {
+            var organization = _dbContext.Organizations
+                        .Include(o => o.OrganizationEmployees)
+                        .FirstOrDefault(x => x.AppUserId == orgOwnerId);
+            if(organization != null)
+            {
+                var res = organization != null ? organization.OrganizationEmployees
+                            .Where(e => e.AppUserId == masterId && e.DismissalDate == null).Any() : false;
+                return res;
+            }
+
+            return false;
         }
     }   
 

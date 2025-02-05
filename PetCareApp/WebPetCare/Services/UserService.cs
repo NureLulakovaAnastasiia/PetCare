@@ -762,6 +762,131 @@ namespace WebPetCare.Services
             }
             return res;
         }
+
+        public async Task<Result<List<ScheduleDto>>> GetMasterSchedule(string? masterId)
+        {
+            var res = new Result<List<ScheduleDto>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                var strToAdd = !String.IsNullOrEmpty(masterId) ? $"?masterId={masterId}" : "";
+                string fullUrl = $"{_apiUrl}/api/Master/getMasterSchedule{strToAdd}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<ScheduleDto>>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<string> UpdateMasterSchedule(List<ScheduleDto> schedules)
+        {
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Master/updateSchedule";
+                JsonSerializerOptions options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                };
+                string json = JsonSerializer.Serialize(schedules, options);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await httpClient.PutAsync(fullUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                   return await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
+        public async Task<string> DeleteMasterSchedule(int scheduleId)
+        {
+            var res = string.Empty;
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Master/deleteSchedule?scheduleId={scheduleId}";
+
+                HttpResponseMessage response = await httpClient.DeleteAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<string> AddMasterSchedule(ScheduleDto schedule)
+        {
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Master/addSchedule";
+                JsonSerializerOptions options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                };
+                string json = JsonSerializer.Serialize(schedule, options);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await httpClient.PostAsync(fullUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
     
 }

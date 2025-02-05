@@ -1,19 +1,106 @@
-﻿
+﻿@inject IUserService _userService
+@inject SfDialogService DialogService
+@inject IJSRuntime _JSRuntime
+
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border bg-body-secondary p-3 ">
+            <div class="row text-end">
+                <div class="col-7 ">
+                    <h3>Schedule</h3>
+                </div>
+                <div class="col-3">
+                    <button class="btn btn-func p-2" @onclick="AddSchedule">+  Add</button>
+                </div>
+            </div>
+            <div class="m-3 row">
+                <table class="table col-10">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            @if (isEditable)
+                            {
+                                <th>Actions</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var time in schedule)
+                        {
+                            var dayOrDate = time.DayOfWeek != null ? Enum.GetName(typeof(DayOfWeek), time.DayOfWeek) : time.Date?.ToString("d");
+                            <tr>
+                                <td><h4>@dayOrDate</h4></td>
+                                <td><h4>@time.StartTime</h4></td>
+                                <td><h4>@time.EndTime</h4></td>
+                                @if (isEditable)
+                                {
+                                    <td>
+                                        <button class="btn btn-func" @onclick="() => EditSchedule(time.Id)">Edit</button>
+                                        <button class="btn btn-func-danger" @onclick="() => DeleteSchedule(time.Id)">Delete</button>
+                                    </td>
+                                }
+                            </tr>
+                        }
 
-            <div class="m-3">
-                @foreach (var time in schedule)
-                {
-                    var dayOrDate = time.DayOfWeek != null ? Enum.GetName(typeof(DayOfWeek), time.DayOfWeek) : time.Date.ToString();
-                    <div>
-                        <h4>
-                            @dayOrDate : @time.StartTime - @time.EndTime
-                        </h4>
-                    </div>
-                }
+                    </tbody>
+                </table>
 
+
+                <SfDialog Width="450px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@isEdit">
+                    <DialogTemplates>
+                        <Header> @(isAdding ? "Add schedule" : "Update schedule") </Header>
+                        <Content>
+                            <div>
+                                @if (isAdding)
+                                {
+                                    <div class="row mb-3">
+                                        <SfCheckBox Label="Is date" @bind-Checked="@isDate"></SfCheckBox>
+                                    </div>
+                                }
+                                <div>
+                                    <div>
+
+                                        @if (isDate && editedSchedule != null)
+                                        {
+                                            <SfDatePicker TValue="DateTime?" @bind-Value="@editedSchedule.Date"></SfDatePicker>
+                                        }
+                                        else
+                                        {
+                                            <SfDropDownList TValue="int" TItem="DayOfWeekItem" Placeholder="Select a day" DataSource="@DaysOfWeek" @bind-Value="selectedDayOfWeek.ID">
+                                                <DropDownListFieldSettings Value="ID" Text="Text"></DropDownListFieldSettings>
+                                            </SfDropDownList>
+                                        }
+
+                                    </div>
+                                    <div class="container row mt-3 text-center">
+                                        <div class="col-5 offset-1">
+                                            <label>Start Time</label>
+                                            <SfTimePicker TValue="TimeSpan" @bind-Value="@editedSchedule.StartTime">
+                                                <TimePickerMaskPlaceholder Hour="hour" Minute="minute"></TimePickerMaskPlaceholder>
+                                            </SfTimePicker>
+                                        </div>
+
+                                        <div class="col-5">
+                                            <label>End Time</label>
+
+                                            <SfTimePicker TValue="TimeSpan" @bind-Value="@editedSchedule.EndTime">
+                                                <TimePickerMaskPlaceholder Hour="hour" Minute="minute"></TimePickerMaskPlaceholder>
+                                            </SfTimePicker>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </Content>
+                    </DialogTemplates>
+                    <DialogButtons>
+                        <DialogButton Content="Save" IsPrimary="true" OnClick="@UpsertSchedule" />
+                        <DialogButton Content="Cancel" OnClick="@CancelEdit" />
+                    </DialogButtons>
+                </SfDialog>
 
             </div>
         </div>
@@ -22,14 +109,169 @@
 @code {
     [Parameter]
     public List<ScheduleDto> schedule { get; set; } = new List<ScheduleDto>();
-
-
+    [Parameter]
+    public bool isEditable { get; set; } = false;
+    [Parameter]
+    public string? masterId { get; set; }
+    public bool isEdit { get; set; } = false;
+    private bool isDate { get; set; } = false;
+    private List<DayOfWeekItem> DaysOfWeek { get; set; } = new();
+    private DayOfWeekItem selectedDayOfWeek { get; set; } = new DayOfWeekItem();
+    public ScheduleDto? editedSchedule { get; set; } = new ScheduleDto();
+    private bool isAdding = false;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             schedule = schedule.OrderBy(s => s.DayOfWeek).ToList();
         }
+        DaysOfWeek = Enum.GetValues(typeof(DayOfWeek))
+            .Cast<DayOfWeek>()
+            .Select(day => new DayOfWeekItem
+                {
+                    ID = (int)day,
+                    Text = day.ToString()
+                }).ToList();
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        if (schedule == null || schedule.Count == 0)
+        {
+            await GetMasterSchedule();
+        }
     }
 
+    private async Task GetMasterSchedule()
+    {
+        var data = await _userService.GetMasterSchedule(masterId);
+        if (data.IsSuccess)
+        {
+            schedule = data.Data;
+            schedule = schedule.OrderBy(s => s.DayOfWeek).ToList();
+            StateHasChanged();
+        }
+        else
+        {
+            //showToastr(data.ErrorMessage);
+        }
+    }
+
+    public void EditSchedule(int scheduleId)
+    {
+        editedSchedule = new ScheduleDto(schedule.FirstOrDefault(s => s.Id == scheduleId) ?? new ScheduleDto());
+        if (editedSchedule != null)
+        {
+            isDate = editedSchedule.Date != null;
+            if (editedSchedule.DayOfWeek != null)
+            {
+                selectedDayOfWeek = DaysOfWeek.First(d => d.ID == editedSchedule.DayOfWeek);
+            }
+            isEdit = true;
+        }
+    }
+
+    public async Task UpsertSchedule()
+    {
+        if (editedSchedule == null)
+        {
+            showToastr("Nothing to add or update");
+            return;
+        }
+        if (!isDate)
+        {
+            editedSchedule.DayOfWeek = selectedDayOfWeek.ID;
+            editedSchedule.Date = null;
+        }
+
+        if (isAdding)
+        {
+            editedSchedule.AppUserId = masterId;
+            var res = await _userService.AddMasterSchedule(editedSchedule);
+            if (String.IsNullOrEmpty(res))
+            {
+                await GetMasterSchedule();
+                isAdding = false;
+                CancelEdit();
+            }
+            else
+            {
+                showToastr(res);
+            }
+        }
+        else
+        {
+            var itemsToUpdate = new List<ScheduleDto>();
+            itemsToUpdate.Add(editedSchedule);
+            var res = await _userService.UpdateMasterSchedule(itemsToUpdate);
+            if (String.IsNullOrEmpty(res))
+            {
+                showToastr("", "Schedule was succesfully updated");
+                var newSchedule = new ScheduleDto(editedSchedule);
+                var sch = schedule.Where(s => s.Id == editedSchedule.Id).FirstOrDefault();
+                var ind = schedule.IndexOf(sch);
+                if (ind != -1)
+                {
+                    schedule[ind] = newSchedule;
+                }
+
+                CancelEdit();
+            }
+
+        }
+    }
+
+    public void AddSchedule()
+    {
+        editedSchedule = new ScheduleDto();
+        isAdding = true;
+        isEdit = true;
+    }
+
+    public async Task DeleteSchedule(int scheduleId)
+    {
+        editedSchedule = schedule.FirstOrDefault(s => s.Id == scheduleId);
+        if (editedSchedule != null)
+        {
+            var isConfirm = await DialogService.ConfirmAsync("Are you sure you want to delete this schedule? \nRecords will not be removed if they exists", "Delete schedule");
+            if (isConfirm)
+            {
+                var res = await _userService.DeleteMasterSchedule(scheduleId);
+                if (String.IsNullOrEmpty(res))
+                {
+                    showToastr("", "Schedule was succefully removed");
+                    schedule.Remove(editedSchedule);
+                    StateHasChanged();
+                }
+                else
+                {
+                    showToastr(res);
+                }
+            }
+        }
+    }
+
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+
+    public void CancelEdit()
+    {
+        editedSchedule = new ScheduleDto();
+        isEdit = false;
+    }
+
+    private class DayOfWeekItem
+    {
+        public int ID { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
 }

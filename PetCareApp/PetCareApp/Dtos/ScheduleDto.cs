@@ -10,5 +10,17 @@ namespace PetCareApp.Dtos
         public DateTime? Date { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
+        public string? AppUserId { get; set; }
+
+        public ScheduleDto() { }
+        public ScheduleDto(ScheduleDto dto) {
+            Id = dto.Id;
+            DayOfWeek = dto.DayOfWeek;
+            Date = dto.Date;
+            StartTime = dto.StartTime;
+            EndTime = dto.EndTime;
+            AppUserId = dto.AppUserId;
+        }
+
     }
 }

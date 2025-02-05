@@ -130,6 +130,11 @@
 
 </SfSchedule>
 
+<div class="mt-4">
+    <_MasterSchedule isEditable="@true" masterId="@selectedMaster.Id" @key="selectedMaster.Id"></_MasterSchedule>
+</div>
+
+
 
 @code {
     private DayOfWeek _firstDayOfWeek = DayOfWeek.Tuesday;
@@ -145,6 +150,9 @@
     public bool isOrganization { get; set; } = false;
     private List<ShortEmployeeDto> employeesList = new List<ShortEmployeeDto>();
     private ShortEmployeeDto selectedMaster = new ShortEmployeeDto();
+    private bool isDisposed = false;
+
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -173,14 +181,14 @@
         availableDates.Clear();
         serviceNames.Clear();
         var res = await _userService.getMasterBreaks(selectedMaster.Id);
-            if (res.IsSuccess)
-            {
-                breaks = res.Data;
-                UpdateBreaks();
-                GetMasterServicesNames();
-                DateRangeChanged(DateTime.Now);
-                StateHasChanged();
-            }
+        if (res.IsSuccess)
+        {
+            breaks = res.Data;
+            UpdateBreaks();
+            GetMasterServicesNames();
+            DateRangeChanged(DateTime.Now);
+            StateHasChanged();
+        }
     }
 
 
@@ -441,6 +449,8 @@
         }
     }
 
+    
+
     private async Task DeleteRecords(List<AppointmentData> records, string reason)
     {
         List<int> recordsToDelete = new List<int>();
@@ -682,8 +692,10 @@
             default: return -1;
         }
     }
-    private async void showToastr(string res, string successMessage = "")
+    private async Task showToastr(string res, string successMessage = "")
     {
+        if (isDisposed)
+            return;
         if (String.IsNullOrEmpty(res))
         {
             await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
@@ -694,6 +706,15 @@
         }
     }
 
+    protected override void OnInitialized()
+    {
+        isDisposed = false;
+    }
+
+    public void Dispose()
+    {
+        isDisposed = true;
+    }
     public class Status
     {
         public int Id { get; set; } = 0;
