@@ -1329,6 +1329,10 @@ namespace PetCareApp.Services
             {
                 var res = organization != null ? organization.OrganizationEmployees
                             .Where(e => e.AppUserId == masterId && e.DismissalDate == null).Any() : false;
+                if(orgOwnerId == masterId)
+                {
+                    return true;
+                }
                 return res;
             }
 

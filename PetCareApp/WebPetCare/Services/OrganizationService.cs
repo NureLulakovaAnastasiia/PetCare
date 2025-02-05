@@ -451,5 +451,39 @@ namespace WebPetCare.Services
 
             return res;
         }
+
+        public async Task<Result<List<GetServiceDto>>> GetOrganizationServices(int? orgId)
+        {
+            var res = new Result<List<GetServiceDto>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                var strToAdd = orgId != null ? $"?orgId={orgId}" : "";
+                string fullUrl = $"{_apiUrl}/api/Organization/getOrganizationServices{strToAdd}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<GetServiceDto>>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
     }
 }

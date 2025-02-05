@@ -22,7 +22,7 @@ namespace WebPetCare.IServices
 
         public Task<string> AddOrgPortfolios(List<int> orgPortfolioIds);
         public Task<string> RemoveOrgPortfolio(int portfolioId);
-
         public Task<Result<List<ShortEmployeeDto>>> GetShortEmployees();
+        public Task<Result<List<GetServiceDto>>> GetOrganizationServices(int? orgId);
     }
 }

@@ -4,14 +4,17 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 ">
+        <div class="form-custom-border bg-body-secondary p-3 mt-3">
             <div class="row text-end">
                 <div class="col-7 ">
                     <h3>Schedule</h3>
                 </div>
-                <div class="col-3">
-                    <button class="btn btn-func p-2" @onclick="AddSchedule">+  Add</button>
-                </div>
+                @if (isEditable)
+                {
+                    <div class="col-3">
+                        <button class="btn btn-func p-2" @onclick="AddSchedule">+  Add</button>
+                    </div>
+                }
             </div>
             <div class="m-3 row">
                 <table class="table col-10">
@@ -119,6 +122,8 @@
     private DayOfWeekItem selectedDayOfWeek { get; set; } = new DayOfWeekItem();
     public ScheduleDto? editedSchedule { get; set; } = new ScheduleDto();
     private bool isAdding = false;
+    
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -155,6 +160,15 @@
             //showToastr(data.ErrorMessage);
         }
     }
+    public bool CheckSchedule()
+    {
+        if(editedSchedule.StartTime > editedSchedule.EndTime)
+        {
+            showToastr("start time cannot be bigger then end time");
+            return false;
+        }
+        return true;
+    }
 
     public void EditSchedule(int scheduleId)
     {
@@ -172,9 +186,14 @@
 
     public async Task UpsertSchedule()
     {
+        
         if (editedSchedule == null)
         {
             showToastr("Nothing to add or update");
+            return;
+        }
+        if (!CheckSchedule())
+        {
             return;
         }
         if (!isDate)

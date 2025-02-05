@@ -1,6 +1,7 @@
 ﻿@inject IUserService _userService
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
+@inject IOrganizationService orgService
 
 
 <div class="d-flex justify-content-center">
@@ -26,6 +27,10 @@
                                         <div class="col-9">
                                            <h5>Price: @service.MinimumPrice - @service.MaximumPrice</h5>
                                             <h5>Time: @service.MinimumTime - @service.MaximumTime min</h5>
+                                            @if (!String.IsNullOrEmpty(service.AppUserName))
+                                            {
+                                                <h5>Master: @service.AppUserName</h5>
+                                            }
                                         </div>
                                         <div class="col-2">
                                             <button class="btn " style="background-color: #8de3af; " @onclick="()=> GoToDetails(service.Id)">More</button>
@@ -50,6 +55,8 @@
 @code {
     [Parameter]
     public string? masterId { get; set; }
+    [Parameter]
+    public int? orgId { get; set; }
     private List<GetServiceDto> services = new List<GetServiceDto>();
 
 
@@ -57,7 +64,13 @@
     {
         if (firstRender)
         {
-            await GetMasterServices();
+            if (masterId != null)
+            {
+                await GetMasterServices();
+            }else if(orgId != null)
+            {
+                await GetOrgServices();
+            }
 
         }
     }
@@ -75,6 +88,22 @@
         }
 
     }
+
+    private async Task GetOrgServices()
+    {
+        var res = await orgService.GetOrganizationServices(orgId);
+        if (res.IsSuccess)
+        {
+            services = res.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            showToastr(res.ErrorMessage);
+        }
+
+    }
+
 
     private void GoToDetails(int serviceId)
     {

@@ -21,6 +21,7 @@ namespace PetCareApp.Dtos
         public bool IsHidden { get; set; } = false;
         public double Rate { get; set; } = 0;
         public string? AppUserId { get; set; }
+        public string AppUserName { get; set; } = string.Empty;
         public List<Review> Reviews { get; set; } = new List<Review>();
 
         public List<Tag> Tags { get; set; } = new List<Tag>();

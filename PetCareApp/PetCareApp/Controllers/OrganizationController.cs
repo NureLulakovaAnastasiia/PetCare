@@ -183,5 +183,17 @@ namespace PetCareApp.Controllers
             return StatusCode(500, res.ErrorMessage);
         }
 
+
+        [HttpGet("getOrganizationServices")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetOrganizationServices([FromQuery] int? orgId)
+        {
+            var res = await _organizationService.GetOrgServices(orgId);
+            if (res != null && res.IsSuccess)
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res.ErrorMessage);
+        }
     }
 }

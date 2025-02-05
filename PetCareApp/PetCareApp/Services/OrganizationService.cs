@@ -298,6 +298,7 @@ namespace PetCareApp.Services
                         {
                             Id = organization.Id,
                             Name = organization.Name,
+                            AppUserId = organization.AppUserId,
                             Description = organization.Description
                         };
                     }
@@ -336,6 +337,7 @@ namespace PetCareApp.Services
                     {
                         Id = organization.Id,
                         Name = organization.Name,
+                        AppUserId = organization.AppUserId,
                         Description = organization.Description
                     };
                     if (organization.AppUser != null)
@@ -608,6 +610,63 @@ namespace PetCareApp.Services
                 res.ErrorMessage = "Cannot find user";
             }
             catch(Exception ex) 
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<List<GetServiceDto>>> GetOrgServices(int? orgId)
+        {
+            var res = new Result<List<GetServiceDto>>();
+            try
+            {
+                if (orgId == null)
+                {
+                    var user = await GetCurrentUserAsync();
+                    if (user != null)
+                    {
+                        var organization = _dbContext.Organizations.FirstOrDefault(o => o.AppUserId == user.Id);
+                        if (organization != null)
+                        {
+                            orgId = organization.Id;
+                        }
+                        else
+                        {
+                            res.ErrorMessage = "No organization was found";
+                            return res;
+                        }
+                    }
+                }
+
+                var masters = _dbContext.OrganizationEmployees
+                    .Where(e => e.OrganizationId == orgId && e.DismissalDate == null)
+                    .Distinct()
+                    .Select(m => m.AppUserId)
+                    .ToList();
+                if (masters != null && masters.Count > 0)
+                {
+                    var services = _dbContext.Services
+                        .Where(s => masters.Contains(s.AppUserId))
+                        .Include(s => s.AppUser)
+                        .ToList();
+                    if(services != null)
+                    {
+                        res.Data = _mapper.Map<List<GetServiceDto>>(services);
+                    }
+                    else
+                    {
+                        res.ErrorMessage = "No services were found";
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "No workers in this organization";
+                }
+
+            }
+            catch (Exception ex)
             {
                 res.ErrorMessage = ex.Message;
             }

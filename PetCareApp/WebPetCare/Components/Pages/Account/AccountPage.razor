@@ -74,7 +74,7 @@
                 <_OrganizationPortfolio isEditable="@true" orgId="@organizationInfo.Id"></_OrganizationPortfolio>
                 break;
             case organizationOptions.Services:
-                
+                <_AllMasterServices orgId="@organizationInfo.Id"></_AllMasterServices>
                 break;
             case organizationOptions.Employees:
                 <_OrgEmployees orgId="@organizationInfo.Id"></_OrgEmployees>
@@ -86,6 +86,7 @@
             case organizationOptions.General:
                 <_OrganizationData orgInfo="@organizationInfo"></_OrganizationData>
                 <_GeneralAccount masterData="masterData"></_GeneralAccount>
+                <_MasterSchedule isEditable ="@true" masterId="@organizationInfo.AppUserId"></_MasterSchedule>
                 break;
         }
         
@@ -103,6 +104,7 @@
     private menuOptions options = menuOptions.General;
     public OrganizationInfo organizationInfo { get; set; } = new OrganizationInfo();
     private organizationOptions orgOptions = organizationOptions.General;
+    public List<GetServiceDto> orgServices = new List<GetServiceDto>();
     public enum menuOptions
     {
         General, Calendar, Services, Reviews, Portfolio, Requests
@@ -156,6 +158,11 @@
     {
         orgOptions = option;
         StateHasChanged();
+    }
+
+    private async Task GetOrganizationServices()
+    {
+        
     }
 
     private async void showToastr(string res, string successMessage = "")
