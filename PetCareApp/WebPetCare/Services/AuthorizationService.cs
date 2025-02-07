@@ -184,6 +184,19 @@ namespace WebPetCare.Services
             await _jsRuntime.InvokeVoidAsync("sessionStorageSetItem", name, token);
         }
 
+        public async Task<string> Logout()
+        {
+            try
+            {
+                await SetStoreItemAsync("", "token");
+                await SetStoreItemAsync("", "role");
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 
     public class ResultData //remake to use result generic class

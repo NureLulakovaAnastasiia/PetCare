@@ -12,7 +12,12 @@
                 <div>
                     <h2>@masterData.FirstName   @masterData.LastName</h2>
                 </div>
-
+                @if (masterData.OrgId != null)
+                {
+                    <div>
+                        <h3>Organization: <NavLink @onclick="GoToOrgPage" class="nav-link">@masterData.OrgName</NavLink></h3>
+                    </div>
+                }
                 <div class="row">
                     <div class="col-7">
                         <label>Address</label>
@@ -84,6 +89,11 @@
     {
         options = option;
         StateHasChanged();
+    }
+
+    private void GoToOrgPage()
+    {
+        Navigation.NavigateTo($"/organization/{masterData.OrgId}");
     }
 
     public enum MasterDataOptions

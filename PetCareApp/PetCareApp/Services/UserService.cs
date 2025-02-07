@@ -113,6 +113,7 @@ namespace PetCareApp.Services
                 .ThenInclude(c => c.Location)
                 .Include(u => u.Schedules)
                 .Include(u => u.Portfolios)
+                .Include(u => u.OrganizationEmployee)
                 .FirstOrDefault();
 
             if(master != null)
@@ -124,6 +125,19 @@ namespace PetCareApp.Services
                 res.Contacts = ContactsMapping.MapContact(master.Contacts);
                 res.Portfolios = _mapper.Map<List<PortfolioDto>>(master.Portfolios);
                 res.Schedules = res.Schedules.Where(s => s.Date == null || s.Date > DateTime.Now).ToList();
+                if (master.OrganizationEmployee != null && master.OrganizationEmployee.Count > 0)
+                {
+                    var currentOrg = master.OrganizationEmployee.FirstOrDefault(e => e.DismissalDate == null);
+                    if (currentOrg != null)
+                    {
+                        var org = _dbContext.Organizations.FirstOrDefault(o => o.Id == currentOrg.Id);
+                        if (org != null)
+                        {
+                            res.OrgName = org.Name;
+                            res.OrgId = org.Id;
+                        }
+                    }
+                }
             }
 
             return res;
