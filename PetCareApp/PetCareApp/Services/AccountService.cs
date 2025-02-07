@@ -104,5 +104,37 @@ namespace PetCareApp.Services
                 return ex.Message;
             }
         }
+
+        //public async Task<string> ChangeRoleToMaster()
+        //{
+        //    try
+        //    {
+        //        var user = await GetCurrentUserAsync();
+        //        if (user != null)
+        //        {
+        //            var roles = await _userManager.GetRolesAsync(user);
+        //            if (roles != null && roles.Contains("User"))
+        //            {
+        //                var res = await _userManager.RemoveFromRoleAsync(user, "User");
+        //                if(res != null && res.Succeeded)
+        //                {
+        //                    res = await _userManager.AddToRoleAsync(user, "Master");
+        //                    if(res != null && res.Succeeded)
+        //                    {
+        //                        return string.Empty;
+        //                    }
+        //                }
+
+        //                return res.Errors.ToString();
+        //            }
+        //            return "You don't have acces to this action";
+        //        }
+        //        return "User was not found";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ex.Message;
+        //    }
+        //}
     }
 }

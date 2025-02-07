@@ -7,6 +7,7 @@ using WebPetCare.IServices;
 using PetCareApp.Models;
 using WebPetCare.Components.Pages.Account;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 
 namespace WebPetCare.Services
 {
@@ -886,6 +887,30 @@ namespace WebPetCare.Services
             {
                 return ex.Message;
             }
+        }
+
+        public async Task<string> UserRoleToMaster()
+        {
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Account/changeRoleToMaster";
+
+                HttpResponseMessage response = await httpClient.PatchAsync(fullUrl, null);
+                string result = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
         }
     }
     

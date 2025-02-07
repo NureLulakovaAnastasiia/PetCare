@@ -1,10 +1,13 @@
 ﻿@inject IJSRuntime JSRuntime
+@inject IAuthorizationService _authService
+@inject NavigationManager Navigation
+@using Syncfusion.Blazor.SplitButtons
 
 <nav class="navbar bg-body d-flex">
     <div class="flex-row">
         <p class=" mx-5 brand-logo">PetCare</p>
     </div>
-    <ul class="navbar-nav flex-row-reverse">
+    <ul class="navbar-nav flex-row-reverse align-content-center">
         <li class="nav-item p-0 mx-4">
             <a class="nav-link" href="" Match="NavLinkMatch.All">
                 Home
@@ -24,10 +27,19 @@
             </a>
         </li>
         }else{
-        <li class="nav-item p-0 mx-4">
-            <a class="nav-link" href="account">
+
+        <li class="nav-item p-1 mx-3">
+            @* <a class="nav-link" href="account">
                 Account
-            </a>
+            </a> *@
+                <SfDropDownButton Content="Account" CssClass="custom-dropdown-menu">
+                <DropDownButtonEvents  ItemSelected="SelectItem" >
+                </DropDownButtonEvents>
+                <DropDownMenuItems>
+                    <DropDownMenuItem Text="Profile" Id="Profile"></DropDownMenuItem>
+                    <DropDownMenuItem Text="Log Out" Id="LogOut"></DropDownMenuItem>
+                </DropDownMenuItems>
+            </SfDropDownButton>
         </li>
         }
     </ul>
@@ -44,10 +56,68 @@
         return Task.CompletedTask;
     }
 
+    public async Task SelectItem(MenuEventArgs args)
+    {
+        if (args.Item.Id == "LogOut")
+        {
+            var res = await _authService.Logout();
+            if (String.IsNullOrEmpty(res))
+            {
+                isLogged = false;
+                StateHasChanged();
+                Navigation.NavigateTo("/login");
+            }
+        }
+        else if (args.Item.Id == "Profile")
+        {
+            Navigation.NavigateTo("/account");
+        }
+    }
 
-    
     
 
 }
+
+<style>
+    .e-dropdown-btn {
+        font-size: var(--bs-nav-link-font-size) !important;
+        font-weight: var(--bs-nav-link-font-weight) !important;
+        color: var(--bs-nav-link-color) !important;
+        text-decoration: none;
+        background: none;
+        border: 0 !important;
+        box-shadow: none !important;
+        filter: drop-shadow(0px 7px 7px #edd3d1);
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        font-family: var(--bs-body-font-family) !important;
+    }
+
+        .e-dropdown-btn:hover, .e-dropdown-btn.e-active {
+            color: var(--bs-nav-link-hover-color) !important;
+            background: none;
+            border: none;
+            font-size: var(--bs-nav-link-font-size);
+            font-weight: var(--bs-nav-link-font-weight);
+            color: var(--bs-nav-link-color);
+            background-color: rgba(255, 255, 255, .3) !important;
+        }
+
+    .e-dropdown-popup ul .e-item:active{
+        outline: 0;
+        font-family: var(--bs-body-font-family) !important;
+        background: none !important;
+    }
+
+   
+    .custom-dropdown-menu{
+        background: none !important;
+        border: none !important;
+    }
+
+    .e-dropdown-popup {
+        background-color: rgba(255, 255, 255, .3) !important;
+        box-shadow: 0px 0px 5px var(--bs-nav-link-hover-color) !important;
+    }
+</style>
 
 

@@ -51,5 +51,7 @@ namespace WebPetCare.IServices
         public Task<string> DeleteMasterSchedule(int scheduleId);
 
         public Task<string> AddMasterSchedule(ScheduleDto schedules);
+
+        public Task<string> UserRoleToMaster();
     }
 }

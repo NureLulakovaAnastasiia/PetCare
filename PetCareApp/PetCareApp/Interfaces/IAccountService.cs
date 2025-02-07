@@ -13,5 +13,7 @@ namespace PetCareApp.Interfaces
         public Task<string?> GetCurrentRole();
 
         public string CreateOrganization(string userId);
+
+        //public Task<string> ChangeRoleToMaster();
     }
 }

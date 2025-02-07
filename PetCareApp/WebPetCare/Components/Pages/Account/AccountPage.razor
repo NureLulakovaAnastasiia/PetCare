@@ -3,8 +3,10 @@
 @using WebPetCare.Components.Pages.Organization
 @inject IUserService userService
 @inject IOrganizationService orgService
+@inject IAuthorizationService authService
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
+@inject SfDialogService DialogService
 
 <PageTitle>Account</PageTitle>
 
@@ -55,6 +57,9 @@
         <_GeneralAccount masterData="masterData"></_GeneralAccount>
         <_PetsList Pets="@masterData.Pets"></_PetsList>
         <_UserRecords></_UserRecords>
+        <div class="mt-5 text-center">
+            <button class="btn btn-success p-4" @onclick="UserToMaster">Become a master</button>
+        </div>
     }else if(role == "Organization")
     {
         <div class="row col-8 offset-3 mb-3 ">
@@ -113,6 +118,9 @@
     {
         General, Requests, Calendar, Services, Portfolio, Employees
     }
+    [CascadingParameter]
+    public Func<bool, Task> UpdateAuthenticationStatus { get; set; }
+
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -160,9 +168,28 @@
         StateHasChanged();
     }
 
-    private async Task GetOrganizationServices()
+    private async Task UserToMaster()
     {
-        
+        var confirm = await DialogService.ConfirmAsync("Are you sure you want to change role to master?", "Change role to master");
+        if (!confirm)
+        {
+            return;
+        }
+        var res = await userService.UserRoleToMaster();
+        if (String.IsNullOrEmpty(res))
+        {
+            showToastr("", "Role was succesfully changed");
+            await authService.Logout();
+            if(UpdateAuthenticationStatus != null)
+            {
+                await UpdateAuthenticationStatus.Invoke(false);
+            }
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            showToastr(res);
+        }
     }
 
     private async void showToastr(string res, string successMessage = "")
