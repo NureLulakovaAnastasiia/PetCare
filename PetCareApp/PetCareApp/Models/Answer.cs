@@ -9,7 +9,7 @@ namespace PetCareApp.Models
         public int Id { get; set; }
         [StringLength(150)]
         public string Text { get; set; } = string.Empty;
-        public byte[] Photo { get; set; } = [];
+        public byte[]? Photo { get; set; } = null;
         public int Time { get; set; } = 0;
         public bool IsTimeMinimum { get; set; } = false;
         public bool IsTimeMaximum { get; set; } = false;

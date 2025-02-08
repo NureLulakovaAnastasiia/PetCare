@@ -8,7 +8,7 @@ namespace PetCareApp.Dtos
         public int Id { get; set; }
         [Required]
         public string Text { get; set; } = string.Empty;
-        public byte[] Photo { get; set; } = [];
+        public byte[]? Photo { get; set; } = null;
         public int Time { get; set; } = 0;  //+- time or if fixed == true => fixed end time
         public bool IsTimeMinimum { get; set; } = false;
         public bool IsTimeMaximum { get; set; } = false;

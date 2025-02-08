@@ -35,72 +35,81 @@
                         </div>
                     </div>
                 }
-            @if (questions != null && !isNotNeeded)
+            @if (!isNotNeeded)
             {
                 <div class="row justify-content-end">
                     <button class="btn btn-func" type="button" @onclick="AddQuestion">Add Question</button>
                 </div>
-                <hr />
-                <form method="post" @onsubmit="SubmitAdding">
-                    <ol>
-                        @foreach (var question in questions)
-                        {
-                            <li>
-                                <div class="mb-3" @key="question">
-                                    <label class="form-check-label">Question Text</label>
-                                    <InputText @bind-Value="question.Name" class="form-control" />
-                                        @{
-                                            var questionInd = questions.IndexOf(question);
-                                        }
-                                    <div>
-                                        <button type="button" class="btn btn-danger" @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash3"></i></button>
-                                        <button class="btn btn-func m-3" type="button" @onclick="() => AddAnswer(questionInd)">Add Answer</button>
-                                        <InputCheckbox @bind-Value="question.HasAnswerWithFixedTime" @onclick="() => ChooseFixedQuestion(questionInd)"></InputCheckbox>
-                                        <label class="form-check-label">Is Time Fixed</label>
-                                    </div>
-                                    <ul>
-                                        @foreach (var answer in question.Answers)
-                                        {
+                    <hr />
+                    <form method="post" @onsubmit="SubmitAdding">
+                        <ol>
+                            @if (questions != null)
+                            {
+                                @foreach (var question in questions)
+                                {
+                                    <li>
+                                        <div class="mb-3" @key="question">
+                                            <label class="form-check-label">Question Text</label>
+                                            <InputText @bind-Value="question.Name" class="form-control" />
+                                            @{
+                                                var questionInd = questions.IndexOf(question);
+                                            }
+                                            <div>
+                                                <button type="button" class="btn btn-danger" @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash3"></i></button>
+                                                <button class="btn btn-func m-3" type="button" @onclick="() => AddAnswer(questionInd)">Add Answer</button>
+                                                <InputCheckbox @bind-Value="question.HasAnswerWithFixedTime" @onclick="() => ChooseFixedQuestion(questionInd)"></InputCheckbox>
+                                                <label class="form-check-label">Is Time Fixed</label>
+                                            </div>
+                                            <ul>
+                                                @foreach (var answer in question.Answers)
+                                                {
 
-                                            var answerInd = questions[questionInd].Answers.IndexOf(answer);
-                                            <li>
-                                                <div class="row mt-2" @key="answer">
-                                                    <div class="col-5">
-                                                        <label class="form-check-label">Answer</label>
-                                                        <InputText @bind-Value="answer.Text" class="form-control" />
-                                                    </div>
-                                                    <div class="row col-6 ms-4">
-                                                        @if ((fixedQuestionNum == questionInd || fixedQuestionNum == -1))
-                                                        {
-                                                            <div class="form-check col-5">
-                                                                <fieldset disabled="@(!answer.IsTimeFixed)">
-                                                                    @* Maximum is default if nothing else  *@
-                                                                    <div class="form-check mt-3">
-                                                                        <InputCheckbox @bind-Value="answer.IsTimeMinimum" class="form-check-input" />
-                                                                        <label class="form-check-label">Minimum Time</label>
-                                                                      
-                                                                    </div> @* make radiobutton *@
-
-                                                                </fieldset>
+                                                    var answerInd = questions[questionInd].Answers.IndexOf(answer);
+                                                    var image = answer.Photo != null ? $"data:image/png;base64,{Convert.ToBase64String(answer.Photo)}" : null;
+                                                    <li>
+                                                        <div class="row mt-2" @key="answer">
+                                                            <div class="col-5">
+                                                                <label class="form-check-label">Answer</label>
+                                                                <InputText @bind-Value="answer.Text" class="form-control" />
+                                                                @if (image != null)
+                                                                {
+                                                                    <img src="@image" class="pb-2" alt="Answer image" style="max-width: 200px;" />
+                                                                }
+                                                                <InputFile class="p-2 ms-2" OnChange="@(e => AddImage(e, answerInd, question.Id))" accept="image/*" />
                                                             </div>
-                                                        }
-                                                        <div class="col-4 text-center">
-                                                            <label class="form-check-label">Time @((fixedQuestionNum == questionInd || fixedQuestionNum == -1) ? "(fixed)" : "(+/- format)")</label>
-                                                            <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
+                                                            <div class="row col-6 ms-4">
+                                                                @if ((fixedQuestionNum == questionInd || fixedQuestionNum == -1))
+                                                                {
+                                                                    <div class="form-check col-5">
+                                                                        <fieldset disabled="@(!answer.IsTimeFixed)">
+                                                                            @* Maximum is default if nothing else  *@
+                                                                            <div class="form-check mt-3">
+                                                                                <InputCheckbox @bind-Value="answer.IsTimeMinimum" class="form-check-input" />
+                                                                                <label class="form-check-label">Minimum Time</label>
+
+                                                                            </div> @* make radiobutton *@
+
+                                                                        </fieldset>
+                                                                    </div>
+                                                                }
+                                                                <div class="col-4 text-center">
+                                                                    <label class="form-check-label">Time @((fixedQuestionNum == questionInd || fixedQuestionNum == -1) ? "(fixed)" : "(+/- format)")</label>
+                                                                    <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
+                                                                </div>
+                                                                <div class="col-1 mt-3 text-center">
+                                                                    <button type="button" class="btn btn-danger" @onclick="() => deleteAnswer(questionInd, answerInd)"><i class="bi bi-trash3"></i></button>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="col-1 mt-3 text-center">
-                                                            <button type="button" class="btn btn-danger" @onclick="() => deleteAnswer(questionInd, answerInd)"><i class="bi bi-trash3"></i></button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <hr />
-                                        }
-                                    </ul>
-                                </div>
-                            </li>
-                        }
-                        <button type="submit" class="btn col-2 btn-func-success mt-3" style="font-size: 1.5em">Save</button>
+                                                    </li>
+                                                    <hr />
+                                                }
+                                            </ul>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                            <button type="submit" class="btn col-2 btn-func-success mt-3" style="font-size: 1.5em">Save</button>
 
                     </ol>
                 </form>
@@ -118,7 +127,7 @@
 
     private bool isNotNeeded = false;
     private bool showConfirmation = false;
-
+    private IBrowserFile SelectedFile;
     public List<UpdateQuestionDto> questions { get; set; }
 
     private int fixedQuestionNum = -1;
@@ -156,6 +165,25 @@
     {
         isNotNeeded = !isNotNeeded;
         questions.Clear();
+    }
+    private async Task AddImage(InputFileChangeEventArgs e, int answerInd, int questionId)
+    {
+        SelectedFile = e.File;
+
+        using var stream = new MemoryStream();
+        await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+        var question = questions.FirstOrDefault(q => q.Id == questionId);
+        if(question != null)
+        {
+            var answer = question.Answers[answerInd];
+            if(answer != null)
+            {
+                answer.Photo = stream.ToArray();
+                StateHasChanged();
+
+            }
+        }
+
     }
 
     private void deleteAnswer(int questionInd, int answerInd)
@@ -211,7 +239,12 @@
 
     private void AddQuestion()
     {
-        questions.Add(new UpdateQuestionDto { Answers = new List<UpdateAnswerDto>() });
+        if (questions == null)
+        {
+            questions = new List<UpdateQuestionDto>();
+        }
+        questions.Add(new UpdateQuestionDto { Answers = new List<UpdateAnswerDto>(), ServiceId = serviceId});
+
     }
 
     private void AddAnswer(int questionInd)

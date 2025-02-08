@@ -16,10 +16,15 @@
                                 <div>
                                     @foreach(var answer in question.Answers)
                                     {
-                                        <div class="row m-1">
+                                        var image = answer.Photo != null ? $"data:image/png;base64,{Convert.ToBase64String(answer.Photo)}" : null;
+                                        <div class="row m-1 align-items-center">
                                             <input type="radio" class="col-1" name="@question.Name" value="@answer.IsSelected"
                                             @onchange="() => UpdateSelection(question, answer)" />
-                                            <h6 class="col-8">@answer.Text</h6>
+                                            <h6 class="col-5">@answer.Text</h6>
+                                            @if (image != null)
+                                            {
+                                                <img src="@image" class="pb-2 col-4" alt="Answer image" style="max-width: 200px;" />
+                                            }
                                         </div>
                                     }
                                 </div>
