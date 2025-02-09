@@ -17,5 +17,7 @@ namespace PetCareApp.Dtos
         public int? ServiceId { get; set; }
         public string? ServiceName { get; set; }
         public List<ReviewCommentDto> Comments { get; set; } = new List<ReviewCommentDto>();
+        public bool isYours { get; set; } = false;
+
     }
 }

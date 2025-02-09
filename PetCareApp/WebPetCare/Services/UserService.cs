@@ -581,10 +581,10 @@ namespace WebPetCare.Services
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     };
-                    var data = JsonSerializer.Deserialize<List<ReviewDto>>(result, options);
+                    var data = JsonSerializer.Deserialize<Result<List<ReviewDto>>>(result, options);
                     if (data != null)
                     {
-                        res.Data = data;
+                        return data;
                     }
                 }
                 else
@@ -911,6 +911,90 @@ namespace WebPetCare.Services
                 return ex.Message;
             }
 
+        }
+
+        public async Task<string> AddReviewComment(ReviewCommentDto comment)
+        {
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/User/addReviewComment";
+                JsonSerializerOptions options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                };
+                string json = JsonSerializer.Serialize(comment, options);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await httpClient.PostAsync(fullUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public async Task<string> DeleteReview(int reviewId)
+        {
+            var res = string.Empty;
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/User/deleteReview?reviewId={reviewId}";
+
+                HttpResponseMessage response = await httpClient.DeleteAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<string> DeleteReviewComment(int commentId)
+        {
+            var res = string.Empty;
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/User/deleteReviewComment?commentId={commentId}";
+
+                HttpResponseMessage response = await httpClient.DeleteAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return res;
+                }
+                else
+                {
+                    res = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res = ex.Message;
+            }
+
+            return res;
         }
     }
     

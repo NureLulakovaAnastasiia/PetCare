@@ -46,6 +46,10 @@ namespace WebPetCare.IServices
         public Task<string> CancelRecord(int recordId);
 
         public Task<string> AddReview(ReviewDto review);
+        public Task<string> AddReviewComment(ReviewCommentDto comment);
+
+        public Task<string> DeleteReview(int reviewId);
+        public Task<string> DeleteReviewComment(int commentId);
         public Task<Result<List<ScheduleDto>>> GetMasterSchedule(string? masterId);
         public Task<string> UpdateMasterSchedule(List<ScheduleDto> schedules);
         public Task<string> DeleteMasterSchedule(int scheduleId);

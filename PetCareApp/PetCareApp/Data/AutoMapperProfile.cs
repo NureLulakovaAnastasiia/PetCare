@@ -60,8 +60,8 @@ namespace PetCareApp.Data
                 .MapFrom(src => src.AppUser != null ? (src.AppUser.LastName + " " + src.AppUser.FirstName) : ""))
                 .ForMember(dest => dest.Id, opt => opt
                 .MapFrom(src => src.AppUser != null ? src.AppUser.Id : ""));
-                
-            
+
+            CreateMap<ReviewCommentDto, ReviewComment>();
         }
 
     }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Index.HPRtree;
 using PetCareApp.Data;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
@@ -235,24 +236,56 @@ namespace PetCareApp.Services
             return String.Empty;
         }
 
-        public async Task<List<ReviewDto>> GetServiceReviews(int serviceId)
+        public async Task<Result<List<ReviewDto>>> GetServiceReviews(int serviceId)
         {
-            var res = new List<ReviewDto>();
-            var reviews = _dbContext.Reviews.Where(x => x.ServiceId == serviceId)
-                   .Include(r => r.Comments)
-                   .ThenInclude(c => c.AppUser)
-                   .Include(r => r.AppUser)
-                   .ToList();
+            var res = new Result<List<ReviewDto>>();
 
-            if(reviews != null)
+            try
             {
-                foreach (var review in reviews)
+                var user = await GetCurrentUserAsync();
+                var reviews = _dbContext.Reviews.Where(x => x.ServiceId == serviceId)
+                       .Include(r => r.Comments)
+                       .ThenInclude(c => c.AppUser)
+                       .Include(r => r.AppUser)
+                       .ToList();
+
+                if (reviews != null)
                 {
-                    var mapped = ReviewMapping.MapReview(review);
-                    res.Add(mapped);
+                    res.Data = new List<ReviewDto>();
+                    foreach (var review in reviews)
+                    {
+                        var mapped = ReviewMapping.MapReview(review);
+                        if (user != null)
+                        {
+                            if (mapped.AppUserId == user.Id)
+                            {
+                                mapped.isYours = true;
+                            }
+                            foreach (var comment in mapped.Comments)
+                            {
+                                if (comment.AppUserId == user.Id)
+                                {
+                                    comment.isYours = true;
+                                }
+                            }
+                        }
+                        res.Data.Add(mapped);
+                    }
+                }
+
+                if (user != null)
+                {
+                    var service = _dbContext.Services.FirstOrDefault(s => s.Id == serviceId);
+                    if (service != null && service.AppUserId == user.Id)
+                    {
+                        res.ErrorMessage = "Owner";
+                    }
                 }
             }
-
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
             return res;
         }
     }

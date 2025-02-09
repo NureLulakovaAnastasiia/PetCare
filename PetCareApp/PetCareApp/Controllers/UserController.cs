@@ -94,7 +94,7 @@ namespace PetCareApp.Controllers
         {
             
             var res =  await _userService.GetMasterReviews(masterId);
-            if (res.Count == 0)
+            if (res.Data == null || res.Data.Count == 0)
             {
                 return NotFound();
             }
@@ -139,6 +139,55 @@ namespace PetCareApp.Controllers
             }
 
             var res = await _userService.AddReview(review);
+            if (res.IsSuccess)
+            {
+                return Ok();
+            }
+            return BadRequest(res.ErrorMessage);
+        }
+
+        [HttpPost("addReviewComment")]
+        [Authorize(Roles = "Master,Organization")]
+        public async Task<IActionResult> AddReviewComment([FromBody] ReviewCommentDto comment)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var res = await _userService.AddReviewComment(comment);
+            if (res.IsSuccess)
+            {
+                return Ok();
+            }
+            return BadRequest(res.ErrorMessage);
+        }
+
+        [HttpDelete("deleteReview")]
+        public async Task<IActionResult> RemoveReview([FromQuery] int reviewId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var res = await _userService.RemoveReview(reviewId);
+            if (res.IsSuccess)
+            {
+                return Ok();
+            }
+            return BadRequest(res.ErrorMessage);
+        }
+
+        [HttpDelete("deleteReviewComment")]
+        public async Task<IActionResult> RemoveReviewComment([FromQuery] int commentId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var res = await _userService.RemoveReviewComment(commentId);
             if (res.IsSuccess)
             {
                 return Ok();

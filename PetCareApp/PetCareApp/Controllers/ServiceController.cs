@@ -175,13 +175,17 @@ namespace PetCareApp.Controllers
                 return BadRequest(ModelState);
             }
 
-            var reviews = await _serviceService.GetServiceReviews(serviceId);
-            if (reviews == null || reviews.Count == 0)
+            var res = await _serviceService.GetServiceReviews(serviceId);
+            if (res == null)
             {
                 return NotFound();
             }
+            else if (res.IsSuccess || res.ErrorMessage == "Owner")
+            {
+                return Ok(res);
+            }
 
-            return Ok(reviews);
+            return StatusCode(500, res.ErrorMessage);
         }
     }
 }

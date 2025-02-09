@@ -1,5 +1,7 @@
 ﻿@inject IUserService userService
 @inject IServiceService serviceService
+@inject SfDialogService DialogService
+@inject IJSRuntime _JSRuntime
 
 
 <div class="d-flex justify-content-center mt-2">
@@ -9,6 +11,8 @@
                 <h2>Reviews</h2>
                 @foreach (var item in reviews)
                 {
+                    var image = item.Photo != null ? $"data:image/png;base64,{Convert.ToBase64String(item.Photo)}" : null;
+
                     <div class="main-review p-2 m-1 text-start ">
                         <div class="row align-items-center">
                             <h4 class="col-3">@item.AppUserName</h4>
@@ -23,7 +27,27 @@
                                 <LabelTemplate>@context+</LabelTemplate>
                             </SfRating>
                         </div>
+                        @if (!String.IsNullOrEmpty(item.ServiceName))
+                        {
+                            <p>For service: @item.ServiceName</p>
+                        }
                         <p>@item.Text</p>
+                        @if (image != null)
+                        {
+                            <img src="@image" class="pb-2" alt="Answer image" style="max-width: 200px;" />
+                        }
+                        @if (item.isYours)
+                        {
+                            <button class="btn-func-danger" @onclick="() => DeleteReview(item.Id)">Delete</button>
+
+                        }
+                        @if ((item.Comments == null || item.Comments.Count == 0) && isOwner)
+                        {
+                            <div class="col-4">
+                                <button class="btn btn-success" @onclick="() => AddComment(item.Id)">Add comment</button>
+
+                            </div>
+                        }
                     </div>
                     @if (item.Comments != null && item.Comments.Count > 0)
                     {
@@ -34,12 +58,36 @@
                                     <div class="col-8 review-comment p-2 m-2">
                                         <h4 class="">@comment.AppUserName</h4>
                                         <p>@comment.Text</p>
+                                    
+                                    @if(comment.isYours){
+                                    <div class="col-2">
+                                            <button class="btn-func-danger" @onclick="() => DeleteComment(comment.Id)">Delete</button>
+                                        </div>
+                                    }
                                     </div>
                                 }
                             </div>
                         </div>
                     }
+                    
                 }
+                <SfDialog Width="250px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@isCommenting">
+                    <DialogTemplates>
+                        <Header> Add Comment </Header>
+                        <Content> 
+                            <div>
+                                <h4>Please, write your comment:</h4>
+                                <InputText @bind-Value="commentDto.Text"></InputText>
+                            </div>
+
+                        </Content>
+                    </DialogTemplates>
+                    <DialogButtons>
+                        <DialogButton Content="OK" IsPrimary="true" OnClick="@SaveComment" />
+                        <DialogButton Content="Cancel" OnClick="@CancelComment" />
+                    </DialogButtons>
+                   
+                </SfDialog>
                 @if(reviews == null || reviews.Count == 0)
                 {
                     <h3>There is no reviews</h3>
@@ -57,6 +105,9 @@
     public List<ReviewDto> reviews = new List<ReviewDto>();
     private string fullTemplateImage = "Images/star-fill.svg";
     private string emptyTemplateImage = "Images/star.svg";
+    private bool isOwner = false;
+    private bool isCommenting = false;
+    private ReviewCommentDto commentDto = new ReviewCommentDto();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -68,14 +119,16 @@
                 if (res.IsSuccess)
                 {
                     reviews = res.Data;
+                    isOwner = String.IsNullOrEmpty(masterId);
                 }
             }
             else if (serviceId != null)
             {
                 var res = await serviceService.GetReviews((int)serviceId);
-                if (res.Count > 0)
+                if (res.IsSuccess || res.ErrorMessage == "Owner")
                 {
-                    reviews = res;
+                    reviews = res.Data;
+                    isOwner = res.ErrorMessage == "Owner";
                 }
                 else
                 {
@@ -83,6 +136,73 @@
                 }
             }
             StateHasChanged();
+        }
+    }
+
+    private void AddComment(int reviewId)
+    {
+        commentDto = new ReviewCommentDto { ReviewId = reviewId };
+        isCommenting = true;
+        StateHasChanged();
+    }
+
+    private void CancelComment()
+    {
+        commentDto = new ReviewCommentDto();
+        isCommenting = false;
+        StateHasChanged();
+    }
+
+    private async Task SaveComment()
+    {
+        var res = await userService.AddReviewComment(commentDto);
+        if (String.IsNullOrEmpty(res))
+        {
+            showToastr("", "Comment was succesfully added");
+            CancelComment();
+            await OnAfterRenderAsync(true);
+        }
+    }
+
+    private async Task DeleteReview(int reviewId)
+    {
+        var res = await userService.DeleteReview(reviewId);
+        if (String.IsNullOrEmpty(res))
+        {
+            showToastr("", "Review was succesfully deleted");
+            await OnAfterRenderAsync(true);
+
+        }
+        else
+        {
+            showToastr(res);
+        }
+    }
+
+    private async Task DeleteComment(int commentId)
+    {
+        var res = await userService.DeleteReviewComment(commentId);
+        if (String.IsNullOrEmpty(res))
+        {
+            showToastr("", "Comment was succesfully deleted");
+            await OnAfterRenderAsync(true);
+
+        }
+        else
+        {
+            showToastr(res);
+        }
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
         }
     }
 }

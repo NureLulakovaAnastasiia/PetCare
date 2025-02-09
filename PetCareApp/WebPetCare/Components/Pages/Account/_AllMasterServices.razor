@@ -27,7 +27,7 @@
                                         <div class="col-9">
                                            <h5>Price: @service.MinimumPrice - @service.MaximumPrice</h5>
                                             <h5>Time: @service.MinimumTime - @service.MaximumTime min</h5>
-                                            @if (!String.IsNullOrEmpty(service.AppUserName))
+                                            @if (!String.IsNullOrEmpty(service.AppUserName) && orgId != null)
                                             {
                                                 <h5>Master: @service.AppUserName</h5>
                                             }
@@ -64,12 +64,13 @@
     {
         if (firstRender)
         {
-            if (masterId != null)
-            {
-                await GetMasterServices();
-            }else if(orgId != null)
+            if(orgId != null)
             {
                 await GetOrgServices();
+            }
+            else
+            {
+                await GetMasterServices();
             }
 
         }

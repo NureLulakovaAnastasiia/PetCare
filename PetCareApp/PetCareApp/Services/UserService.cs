@@ -6,6 +6,7 @@ using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
 using PetCareApp.Mappings;
 using PetCareApp.Models;
+using System.Net.WebSockets;
 
 namespace PetCareApp.Services
 {
@@ -143,13 +144,13 @@ namespace PetCareApp.Services
             return res;
         }
 
-        public async Task<List<ReviewDto>> GetMasterReviews(string masterId)
+        public async Task<Result<List<ReviewDto>>> GetMasterReviews(string masterId)
         {
            
-            var res = new List<ReviewDto>();
+            var res = new Result<List<ReviewDto>>();
+            var user = await GetCurrentUserAsync();
             if (String.IsNullOrEmpty(masterId))
             {
-                var user = await GetCurrentUserAsync();
                 if (user != null)
                 {
                     masterId = user.Id;
@@ -168,9 +169,27 @@ namespace PetCareApp.Services
                 .ToList();
             if (data.Count > 0)
             {
+                res.Data = new List<ReviewDto>();
                 foreach (var item in data)
                 {
-                    res.Add(ReviewMapping.MapReview(item));
+                    var mapped = ReviewMapping.MapReview(item);
+                    if (user != null)
+                    {
+
+                        if (mapped.AppUserId == user.Id)
+                        {
+                            mapped.isYours = true;
+                        }
+                        foreach (var comment in mapped.Comments)
+                        {
+                            if (comment.AppUserId == user.Id)
+                            {
+                                comment.isYours = true;
+                            }
+                        }
+                    }
+                    res.Data.Add(mapped);
+
                 }
             }
 
@@ -300,6 +319,101 @@ namespace PetCareApp.Services
             catch (Exception ex)
             {
                 res.ErrorMessage += ex.ToString();
+            }
+
+            return res;
+        }
+
+        public async Task<Result<bool>> RemoveReview(int reviewId)
+        {
+            var res = new Result<bool>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    res.ErrorMessage = "There is no such user";
+                    return res;
+                }
+
+                var review = _dbContext.Reviews.FirstOrDefault(r => r.Id == reviewId);
+                if (review != null && review.AppUserId == user.Id)
+                {
+                    var comments = _dbContext.ReviewComments.Where(r => r.ReviewId == reviewId).ToList();
+                    if (comments != null && comments.Any())
+                    {
+                        _dbContext.RemoveRange(comments);
+                    }
+                    _dbContext.Remove(review);
+                    res.Data = _dbContext.SaveChanges() > 0;
+                }
+                else
+                {
+                    res.ErrorMessage = "No such review";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<bool>> RemoveReviewComment(int commentId)
+        {
+            var res = new Result<bool>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    res.ErrorMessage = "There is no such user";
+                    return res;
+                }
+
+                var comment = _dbContext.ReviewComments.FirstOrDefault(c => c.Id == commentId);
+                if (comment != null && comment.AppUserId == user.Id)
+                {
+                    _dbContext.Remove(comment);
+                    res.Data = _dbContext.SaveChanges() > 0;
+                }
+                else
+                {
+                    res.ErrorMessage = "No such comment";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<bool>> AddReviewComment(ReviewCommentDto reviewComment)
+        {
+            var res = new Result<bool>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    res.ErrorMessage = "There is no such user";
+                    return res;
+                }
+
+                var comment = _mapper.Map<ReviewComment>(reviewComment);
+                if (comment != null)
+                {
+                    comment.AppUserId = user.Id;
+                    _dbContext.Add(comment);
+                    res.Data = _dbContext.SaveChanges() > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
             }
 
             return res;

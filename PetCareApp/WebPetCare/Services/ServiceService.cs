@@ -7,7 +7,7 @@ using WebPetCare.IServices;
 
 namespace WebPetCare.Services
 {
-    public class ServiceService: BaseService, IServiceService
+    public class ServiceService : BaseService, IServiceService
     {
         private HttpClient httpClient { get; set; }
         private IJSRuntime jsRuntime;
@@ -125,7 +125,7 @@ namespace WebPetCare.Services
                 {
                     return "Unauthorized";
                 }
-                
+
                 res = await response.Content.ReadAsStringAsync();
                 res = error;
             }
@@ -139,7 +139,7 @@ namespace WebPetCare.Services
         private async Task<string> AddQuestionary(List<AddQuestionDto> questions, int serviceId)
         {
             var res = "";
-            
+
             JsonSerializerOptions options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -170,7 +170,7 @@ namespace WebPetCare.Services
                     res += await DeleteService(serviceId);
                 }
 
-                
+
             }
             catch (Exception ex)
             {
@@ -182,7 +182,7 @@ namespace WebPetCare.Services
         public async Task<string> DeleteService(int serviceId)
         {
             var res = "";
-            
+
             httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
             try
             {
@@ -405,40 +405,40 @@ namespace WebPetCare.Services
             return res;
         }
 
-        public async Task<List<ReviewDto>> GetReviews(int serviceId)
+        public async Task<Result<List<ReviewDto>>> GetReviews(int serviceId)
         {
-                var res = new List<ReviewDto>();
-                try
+            var res = new Result<List<ReviewDto>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Service/getServiceReviews?serviceId={serviceId}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+                string result = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
                 {
-                    httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
-                    string fullUrl = $"{_apiUrl}/api/Service/getServiceReviews?serviceId={serviceId}";
-
-                    HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
-
-                    if (response.IsSuccessStatusCode)
+                    JsonSerializerOptions options = new JsonSerializerOptions
                     {
-                        string result = await response.Content.ReadAsStringAsync();
-                        JsonSerializerOptions options = new JsonSerializerOptions
-                        {
-                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        };
-                        var data = JsonSerializer.Deserialize<List<ReviewDto>>(result, options);
-                        if (data != null)
-                        {
-                            return data;
-                        }
-                    }
-                    else
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<Result<List<ReviewDto>>>(result, options);
+                    if (data != null)
                     {
-                           return res;
+                        return data;
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                   
+                    res.ErrorMessage = result;
                 }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
 
-                return res;
+            return res;
         }
     }
 }
