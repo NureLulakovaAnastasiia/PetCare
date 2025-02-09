@@ -34,11 +34,12 @@ namespace WebPetCare.Services
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     };
-                    var data = JsonSerializer.Deserialize<GetServiceDto>(result, options);
+                    var data = JsonSerializer.Deserialize<Result<GetServiceDto>>(result, options);
                     if (data != null)
                     {
-                        res.Data = data;
+                        res = data;
                     }
+
                 }
                 else
                 {

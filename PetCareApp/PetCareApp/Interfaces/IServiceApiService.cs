@@ -1,4 +1,5 @@
 ﻿using PetCareApp.Dtos;
+using PetCareApp.Models;
 
 namespace PetCareApp.Interfaces
 {
@@ -7,7 +8,7 @@ namespace PetCareApp.Interfaces
         public Task<string> AddService(AddServiceDto service);
         public string UpdateService(UpdateServiceDto service);
         public Task<List<GetServiceDto>> GetServices(string? masterId);
-        public GetServiceDto GetServiceDetails(int serviceId);
+        public Task<Result<GetServiceDto>> GetServiceDetails(int serviceId);
         public Task<string> DeleteService(int serviceId);
         public Task<string> ChangeServiceVisibility(int serviceId);
         public Task<string> GetMasterName(int serviceId);

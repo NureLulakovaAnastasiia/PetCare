@@ -71,20 +71,24 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("getServiceDetails")]
-        [AllowAnonymous]
-        public IActionResult GetServiceDetails(int serviceId)
+        [AllowAnonymous] 
+        public async Task<IActionResult> GetServiceDetails(int serviceId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var service =  _serviceService.GetServiceDetails(serviceId);
-            if (service == null || service.Id == 0)
+            var res = await _serviceService.GetServiceDetails(serviceId);
+            if (res == null)
             {
                 return NotFound();
+            }else if(res.IsSuccess || res.ErrorMessage == "Owner")
+            {
+                return Ok(res);
             }
-            return Ok(service);
+
+            return StatusCode(500, res.ErrorMessage);
         }
 
         [HttpDelete("deleteService")]

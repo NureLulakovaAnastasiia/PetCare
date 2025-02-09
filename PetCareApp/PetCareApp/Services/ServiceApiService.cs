@@ -130,9 +130,9 @@ namespace PetCareApp.Services
             }
         }
 
-        public GetServiceDto GetServiceDetails(int serviceId)
+        public async Task<Result<GetServiceDto>> GetServiceDetails(int serviceId)
         {
-            var res = new GetServiceDto();
+            var res = new Result<GetServiceDto>();
             try
             {
                 var service = _dbContext.Services
@@ -142,20 +142,27 @@ namespace PetCareApp.Services
                
                 if (service != null)
                 {
-                    res = _mapper.Map<GetServiceDto>(service);
-                    if (service.Tags != null)
+                    var serviceDto = _mapper.Map<GetServiceDto>(service);
+                    if (serviceDto.Tags != null)
                     {
-                        service.Tags.ForEach(t => t.Services = null);
+                        serviceDto.Tags.ForEach(t => t.Services = null);
                     }
-                    service.Reviews.ForEach(r => r.Service = null);
-                }
+                    serviceDto.Reviews.ForEach(r => r.Service = null);
 
-                return res;
+                    var user = await GetCurrentUserAsync();
+                    if (user != null && user.Id == serviceDto.AppUserId)
+                    {
+                        res.ErrorMessage = "Owner";
+                    }
+                    res.Data = serviceDto;
+                }
+                
             }
-            catch
+            catch(Exception ex)
             {
-                return res;
+                res.ErrorMessage = ex.Message;
             }
+            return res;
         }
 
         public async Task<string> DeleteService(int serviceId)
