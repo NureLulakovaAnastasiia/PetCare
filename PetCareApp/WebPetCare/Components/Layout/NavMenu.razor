@@ -3,32 +3,32 @@
 @inject NavigationManager Navigation
 @using Syncfusion.Blazor.SplitButtons
 
-<nav class="navbar bg-body d-flex">
+<nav class="navbar bg-body d-flex ">
     <div class="flex-row">
         <p class=" mx-5 brand-logo">PetCare</p>
     </div>
-    <ul class="navbar-nav flex-row-reverse align-content-center">
+    <ul class="navbar-nav  flex-row-reverse align-content-center">
         <li class="nav-item p-0 mx-4">
-            <a class="nav-link" href="" Match="NavLinkMatch.All">
+            <a class="nav-link nav-link-big" href="" Match="NavLinkMatch.All">
                 Home
             </a>
         </li>
 
-        <li class="nav-item p-0  mx-4">
-            <a class="nav-link" href="search">
+        <li class="nav-item  p-0  mx-4">
+            <a class="nav-link nav-link-big" href="search">
                 Search
             </a>
         </li>
         @if (!isLogged)
         {
-            <li class="nav-item p-0 mx-4">
-                <a class="nav-link" href="login">
+            <li class="nav-item  p-0 mx-4">
+                <a class="nav-link nav-link-big" href="login">
                 Login
             </a>
         </li>
         }else{
 
-        <li class="nav-item p-1 mx-3">
+            <li class="nav-item  p-1 mx-3">
             @* <a class="nav-link" href="account">
                 Account
             </a> *@

@@ -9,82 +9,86 @@
 <PageTitle>Login</PageTitle>
 
 
-<div class="col-12">
+<div class="row text-center justify-content-center mt-5">
 
-    <div class="form-custom-border container-fluid col-md-8 col-lg-7 offset-md-3 pb-3 bg-body-secondary">
-        <div class="text-danger">
-            <p class="alert-primary">@error</p>
-        </div>
+    @* <div class="text-danger">
+    <p class="alert-primary">@error</p>
+    </div> *@
 
-        @if (!IsCode)
+    <div class="col-8 offset-4">
+        @if (IsLogin)
         {
-            <div class="tab-container mb-3">
-                <div class="tab @(IsLogin ? "active" : "")" @onclick="() => SelectTab(true)">
-                Login
-            </div>
-            <div @onclick="() => SelectTab(false)" class="tab @(IsLogin ? "" : "active")">
-                Sign Up
-            </div>
-        </div>
-        }
-
-        <div class="d-flex flex-row mx-2 px-2 align-items-end">
-            <div class="col-2 col-lg-3">
-            </div>
-            @if (IsLogin)
-            {
-               
-                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="LoginFunc" class="col-lg-6 col-9 text-center">
+            <div class="col-7">
+                <h1>With returning</h1>
+                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="LoginFunc" class="">
                     <div class="form-group py-2 text-center">
                         <h5>Email</h5>
-                        <InputText class="form-control" @bind-Value="LoginModel.Email" />
+                        <InputText class="form-control" @bind-Value="LoginModel.Email" DisplayName="Email" />
                         <h5>Password</h5>
                         <InputText typeof="password" class="form-control" @bind-Value="LoginModel.Password" />
                     </div>
-                    <button type="submit" class="btn btn-primary ">Login</button>
+                    <button type="submit" class="btn btn-primary col-10 mt-3">Login</button>
                 </EditForm>
-                <div class="col-lg-3 ps-4 ps-lg-6">
-                    <img src="Images/dog.png" style="max-width: 100%; height: auto" />
+                <div class="mt-3">
+                    <h6>Don't have an account? <a @onclick="() => SelectTab(false)">Register</a></h6>
                 </div>
-            }
-            else if(!IsLogin && !IsCode)
-            {
-
-                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="RegisterFunc" class="col-lg-6 col-9 text-center">
+            </div>
+        }
+        else if (!IsLogin && !IsCode)
+        {
+            <div class="col-7">
+                <h1>Create new account</h1>
+                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="RegisterFunc" class="">
                     <div class="form-group py-2 text-center">
-                        <h5>First Name</h5>
-                        <InputText class="form-control" @bind-Value="RegisterModel.FirstName" />
-                        <h5>Last Name</h5>
-                        <InputText class="form-control" @bind-Value="RegisterModel.LastName" />
-                        <h5>Email</h5>
-                        <InputText class="form-control" @bind-Value="RegisterModel.Email" />
-                        <InputRadioGroup @bind-Value="role">
-                            @foreach (var Erole in Enum.GetValues<Roles>())
-                            {
-                                <div>
-                                    <label>
-                                        <InputRadio Value="@Erole.ToString()" />
-                                        @Erole
-                                    </label>
-                                </div>
-                            }
-                        </InputRadioGroup>
-                        <h5>Password</h5>
-                        <InputText typeof="password" class="form-control" @bind-Value="RegisterModel.Password" />
-                    </div>
-                    <button type="submit" class="btn btn-primary ">Register</button>
-                </EditForm>
-                <div class="col-lg-1 col-3 ps-4 ps-lg-6">
-                    <img src="Images/dog.png" style="max-width: 100%; height: auto" />
-                </div>
-            }
-            @if (IsCode)
-            {
-               <_EmailSubmit realCode="@realCode" email="@Email"/>
-            }
-        </div>
+                        <div class="row justify-content-between mb-3">
+                            <div class="col-6">
+                                <h5>First Name</h5>
+                                <InputText class="form-control" @bind-Value="RegisterModel.FirstName" />
+                            </div>
+                            <div class="col-6">
+                                <h5>Last Name</h5>
+                                <InputText class="form-control" @bind-Value="RegisterModel.LastName" />
+                            </div>
+                        </div>
+                        <div>
+                            <h5>Choose your role</h5>
+                            <div class="row justify-content-center">
+                            <InputRadioGroup @bind-Value="role">
+                                @foreach (var Erole in Enum.GetValues<Roles>())
+                                {
+                                    <div class="col-5">
+                                        <label>
+                                            <InputRadio Value="@Erole.ToString()" />
+                                            @Erole
+                                        </label>
+                                    </div>
+                                }
+                            </InputRadioGroup>
+                            </div>
 
+                            <div class="mt-3">
+                                <h5>Email</h5>
+                                <InputText class="form-control" @bind-Value="RegisterModel.Email" />
+                            </div>
+                            <div class="mt-3">
+                                <h5>Password</h5>
+                                <InputText typeof="password" class="form-control" @bind-Value="RegisterModel.Password" />
+                             </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary  col-10 mt-3">Register</button>
+                </EditForm>
+                <div class="mt-3">
+                    <h6>Already have an account? <a @onclick="() => SelectTab(true)">Login</a></h6>
+                </div>
+            </div>
+        }
+        @if (IsCode)
+        {
+            <_EmailSubmit realCode="@realCode" email="@Email" />
+        }
     </div>
+
 </div>
 
 
@@ -107,7 +111,7 @@
     {
         get
         {
-            if(LoginModel.Email != null)
+            if (LoginModel.Email != null)
             {
                 return LoginModel.Email;
             }
@@ -132,7 +136,7 @@
         if (!String.IsNullOrEmpty(result.Error))
         {
             error = result.Error;
-            if(result.StatusCode != null && result.StatusCode == 403)
+            if (result.StatusCode != null && result.StatusCode == 403)
             {
                 realCode = result.Result;
                 CheckForCode();
@@ -177,3 +181,10 @@
         IsLogin = loginSelected;
     }
 }
+
+
+<style>
+    body {
+        background: local url("../Images/background-2.svg") no-repeat top;
+    }
+</style>

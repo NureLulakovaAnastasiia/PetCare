@@ -55,7 +55,7 @@
                                                 var questionInd = questions.IndexOf(question);
                                             }
                                             <div>
-                                                <button type="button" class="btn btn-danger" @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash3"></i></button>
+                                                <button type="button" class="btn btn-danger" @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash3">Delete</i></button>
                                                 <button class="btn btn-func m-3" type="button" @onclick="() => AddAnswer(questionInd)">Add Answer</button>
                                                 <InputCheckbox @bind-Value="question.HasAnswerWithFixedTime" @onclick="() => ChooseFixedQuestion(questionInd)"></InputCheckbox>
                                                 <label class="form-check-label">Is Time Fixed</label>
@@ -97,7 +97,7 @@
                                                                     <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
                                                                 </div>
                                                                 <div class="col-1 mt-3 text-center">
-                                                                    <button type="button" class="btn btn-danger" @onclick="() => deleteAnswer(questionInd, answerInd)"><i class="bi bi-trash3"></i></button>
+                                                                    <button type="button" class="btn btn-danger" @onclick="() => deleteAnswer(questionInd, answerInd)"><i class="bi bi-trash3">Delete</i></button>
                                                                 </div>
                                                             </div>
                                                         </div>

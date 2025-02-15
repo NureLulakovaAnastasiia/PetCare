@@ -5,6 +5,7 @@
 @inject ISearchService _searchService
 @inject IJSRuntime _JSRuntime
 @using LabelPosition = Syncfusion.Blazor.Inputs.LabelPosition
+@inject NavigationManager Navigation
 
 
 
@@ -141,10 +142,11 @@
                     <div class="col-6">
                         @foreach (var item in filteredServices)
                         {
-                            <div style="box-shadow: @(item.Selected ? "0px 0px 15px #c4b991" : "") " @onclick="(() => HandleParentServiceSelection(item))">
+                            <div class="m-2 p-2" style="box-shadow: @(item.Selected ? "0px 0px 15px #c4b991" : "") " @onclick="(() => HandleParentServiceSelection(item))">
                                 <h4>@item.ServiceDto.Name</h4>
                                 <p>@item.ServiceDto.MinimumPrice  -  @item.ServiceDto.MaximumPrice</p>
                                 <p>Rate: @item.ServiceDto.Rate</p>
+                                <button class="btn btn-success mt-2" @onclick="() => GoToService(item.ServiceDto.Id)">Details</button> 
                             </div>
                         }
                     </div>
@@ -351,6 +353,11 @@
         StateHasChanged();
     }
 
+
+    public void GoToService(int serviceId)
+    {
+         Navigation.NavigateTo($"/service-id={serviceId}");
+    }
 
     private async void showToastr(string res, string successMessage = "")
     {
