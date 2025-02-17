@@ -3,86 +3,132 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 ">
-                @if (!IsEdit)
-                {
-                    <div class="row text-center">
-                        <h3 class="col-8 offset-2"><b>About me</b></h3>
-                        <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
-                    </div>
-                }
+        <div class="form-custom-border p-3 ">
+            @if (!IsEdit)
+            {
+                <div class="row text-center ">
+                    <h3 class="col-8 offset-2"><b>About me</b></h3>
+                    <button class="btn col-2 btn-func btn-func-primary p-0" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                </div>
+            }
 
             <form method="post" @onsubmit="UpdateMasterData">
                 @if (IsEdit)
                 {
                     <div class="row text-center">
                         <h3 class="col-6 offset-3"><b>About me</b></h3>
-                        <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
-                        <button type="submit" class="btn col-2 btn-func-success" >Save</button>
+                        <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">Cancel</button>
+                        <button type="submit" class="btn col-2 btn-func btn-success">Save</button>
                     </div>
                 }
-           
+
                 <hr />
-            
+
                 <div class="text-start">
-                    @if(masterData != null){
-                    <div class="row col-lg-12 m-3">
-                        <div class="col-4 ms-4 mb-4 me-5">
-                            <h4>Last Name</h4>
-                            <InputText @bind-Value="masterData.LastName" placeholder="@masterData.LastName" 
-                            class="input-text-style" disabled="@(!IsEdit)" />
-                        </div>
-
-                        <div class="col-4 ms-4 mb-4 me-5">
-                            <h4>First Name</h4>
-                            <InputText @bind-Value="masterData.FirstName" placeholder="@masterData.FirstName"
-                                        class="input-text-style" disabled="@(!IsEdit)" />
-                        </div>
-                    </div>
-
-                    <div class="row col-lg-12 m-3">
-                        <div class="col-4 ms-4 mb-4 me-5">
-                            <h4>Location</h4>
-                            <h3>@(masterData.Contacts.City + ", " + masterData.Contacts.Address)</h3>
-                                @if (IsEdit)
-                                {
-                                    <button type="button" class="btn btn-func-success" @onclick="OpenModal">Edit</button>
-                                }
-                            </div>
-                            @if (IsModalOpen)
-                            {
-                                        <div>
-                                            <span class="close" @onclick="CloseModal">&times;</span>
-                                            <h2>Edit location</h2>
+                    @if (masterData != null)
+                    {
+                        var base64Image = ""; 
+                        @* $"data:image/jpeg;base64,{Convert.ToBase64String(masterData.LastName)}"; *@
+                        <div class="row col-lg-12 m-3">
+                            <div class="col-3 text-center">
+                                <h4>Profile photo</h4>
+                                <label class="image-upload pb-4">
+                                    <input type="file" accept="image/*" onchange="previewImage(event)">
+                                    <div class="image-container">
+                                        <img id="preview" src="" alt="Upload Image">
+                                        <div class="placeholder">
+                                            <span class="plus"><i class="bi bi-plus-square-dotted"></i></span>
                                         </div>
-                                        <_EditLocation Contacts="@masterData.Contacts"
-                                        CloseAndSubmit="CloseModal">
-                                        </_EditLocation>
-                            }
-                    </div>
+                                    </div>
+                                </label>
 
-                    <div class="row col-lg-12 m-3">
-                        <div class="col-4 ms-4 mb-4 me-5">
-                            <h4>Phone</h4>
-                            <InputText @bind-Value="masterData.Contacts.Phone"
-                                        placeholder="@(masterData.Contacts.Phone != null ? masterData.Contacts.Phone : " - ")"
-                                        class="input-text-style" disabled="@(!IsEdit)" />
-                        </div>
 
-                        <div class="col-5 ms-4 mb-4 me-5">
-                            <h4>Email</h4>
-                            <InputText @bind-Value="masterData.Email"
-                                        placeholder="@masterData.Email"
-                                        class="input-text-style" disabled />
+
+                            </div>
+                            <div class="col-9">
+                                <div>
+                                    <div class="row ms-3 text-center justify-content-around">
+                                        <div class="offset-1 col-5">
+                                            <h4>Last Name</h4>
+                                            <InputText @bind-Value="masterData.LastName" placeholder="@masterData.LastName"
+                                                       class="input-text-style col-12" disabled="@(!IsEdit)" />
+                                        </div>
+
+                                        <div class="col-5">
+                                            <h4>First Name</h4>
+                                            <InputText @bind-Value="masterData.FirstName" placeholder="@masterData.FirstName"
+                                                       class="input-text-style col-12" disabled="@(!IsEdit)" />
+                                        </div>
+                                    </div>
+
+                                    <div class="ms-5 text-center mt-3 mb-3">
+                                        <h4>Location</h4>
+                                        <div class="row">
+                                            <h4 class="offset-1 col-9" style="color: var(--bs-green-blue)">@(masterData.Contacts.City + ", "
+                                                    + masterData.Contacts.Address)
+                                            </h4>
+                                            @if (IsEdit)
+                                            {
+                                                <button type="button" class="col-1 btn btn-func btn-success" @onclick="OpenModal"><i class="bi bi-pencil-fill"></i></button>
+                                            }
+                                        </div>
+                                    </div>
+                                    @if (IsModalOpen)
+                                    {
+                                        <SfDialog Target="#target" Width="50%" ShowCloseIcon="true" @bind-Visible="IsModalOpen" AllowPrerender="true" IsModal="true">
+                                            <DialogTemplates>
+                                                
+                                                <Content>
+                                                    <div class="text-center">
+                                                        <h2>Edit location</h2>
+                                                        <_EditLocation Contacts="@masterData.Contacts"
+                                                                       CloseAndSubmit="CloseModal">
+                                                        </_EditLocation>
+                                                    </div>
+                                                </Content>
+                                            </DialogTemplates>
+                                        </SfDialog>
+                                        @* <div class="modal-overlay">
+                                            <div class="modal-content text-center">
+                                                <div>
+                                                    <span class="close" @onclick="CloseModal">&times;</span>
+                                                    <h2>Edit location</h2>
+                                                </div>
+                                                <_EditLocation Contacts="@masterData.Contacts"
+                                                               CloseAndSubmit="CloseModal">
+                                                </_EditLocation>
+                                            </div>
+                                        </div> *@
+                                    }
+                                    <div class="row ms-3 text-center justify-content-around">
+                                        <div class="offset-1 col-5">
+                                            <h4>Phone</h4>
+                                            <InputText @bind-Value="masterData.Contacts.Phone"
+                                                       placeholder="@(masterData.Contacts.Phone != null ? masterData.Contacts.Phone : " - ")"
+                                                       class="input-text-style  col-12" disabled="@(!IsEdit)" />
+                                        </div>
+
+                                        <div class="col-5">
+                                            <h4>Email</h4>
+                                            <InputText @bind-Value="masterData.Email"
+                                                       placeholder="@masterData.Email"
+                                                       class="input-text-style" disabled />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    }else{
-                        <h3>There is no data to display</h3>
+                   
+                   
                     }
-                </div>
-            </form>
+                    else
+                    {
+                    <h3>There is no data to display</h3>
+                    }
         </div>
+        </form>
     </div>
+</div>
 </div>
 
 
@@ -144,6 +190,70 @@
     }
     private void AddLocation(MouseEventArgs e)
     {
-        
+
     }
 }
+
+<style>
+    .image-upload {
+        display: inline-block;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+
+        .image-upload input {
+            display: none; /* Hide file input */
+        }
+
+    .image-container {
+        width: 100%; 
+        height: 100%;
+        
+        background: #ddd;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; 
+        }
+
+    .placeholder {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    .plus {
+        font-size: 40px;
+        font-weight: bold;
+        color: #777;
+    }
+
+    .pac-container {
+        z-index: 9999 !important;
+    }
+
+    .e-dialog {
+        z-index:1000 !important;
+    }
+
+    .e-dlg-overlay {
+        background-color: slategray;
+        opacity: 0.6;
+        z-index: 300 !important;
+    }
+</style>

@@ -32,7 +32,7 @@
             @* <a class="nav-link" href="account">
                 Account
             </a> *@
-                <SfDropDownButton Content="Account" CssClass="custom-dropdown-menu">
+                <SfDropDownButton Content="Account">
                 <DropDownButtonEvents  ItemSelected="SelectItem" >
                 </DropDownButtonEvents>
                 <DropDownMenuItems>
@@ -80,14 +80,14 @@
 
 <style>
     .e-dropdown-btn {
-        font-size: var(--bs-nav-link-font-size) !important;
+        font-size: 2rem !important;
         font-weight: var(--bs-nav-link-font-weight) !important;
         color: var(--bs-nav-link-color) !important;
         text-decoration: none;
-        background: none;
+        background: rgba(255, 255, 255, .3) !important;
+        padding-top: 2px;
         border: 0 !important;
         box-shadow: none !important;
-        filter: drop-shadow(0px 7px 7px #edd3d1);
         transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
         font-family: var(--bs-body-font-family) !important;
     }
@@ -96,9 +96,6 @@
             color: var(--bs-nav-link-hover-color) !important;
             background: none;
             border: none;
-            font-size: var(--bs-nav-link-font-size);
-            font-weight: var(--bs-nav-link-font-weight);
-            color: var(--bs-nav-link-color);
             background-color: rgba(255, 255, 255, .3) !important;
         }
 
@@ -108,16 +105,31 @@
         background: none !important;
     }
 
-   
-    .custom-dropdown-menu{
-        background: none !important;
-        border: none !important;
-    }
+   .e-dropdown-menu{
+       min-width: 160px !important;
+   }
+
 
     .e-dropdown-popup {
-        background-color: rgba(255, 255, 255, .3) !important;
+        background-color: rgba(255, 255, 255, .8) !important;
+        
         box-shadow: 0px 0px 5px var(--bs-nav-link-hover-color) !important;
+        color: #015A84;
+        font-family: var(--bs-body-font-family) !important;
     }
+
+        .e-dropdown-popup ul .e-item{
+            font-size: 1.3rem !important;
+            font-weight: 500;
+            height: 50px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .e-dropdown-popup ul .e-item:hover{
+                background-color: rgba(241, 237, 234, .8) !important;
+                color: rgb(3, 62, 89);
+        }
 </style>
 
 

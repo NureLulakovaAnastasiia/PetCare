@@ -10,7 +10,15 @@ function initMap(mapId, markerData) {
         center: { lat: markerData[0].latitude, lng: markerData[0].longitude },
         zoom: 12,
     });
-
+    const input = document.getElementById("searchBox");
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+        
+    });
+    autocomplete.setOptions({
+        strictBounds: true,
+        append: input.parentElement 
+    });
+    map.autocomplete = autocomplete;
     markers = markerData.map((marker, index) => {
         const mapMarker = new google.maps.Marker({
             position: { lat: marker.latitude, lng: marker.longitude },
