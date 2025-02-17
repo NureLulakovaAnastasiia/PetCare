@@ -8,12 +8,12 @@
             @if (!IsEdit)
             {
                 <div class="row text-center">
-                    <h3 class="col-7 offset-2"><b>My pets</b></h3>
+                    <h3 class="col-@(Pets.Count > 0 ? "7" : "8") offset-2"><b>My pets</b></h3>
                     @if (Pets.Count > 0)
                     {
-                        <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                        <button class="btn col-2 btn-func btn-warning me-2" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
                     }
-                    <button class="btn col-2 btn-func ms-2" @onclick="OpenModal"><i class="bi bi-plus"></i>   Add</button>
+                    <button class="btn col-2 btn-func btn-func-primary" @onclick="OpenModal"><i class="bi bi-plus-circle"></i>     Add</button>
                 </div>
             }
             <form method="post" @onsubmit="UpdatePets">
@@ -21,8 +21,8 @@
                 {
                     <div class="row text-center">
                         <h3 class="col-7 offset-2"><b>My pets</b></h3>
-                        <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
-                        <button type="submit" class="btn col-2 btn-func-success">Save</button>
+                        <button type="button" class="btn col-2 btn-func mx-1 btn-danger" @onclick="CancelEdit">Cancel</button>
+                        <button type="submit" class="btn col-2 btn-func btn-success">Save</button>
                     </div>
                 }
 
@@ -30,52 +30,63 @@
 
                 @if (Pets.Count > 0)
                 {
-                    <div class="container my-4">
-                        <div class="row">
+                    <div class="container my-4"> 
+                        <div class="d-flex justify-content-between">
                             @foreach (var pet in Pets)
                             {
-                                <div class="col-md-3 mb-4">
+                                <div class="col-5 mb-4">
                                     <div class="card">
+                                        <div class="row g-0 d-flex align-items-center">
+                                            <div class="col-7">
+                                                @if (pet.Photo != null && pet.Photo.Length > 0)
+                                                {
+                                                    var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(pet.Photo)}";
+                                                    <img src="@base64Image" class="card-img card-img-top card-img-bottom ms-2" alt="Portfolio Image" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="card-body text-center">
+                                                        <p>No image available</p>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="col-5">
+                                                <div class="card-body text-start">
+                                                    <div>
+                                                        <label>Name</label>
+                                                        <InputText @bind-Value="pet.Name" placeholder="@pet.Name"
+                                                                   class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
+                                                    </div>
 
-                                        @if (pet.Photo != null && pet.Photo.Length > 0)
-                                        {
-                                            var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(pet.Photo)}";
-                                            <img src="@base64Image" class="card-img-top" alt="Portfolio Image" />
-                                        }
-                                        else
-                                        {
-                                            <div class="card-body text-center">
-                                                <p>No image available</p>
-                                            </div>
-                                        }
-                                        <div class="card-body text-start">
-                                            <div>
-                                                <label>Name</label>
-                                                <InputText @bind-Value="pet.Name" placeholder="@pet.Name"
-                                                           class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
-                                            </div>
+                                                    <div>
+                                                        <label>Breed</label>
+                                                        <InputText @bind-Value="pet.Breed" placeholder="@pet.Breed"
+                                                                   class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
+                                                    </div>
+                                                    <div>
+                                                        <label>Type</label>
+                                                        <InputText @bind-Value="pet.Type" placeholder="@pet.Type"
+                                                                   class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
+                                                    </div>
 
-                                            <div>
-                                                <label>Breed</label>
-                                                <InputText @bind-Value="pet.Breed" placeholder="@pet.Breed"
-                                                           class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
+                                                    <div class="row justify-content-around text-center mt-2">
+                                                        @if (IsEdit)
+                                                        {
+                                                            <button type="button" class="btn btn-info col-6 p-2" @onclick="() => AddToUpdated(pet.Id)">Update</button>
+                                                            <button class="btn btn-danger col-3 p-2" @onclick="()=>DeletePet(pet.Id)"><i class="bi bi-trash"></i></button>
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label>Type</label>
-                                                <InputText @bind-Value="pet.Type" placeholder="@pet.Type"
-                                                           class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
-                                            </div>
-
-                                            <div>
-                                                <label>Description</label>
-                                                <InputTextArea @bind-Value="pet.Description" placeholder="@pet.Description"
-                                                               class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
-                                            </div>
-                                            @if (IsEdit)
+                                        </div>
+                                        <div class="text-center m-3 ">
+                                            <label>Description</label>
+                                            @if (!IsEdit && String.IsNullOrEmpty(pet.Description))
                                             {
-                                                <button type="button" class="btn btn-func-success" @onclick="() => AddToUpdated(pet.Id)">Save changes</button>
-                                                <button class="btn btn-danger" @onclick="()=>DeletePet(pet.Id)"><i class="bi bi-trash"></i></button>
+                                                <h6>No description available</h6>
                                             }
+                                            <InputTextArea @bind-Value="pet.Description" placeholder="@pet.Description" style="min-height: 30px"
+                                                           class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" />
                                         </div>
                                     </div>
                                 </div>
@@ -85,8 +96,8 @@
                 }
                 else
                 {
-                    <div>
-                        <h3>You don't have pets yet.</h3>
+                    <div class="text-center">
+                        <h4>You don't have pets yet.</h4>
                     </div>
                 }
             </form>
@@ -104,13 +115,13 @@
                                 <div>
                                     <label>Name</label>
                                     <InputText @bind-Value="newPet.Name"
-                                               class="input-textarea-style p-2 m-0 col-12"  />
+                                               class="input-textarea-style p-2 m-0 col-12" />
                                 </div>
 
                                 <div>
                                     <label>Breed</label>
                                     <InputText @bind-Value="newPet.Breed"
-                                               class="input-textarea-style p-2 m-0 col-12"  />
+                                               class="input-textarea-style p-2 m-0 col-12" />
                                 </div>
                                 <div>
                                     <label>Type</label>
@@ -124,16 +135,25 @@
                                                    class="input-textarea-style p-2 m-0 col-12" />
                                 </div>
                             </div>
-                            <div class="col-6 p-2 text-center">
-                                <label for="photo" class="d-block pb-2 pt-2">Photo</label>
+                            <div class="col-6 p-2 pt-0 text-center justify-content-start mb-3 pe-4">
+                                <label for="photo" class="d-block pb-2">Photo</label>
+                                
+                                @* @if (UploadedImage != null)
+                                { *@
+                                    <label class="image-upload pb-4 ">
+                                        <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
+                                        <div class="image-container">
+                                        <img src="@UploadedImage" alt="Preview Image" class="pb-2" style="max-width: 200px;">
+                                            <div class="placeholder">
+                                                <span class="plus"><i class="bi bi-plus-square-dotted"></i></span>
+                                            </div>
+                                        </div>
+                                    </label>
+@*                                     <img src="@UploadedImage" class="pb-2" alt="Preview image" style="max-width: 200px;" />
+ *@                               @*  } *@
 
-                                @if (UploadedImage != null)
-                                {
-                                    <img src="@UploadedImage" class="pb-2" alt="Preview image" style="max-width: 200px;" />
-                                }
-
-                                <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
-                            </div>
+@*                                 <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
+ *@                            </div>
                         </div>
                         <div class="mt-3">
                             <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CloseModal">Cancel</button>
@@ -286,7 +306,7 @@
         StateHasChanged();
     }
 
-    
+
 
     private void OnButtonClick()
     {

@@ -8,7 +8,7 @@
             {
                 <div class="row text-center ">
                     <h3 class="col-8 offset-2"><b>About me</b></h3>
-                    <button class="btn col-2 btn-func btn-func-primary p-0" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    <button class="btn col-2 btn-func btn-warning p-0" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
                 </div>
             }
 
@@ -50,13 +50,13 @@
                                     <div class="row ms-3 text-center justify-content-around">
                                         <div class="offset-1 col-5">
                                             <h4>Last Name</h4>
-                                            <InputText @bind-Value="masterData.LastName" placeholder="@masterData.LastName"
+                                            <InputText @bind-Value="masterData.LastName" placeholder="LastName"
                                                        class="input-text-style col-12" disabled="@(!IsEdit)" />
                                         </div>
 
                                         <div class="col-5">
                                             <h4>First Name</h4>
-                                            <InputText @bind-Value="masterData.FirstName" placeholder="@masterData.FirstName"
+                                            <InputText @bind-Value="masterData.FirstName" placeholder="FirstName"
                                                        class="input-text-style col-12" disabled="@(!IsEdit)" />
                                         </div>
                                     </div>
@@ -64,8 +64,10 @@
                                     <div class="ms-5 text-center mt-3 mb-3">
                                         <h4>Location</h4>
                                         <div class="row">
-                                            <h4 class="offset-1 col-9" style="color: var(--bs-green-blue)">@(masterData.Contacts.City + ", "
-                                                    + masterData.Contacts.Address)
+                                            <h4 class="offset-1 col-@(IsEdit ? "9" : "10") text-center" 
+                                            style="color: var(--bs-green-blue);">
+                                                @(!String.IsNullOrEmpty(masterData.Contacts.Address) ? masterData.Contacts.City + ", "
+                                                    + masterData.Contacts.Address : "–")
                                             </h4>
                                             @if (IsEdit)
                                             {
@@ -88,30 +90,20 @@
                                                 </Content>
                                             </DialogTemplates>
                                         </SfDialog>
-                                        @* <div class="modal-overlay">
-                                            <div class="modal-content text-center">
-                                                <div>
-                                                    <span class="close" @onclick="CloseModal">&times;</span>
-                                                    <h2>Edit location</h2>
-                                                </div>
-                                                <_EditLocation Contacts="@masterData.Contacts"
-                                                               CloseAndSubmit="CloseModal">
-                                                </_EditLocation>
-                                            </div>
-                                        </div> *@
+                                       
                                     }
                                     <div class="row ms-3 text-center justify-content-around">
                                         <div class="offset-1 col-5">
                                             <h4>Phone</h4>
                                             <InputText @bind-Value="masterData.Contacts.Phone"
-                                                       placeholder="@(masterData.Contacts.Phone != null ? masterData.Contacts.Phone : " - ")"
-                                                       class="input-text-style  col-12" disabled="@(!IsEdit)" />
+                                                       placeholder="@(String.IsNullOrEmpty(masterData.Contacts.Phone) && !IsEdit ? "–" : masterData.Contacts.Phone)"
+                                                       class="input-text-style col-12" disabled="@(!IsEdit)" />
                                         </div>
 
                                         <div class="col-5">
                                             <h4>Email</h4>
                                             <InputText @bind-Value="masterData.Email"
-                                                       placeholder="@masterData.Email"
+                                                       placeholder="Email"
                                                        class="input-text-style" disabled />
                                         </div>
                                     </div>
