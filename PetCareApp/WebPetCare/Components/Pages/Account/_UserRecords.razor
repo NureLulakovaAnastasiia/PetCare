@@ -7,71 +7,95 @@
 <div class="d-flex justify-content-center  mt-3">
     <div class="col-lg-10 align-items-center text-center">
         <div class="form-custom-border p-3 ">
-            <h3 class="col-7 offset-2"><b>My records</b></h3>
+            <h3 class=""><b>My records</b></h3>
             <hr />
-            
-            @if(records.Count > 0)
+
+            @if (records.Count > 0)
             {
                 <div class="container my-4 align-content-center">
                     <div class="row text-start">
-                        @foreach(var record in records)
+                        @foreach (var record in records)
                         {
                             <_ServiceReview serviceName="@record.ServiceName" IsReview="IsReview"
-                            CancelReview="CancelReview" PageUpdate="ReloadData" serviceId="@(record.ServiceId ?? 0)"
-                            ></_ServiceReview>
+                                            CancelReview="CancelReview" PageUpdate="ReloadData" serviceId="@(record.ServiceId ?? 0)"></_ServiceReview>
                             <div class="card col-md-10 mb-4 offset-1 p-2">
-                                <div class="card-header row"> 
-                                    <h4 class="col-8">@record.ServiceName</h4>
-                                   
-                                    <div class="col-3 text-center">
+                                <div class="card-header row align-items-center">
+                                    <h3 class="col-7"><strong>@record.ServiceName</strong></h3>
+
+                                    <div class="col-3 text-center text-primary">
                                         @record.StartTime.ToString("D")
                                         <h3>@record.StartTime.ToString("HH:mm") - @record.EndTime.ToString("HH:mm")</h3>
                                     </div>
-                                </div>
-                                <div>
-                                    <div class="row m-2">
-                                        <h5 class="col-2">Status : </h5>
-                                        <h3 class="@(record.Status == "Created" ? "text-success" : "text-primary") col-8">@record.Status</h3>
-                                    </div>
-                                    @if (!String.IsNullOrEmpty(record.RecordCancelReason))
-                                    {
-                                        <div class="row m-2">
-                                            <h5 class="col-3">Cancel Reason: </h5>
-                                            <h4 class="text-danger col-8">@record.RecordCancelReason</h4>
+                                    <div class="offset-1 col-1">
+                                        <button class="btn rounded-circle btn-secondary p-0 ps-1 pe-1 me-2"
+                                                @onclick="() => GoToServiceDetails(record.ServiceId ?? 0)">
+                                            <i class="bi bi-arrow-up-right"></i>
+                                        </button>
                                         </div>
-                                        
-                                    }
                                 </div>
-
-                                @if (!String.IsNullOrEmpty(record.Comment)){
-                                    <h5>Comment: @record.Comment</h5>
-                                }
-                                <div class="input-textarea-style ps-2" style="white-space: pre-line;">Description: @record.Description</div>
-                                @if (!String.IsNullOrEmpty(record.PetName))
-                                {
-                                    <h3 class="text-danger">@record.PetName</h3>
-                                }
-
-                                <div class="m-2 text-end">
-                                    @if(record.Status == "Finished")
-                                    {
-                                        if (record.IsReviewed)
+                                <div class="card-body row">
+                                    <div class="col-6">
+                                        <div class="ms-1 mb-2 align-items-center">
+                                            <h5 class="">Status : </h5>
+                                            <h4 class="@(record.Status == "Created" || record.Status == "Finished" ? "text-primary" : "text-danger") col-8">@record.Status</h4>
+                                        </div>
+                                        @if (!String.IsNullOrEmpty(record.RecordCancelReason))
                                         {
-                                            <label class="ps-3">You already have reviews to this service</label>
+                                            <div class="m-2 mt-3">
+                                                <h5 class="">Cancel Reason: </h5>
+                                                <h4 class="text-danger col-8">@record.RecordCancelReason</h4>
+                                            </div>
+
                                         }
-                                        <button class="btn btn-success" @onclick="WriteReview">Add Review</button>
-                                    }
-                                    else if (record.Status == "Created")
-                                    {
-                                        if (DateTime.UtcNow < record.StartTime)
-                                        {
-                                            var interval = DateTime.UtcNow - record.StartTime;
-                                            if (interval.TotalHours > 2)
+
+                                        <div class="ms-1 mt-3 align-items-center">
+                                            @if (!String.IsNullOrEmpty(record.Comment))
                                             {
-                                                <button class="btn btn-danger" @onclick="() => CancelRecord(record.Id)">Cancel Record</button>
+                                                <h5 class="">Comment: </h5>
+                                                <h6 class=" col-9 green-blue-text"> @record.Comment </h6>
                                             }
+                                        </div>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <h5 class="">Description:</h5>
+                                        <div class="ps-2 green-blue-text" style="white-space: pre-line;">
+                                                @(!String.IsNullOrEmpty(record.Description) ? record.Description : "No description available")
+                                            </div>
+                                        @if (!String.IsNullOrEmpty(record.PetName))
+                                        {
+                                            <h3 class="text-danger">@record.PetName</h3>
                                         }
-                                    }
+                                    </div>
+                                    <div class="m-2 text-end">
+                                        <div class="row">
+                                            <div class="col-4">
+                                            </div>
+                                            <div class="col-8">
+                                                @if (record.Status == "Finished")
+                                                {
+                                                    if (record.IsReviewed)
+                                                    {
+                                                        <label class="ps-3">You've already wrote a review to this service</label>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="btn btn-success p-2" @onclick="WriteReview">Add Review</button>
+                                                    }
+                                                }
+                                                else if (record.Status == "Created")
+                                                {
+                                                    if (DateTime.UtcNow < record.StartTime)
+                                                    {
+                                                        var interval = record.StartTime - DateTime.UtcNow;
+                                                        if (interval.TotalHours > 5)
+                                                        {
+                                                            <button class="btn btn-danger p-2" @onclick="() => CancelRecord(record.Id)">Cancel Record</button>
+                                                        }
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         }
@@ -80,9 +104,9 @@
             }
             else
             {
-                <h3>No records were found</h3>
+                <h3>No records were found.</h3>
             }
-        
+
         </div>
     </div>
 </div>
@@ -140,12 +164,17 @@
     {
         await OnAfterRenderAsync(true);
     }
-    
-    
+
+
     public void WriteReview()
     {
         IsReview = true;
         StateHasChanged();
+    }
+
+    private void GoToServiceDetails(int serviceId)
+    {
+        Navigation.NavigateTo($"/service-id={serviceId}");
     }
 
     private async void showToastr(string res, string successMessage = "")

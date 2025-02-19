@@ -761,21 +761,27 @@
 
 <style>
     .e-break {
-        background: #f57e42 !important;
-        opacity: 0.75 !important;
+        background: rgba(245, 126, 66, 0.7) !important;
+        box-shadow: 1px 1px 5px #f57e42;
+        border: 1px solid #f57e42 !important;
     }
 
     .e-green {
-        background: #28a745 !important;  
+        background: rgba(40, 167, 69, 0.7) !important;
+        box-shadow: 1px 1px 5px #28a745;
+        border: 1px solid #28a745 !important;
     }
 
     .e-blue {
-        background: #007bff !important;  
-
+        background: rgba(0, 123, 255, 0.7) !important;
+        box-shadow: 1px 1px 5px #007bff;
+        border: 1px solid #007bff !important;
     }
 
     .e-red {
-        background: #dc3545  !important;  
+        background: rgba(220, 53, 69, 0.7) !important;
+        box-shadow: 1px 1px 5px #dc3545;
+        border: 1px solid #dc3545 !important;
     }
     
     .custom-event-editor td{
@@ -786,4 +792,86 @@
     .dropdown .e-dropdownlist {
         color: inherit !important;
     }
+
+    .e-schedule {
+        border-radius: 12px !important;
+        font-family: var(--bs-body-font-family);
+        color: var(--bs-secondary) !important;
+    }
+
+        .e-schedule .e-vertical-view {
+            font-size: 1.4rem !important;
+        }
+
+
+    .e-work-cells, .e-header-cells, .e-date-header, .e-resource-cells,  td {
+        color: var(--bs-secondary) !important;
+        font-size: 1.1rem !important;
+    }
+
+    .e-current-day {
+        color: var(--bs-primary) !important;
+    }
+
+    .e-schedule .e-vertical-view .e-current-time {
+        font-size: 1rem;
+        color: #038c69 !important;
+    }
+
+    .e-schedule .e-vertical-view .e-previous-timeline {
+        border-top: 2px dotted #038c69 !important;
+    }
+
+    .e-current-timeline{
+        border-top: 2px solid #038c69 !important;
+    }
+
+    .e-schedule .e-vertical-view .e-day-wrapper .e-appointment{
+        border-radius: 8px !important;
+        font-weight: 400 !important;
+        color:#fff;
+    }
+
+    .e-schedule .e-vertical-view .e-header-cells.e-current-day {
+        color: var(--bs-primary) !important;
+    }
+
+    .e-schedule .e-vertical-view .e-date-header-wrap{
+        color: var(--bs-secondary) !important;
+        font-size: 1.2rem !important;
+    }
+
+    .e-toolbar .e-toolbar-item .e-tbar-btn .e-tbar-btn-text {
+        color: #023c57;
+    }
+
+    .e-schedule .e-schedule-toolbar .e-toolbar-items .e-toolbar-item.e-date-range .e-tbar-btn .e-tbar-btn-text{
+        font-size: 1rem;
+    }
+
+    .e-calendar .e-content td.e-today.e-selected:hover span.e-day, .e-calendar .e-content td.e-selected:hover span.e-day, .e-calendar .e-content td.e-selected.e-focused-date span.e-day {
+        background: var(--bs-primary);
+        border: 1px solid var(--bs-primary);
+    
+    }
+
+    .e-calendar .e-btn.e-today.e-flat.e-primary, .e-calendar .e-css.e-btn.e-today.e-flat.e-primary{
+        background: var(--bs-primary);
+        border: 1px solid var(--bs-primary);
+    }
+
+    .e-calendar .e-content td.e-today span.e-day, .e-calendar .e-content td.e-focused-date.e-today span.e-day {
+        box-shadow: inset 2px 0 var(--bs-primary), inset 0 2px var(--bs-primary), inset -2px 0 var(--bs-primary), inset 0 -2px var(--bs-primary);
+        color: var(--bs-primary);
+    }
+    
+    .e-toolbar .e-toolbar-item .e-tbar-btn:hover{
+        background: var(--bs-secondary);
+        border-color: var(--bs-secondary);
+        border-style: solid;
+        border-width: 0;
+        border-radius: 4px;
+        color: #fff;
+    }
+
 </style>

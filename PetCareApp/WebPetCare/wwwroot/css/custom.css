@@ -44,7 +44,7 @@
     --bs-success: #BADFCD; /*light green*/
     --bs-info: #8abcd4; /*light blue*/
     --bs-warning: #f5de98; /*light yellow*/
-    --bs-danger: #e0b4b1; /*light red*/
+    --bs-danger: #f0948d; /*light red*/
     --bs-light: #e9f7f4; /*very light green*/
     --bs-dark: #212529;
     --bs-hover: #033f5c;
@@ -54,7 +54,7 @@
     --bs-success-rgb: 186, 223, 205;
     --bs-info-rgb: 138, 188, 212;
     --bs-warning-rgb: 245, 222, 152;
-    --bs-danger-rgb: 224, 180, 177;
+    --bs-danger-rgb: 240, 148, 141;
     --bs-light-rgb: 233, 247, 244;
     --bs-dark-rgb: 33, 37, 41;
     --bs-primary-text-emphasis: #163865;
@@ -240,7 +240,7 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
 }
 
 .green-blue-text {
-    color: var(--bs-green-blue);
+    color: var(--bs-green-blue) !important;
 }
 
 .primary-text{
@@ -444,7 +444,7 @@ svg {
 }
 
     .image-upload input {
-        display: none; /* Hide file input */
+        display: none; 
     }
 
 .image-container {
@@ -452,6 +452,7 @@ svg {
     height: 100%;
     background: #ddd;
     border-radius: 12px;
+    background-color: gray;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3433,7 +3434,8 @@ textarea.form-control-lg {
     --bs-btn-color: #fff;
     --bs-btn-bg: var(--bs-secondary);
     --bs-btn-border-color: var(--bs-secondary);
-    --bs-btn-hover-color: #000;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-box-shadow: 1px 1px 7px rgba(var(--bs-secondary), 0.4) ;
     --bs-btn-hover-bg: #023c57;
     --bs-btn-hover-border-color: #023c57;
     --bs-btn-focus-shadow-rgb: 184, 193, 205;
@@ -3511,6 +3513,7 @@ textarea.form-control-lg {
     --bs-btn-border-color: var(--bs-danger);
     --bs-btn-hover-color: #fff;
     --bs-btn-hover-bg: #e07067;
+    --bs-btn-box-shadow: 2px 2px 5px #e94647; 
     --bs-btn-hover-border-color: #e07067;
     --bs-btn-focus-shadow-rgb: 233, 70, 71;
     --bs-btn-active-color: #fff;
@@ -4903,7 +4906,9 @@ textarea.form-control-lg {
 .card-img,
 .card-img-top,
 .card-img-bottom {
-  width: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .card-img,
