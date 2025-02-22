@@ -11,6 +11,8 @@ namespace PetCareApp.Models
         public string Name { get; set; } = string.Empty;
         [StringLength(300)]
         public string Description { get; set; } = string.Empty;
+        public byte[]? Photo { get; set; }
+
         public string? AppUserId { get; set; }
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public AppUser? AppUser { get; set; }

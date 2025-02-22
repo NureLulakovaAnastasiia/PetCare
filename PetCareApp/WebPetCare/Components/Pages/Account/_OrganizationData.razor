@@ -3,12 +3,12 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 mb-3">
+        <div class="form-custom-border p-3 mb-3">
                 @if (!IsEdit)
                 {
                     <div class="row text-center">
                         <h3 class="col-8 offset-2"><b>About organization</b></h3>
-                        <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    <button class="btn col-2 btn-func btn-warning p-0" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
                     </div>
                 }
 
@@ -17,8 +17,8 @@
                 {
                     <div class="row text-center">
                         <h3 class="col-6 offset-3"><b>About organization</b></h3>
-                        <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
-                        <button type="submit" class="btn col-2 btn-func-success" >Save</button>
+                        <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">Cancel</button>
+                        <button type="submit" class="btn col-2 btn-func btn-success">Save</button>
                     </div>
                 }
            
@@ -27,16 +27,41 @@
                  <div class="text-center">
                     @if (orgInfo != null)
                     {
-                        <div class="ms-4 mb-4 me-5 ">
-                                <h4>Name</h4>
-                            <InputText @bind-Value="@orgInfo.Name" placeholder="@orgInfo.Name"
-                                       class="input-text-style col-10 text-center" disabled="@(!IsEdit)" />
-                            </div>
+                        if (String.IsNullOrEmpty(UploadedImage))
+                        {
+                            UploadedImage = $"data:image/jpeg;base64,{Convert.ToBase64String(orgInfo.Photo ?? [])}";
 
-                        <div class="ms-4 mb-4 me-5 text-center">
-                                <h4>Description</h4>
-                            <InputTextArea @bind-Value="@orgInfo.Description" placeholder="@orgInfo.Description"
-                                           class="input-textarea-style col-10 text-center" disabled="@(!IsEdit)" />
+                        }
+                        <div class="row justify-content-around">
+                            <div class="col-3 mb-4">
+                                <h4>Organization logo</h4>
+                                <label class="image-upload pb-4">
+                                    <InputFile accept="image/*" OnChange="HandleFileSelected" disabled="@(!IsEdit)"/>
+                                    <div class="image-logo-container">
+                                        <img id="preview" src="@UploadedImage" alt="Logo">
+
+                                        @if (IsEdit)
+                                        {
+                                            <div class="placeholder">
+                                                <span class="plus"><i class="bi bi-plus-square-dotted"></i></span>
+                                            </div>
+                                        }
+                                    </div>
+                                </label>
+                            </div >
+                            <div class="col-6">
+                                <div class="ms-4 mb-4 me-5 ">
+                                        <h4>Name</h4>
+                                    <InputText @bind-Value="@orgInfo.Name" placeholder="@orgInfo.Name"
+                                               class="input-text-style col-10 text-center" disabled="@(!IsEdit)" />
+                                    </div>
+
+                                <div class="ms-4 mb-4 me-5 text-center">
+                                        <h4>Description</h4>
+                                    <InputTextArea @bind-Value="@orgInfo.Description" placeholder="@orgInfo.Description"
+                                                   class="input-textarea-style col-10 text-center" disabled="@(!IsEdit)" />
+                                </div>
+                            </div>
                         </div>
                     }
                     else
@@ -56,6 +81,18 @@
     public OrganizationInfo initialInfo = new OrganizationInfo();
     [Parameter]
     public OrganizationInfo orgInfo { get; set; } = new OrganizationInfo();
+    private IBrowserFile SelectedFile;
+    private string? UploadedImage;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        SelectedFile = e.File;
+
+        using var stream = new MemoryStream();
+        await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+        UploadedImage = $"data:{SelectedFile.ContentType};base64,{Convert.ToBase64String(stream.ToArray())}";
+        StateHasChanged();
+    }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -64,15 +101,25 @@
             initialInfo.Name = orgInfo.Name;
             initialInfo.Description = orgInfo.Description;
             initialInfo.Id = orgInfo.Id;
+            initialInfo.Photo = orgInfo.Photo;
         }
     }
 
     private void OnButtonClick()
     {
         IsEdit = !IsEdit;
+        UploadedImage = $"data:image/jpeg;base64,{Convert.ToBase64String(orgInfo.Photo ?? [])}";
+
     }
     private async Task UpdateOrganizationData(EventArgs e)
     {
+        if (SelectedFile != null)
+        {
+            using var stream = new MemoryStream();
+            await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+
+            orgInfo.Photo = stream.ToArray();
+        }
         var res = await orgService.UpdateOrganizationInfo(orgInfo);
         if (String.IsNullOrEmpty(res))
         {
@@ -105,3 +152,49 @@
         }
     }
 }
+
+<style>
+    .image-upload {
+        display: inline-block;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+
+        .image-upload input {
+            display: none;
+        }
+
+    .image-logo-container {
+        width: 100%;
+        height: 100%;
+        background: #ddd;
+        border-radius: 12px;
+        background-color: rgba(240,240,240,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .image-logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            max-height: 500px;
+            max-width: 500px;
+            display: block;
+        }
+
+    .placeholder {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+    }
+
+</style>

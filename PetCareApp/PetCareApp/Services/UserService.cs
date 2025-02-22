@@ -122,6 +122,7 @@ namespace PetCareApp.Services
                 res.Id = master.Id;
                 res.FirstName = master.FirstName;
                 res.LastName = master.LastName;
+                res.Photo = master.Photo;
                 res.Schedules = _mapper.Map<List<ScheduleDto>>(master.Schedules);
                 res.Contacts = ContactsMapping.MapContact(master.Contacts);
                 res.Portfolios = _mapper.Map<List<PortfolioDto>>(master.Portfolios);

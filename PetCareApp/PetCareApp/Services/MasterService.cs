@@ -811,6 +811,7 @@ namespace PetCareApp.Services
                         res.FirstName = user.FirstName;
                         res.LastName = user.LastName;
                         res.Email = user.Email != null ? user.Email : "";
+                        res.Photo = user.Photo;
                     }
                 }
             }
@@ -830,6 +831,7 @@ namespace PetCareApp.Services
                 {
                     user.FirstName = !String.IsNullOrEmpty(masterData.FirstName) ? masterData.FirstName : user.FirstName;
                     user.LastName = !String.IsNullOrEmpty(masterData.LastName) ? masterData.LastName : user.LastName;
+                    user.Photo = masterData.Photo;
                     _dbContext.Update(user);
                     var contacts = ContactsMapping.MapFromDto(masterData.Contacts);
                     

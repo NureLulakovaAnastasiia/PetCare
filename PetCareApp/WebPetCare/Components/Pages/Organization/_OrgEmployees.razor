@@ -5,22 +5,37 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 justify-content-center">
+        <div class="form-custom-border p-3 justify-content-center">
             <div class="row text-center">
-                <h3 class="col-8 offset-2"><b>Employees</b></h3>
+                <h2 class="col-8 offset-2"><b>Employees</b></h2>
                 <hr />
             </div>
             @if (employees != null && employees.Count > 0)
             {
-                <div class="d-flex flex-row ">
+                <div class="d-flex justify-content-around">
                     @foreach (var employee in employees)
                     {
-                        <div class="card m-3 p-3">
-                            <div class="">
-                                <h4 class=""><a href="/master/@employee.masterId"><b>@employee.Name</b></a></h4>
+                        <div class="card m-3 p-3 col-3">
+                            <div class="card-img">
+                                <div class="image-card-container">
+                                    @if (employee.Photo != null && employee.Photo.Length > 0)
+                                    {
+                                        var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(employee.Photo)}";
+                                        <img class="fixed-image" src="@base64Image" alt="Pets Image" style="display:block;">
+
+
+                                    }
+                                    else
+                                    {
+                                        <div class="">
+                                            <p>No image available</p>
+                                        </div>
+                                    }
+                                </div>
+                                <h4 class="mt-2"><a href="/master/@employee.masterId"><b>@employee.Name</b></a></h4>
                             </div>
                             <hr class="mt-0 pt-0 text-center" />
-                            <div class="text-center">
+                            <div class="card-body text-center">
                                 <p>Acceptance Date: @(employee.AcceptanceDate.ToString("g") ?? "")</p>
                                 @if(employee.DismissalDate != null)
                                 {
@@ -28,7 +43,7 @@
                                 }
                                 else
                                 {
-                                    <button class="btn btn-func-danger pe-2 ps-2" 
+                                    <button class="btn btn-danger p-2" 
                                             @onclick="() => Dismiss(employee.Id)">
                                         Dismiss
                                     </button>
@@ -104,3 +119,32 @@
     }
 
 }
+
+<style>
+    .image-card-container {
+        width: 100%;
+        height: 280px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        background-color: #f3f3f3;
+    }
+
+    .fixed-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .placeholder {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+       
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+</style>

@@ -16,7 +16,7 @@
 @if(isOrganization && employeesList != null)
 {
     <div class="mb-3 col-5 offset-4">
-        <SfDropDownList ID="dropdown"  TValue="string" TItem="ShortEmployeeDto" Placeholder="Select a master" DataSource="@employeesList" @bind-Value="@selectedMaster.Id">
+        <SfDropDownList ID="dropdown" TValue="string" TItem="ShortEmployeeDto" Placeholder="Select a master" DataSource="@employeesList" @bind-Value="@selectedMaster.Id" >
         <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
             <DropDownListEvents TValue="string" TItem="ShortEmployeeDto" ValueChange="ChangeMaster"></DropDownListEvents>
     </SfDropDownList>
@@ -38,8 +38,8 @@
                         <tr >
                             <td colspan="2" class="text-center">
                                 <SfButtonGroup Mode="Syncfusion.Blazor.SplitButtons.SelectionMode.Single">
-                                    <ButtonGroupButton @bind-Selected="@isRecord">Record</ButtonGroupButton>
-                                    <ButtonGroupButton @bind-Selected="@isBreak">Break</ButtonGroupButton>
+                                    <ButtonGroupButton @bind-Selected="@isRecord" >Record</ButtonGroupButton>
+                                    <ButtonGroupButton @bind-Selected="@isBreak" >Break</ButtonGroupButton>
                                 </SfButtonGroup>
                               </td>
                         </tr>
@@ -783,7 +783,42 @@
         box-shadow: 1px 1px 5px #dc3545;
         border: 1px solid #dc3545 !important;
     }
-    
+
+
+    .e-btn-group input:checked + label.e-btn{
+        color: rgb(255, 255, 255);
+        outline-offset: 0px;
+        background: #023c57;
+        border-color: #023c57;
+        outline: #023c57 solid 0px;
+    }
+
+    .e-btn {
+        color: #fff;
+        background: rgb(var(--bs-secondary-rgb));
+        border-color: rgb(var(--bs-secondary-rgb));
+        transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .e-btn:hover {
+        color: #fff;
+            background: rgb(1, 77, 112);
+            border-color: rgb(1, 77, 112);
+        transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .e-footer-content .e-btn.e-primary.e-flat:not([disabled]) {
+        color: rgb(255, 255, 255);
+        background: rgb(var(--bs-primary-rgb));
+        border-color: rgb(var(--bs-primary-rgb));
+    }
+
+    .e-footer-content .e-btn.e-primary.e-flat:not([disabled]):hover {
+        color: rgb(255, 255, 255);
+        background: rgb(3, 150, 113);
+        border-color: rgb(3, 150, 113);
+    }
+
     .custom-event-editor td{
         padding: 7px;
         padding-right: 16px;
@@ -874,4 +909,26 @@
         color: #fff;
     }
 
+    .e-ddl.e-input-group.e-control-wrapper .e-input {
+        font-size: 15px;
+        font-family: var(--bs-font-sans-serif);
+        color: var(--bs-secondary);
+        box-shadow: none;
+    }
+
+    .e-dropdownbase .e-list-item, .e-dropdownbase .e-list-item.e-item-focus {
+        color: var(--bs-secondary);
+        font-family: var(--bs-font-sans-serif);
+        min-height: 29px;
+    }
+
+        .e-dropdownbase .e-list-item.e-item-focus, .e-dropdownbase .e-list-item.e-active, .e-dropdownbase .e-list-item.e-active.e-hover, .e-dropdownbase .e-list-item.e-hover {
+            color: #023c57;
+            background-color: rgba(var(--bs-secondary-rgb), 0.1);
+        }
+
+    .e-outline.e-input-group.e-input-focus:hover:not(.e-success):not(.e-warning):not(.e-error):not(.e-disabled):not(.e-float-icon-left), .e-outline.e-input-group.e-input-focus.e-control-wrapper:hover:not(.e-success):not(.e-warning):not(.e-error):not(.e-disabled):not(.e-float-icon-left), .e-outline.e-input-group.e-input-focus:not(.e-success):not(.e-warning):not(.e-error):not(.e-disabled), .e-outline.e-input-group.e-control-wrapper.e-input-focus:not(.e-success):not(.e-warning):not(.e-error):not(.e-disabled) {
+        border-color: var(--bs-secondary);
+        box-shadow: inset 1px 1px var(--bs-secondary), inset -1px 0 var(--bs-secondary), inset 0 -1px var(--bs-secondary);
+    }
 </style>

@@ -2,16 +2,15 @@
 @inject IUserService _userService
 @inject IJSRuntime _JSRuntime
 
-
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 ">
+        <div class="form-custom-border p-3 ">
             @if (!IsEdit)
             {
                 <div class="row text-center">
                     <h3 class="col-7 offset-2"><b>My portfolio</b></h3>
-                    <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
-                    <button class="btn col-2 btn-func ms-2" @onclick="OpenModal"><i class="bi bi-plus"></i>   Add</button>
+                    <button class="btn col-2 btn-func btn-warning" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    <button class="btn col-2 btn-func btn-func-primary ms-2" @onclick="OpenModal"><i class="bi bi-plus-circle"></i>   Add</button>
                 </div>
             }
             <form method="post" @onsubmit="UpdatePortfolio">
@@ -19,8 +18,8 @@
                 {
                     <div class="row text-center">
                         <h3 class="col-7 offset-2"><b>My portfolio</b></h3>
-                        <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
-                        <button type="submit" class="btn col-2 btn-func-success">Save</button>
+                        <button type="button" class="btn col-2 btn-func mx-1 btn-danger" @onclick="CancelEdit">Cancel</button>
+                        <button type="submit" class="btn col-2 btn-func btn-success">Save</button>
                     </div>
                 }
 
@@ -34,11 +33,11 @@
                             {
                                 <div class="col-md-3 mb-4">
                                     <div class="card">
-                                       
+                                        <div class="image-row-container">
                                             @if (portfolio.Photo != null && portfolio.Photo.Length > 0)
                                             {
                                                 var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(portfolio.Photo)}";
-                                                <img src="@base64Image" class="card-img-top" alt="Portfolio Image" />
+                                                <img src="@base64Image" class="card-img-top fixed-image" alt="Portfolio Image" />
                                             }
                                             else
                                             {
@@ -46,11 +45,13 @@
                                                     <p>No image available</p>
                                                 </div>
                                             }
-                                            <div class="card-body">
+                                        </div>
+                                        <div class="card-body">
                                             <InputTextArea @bind-Value="portfolio.Text" placeholder="@portfolio.Text"
                                                            class="input-textarea-style p-2 m-0 col-12" disabled="@(!IsEdit)" @oninput="() => AddToUpdated(portfolio.Id)" />
-                                            @if(IsEdit){
-                                                <button class="btn btn-danger" @onclick="()=>DeletePortfolio(portfolio.Id)"><i class="bi bi-trash"></i></button>
+                                            @if (IsEdit)
+                                            {
+                                                <button class="btn btn-danger p-2" @onclick="()=>DeletePortfolio(portfolio.Id)"><i class="bi bi-trash"></i></button>
                                             }
                                         </div>
                                     </div>
@@ -58,6 +59,7 @@
                             }
                         </div>
                     </div>
+
                 }
                 else
                 {
@@ -80,20 +82,29 @@
                                 <label for="description" class="p-2">Description</label>
                                 <textarea id="description" @bind="Description" class="form-control"></textarea>
                             </div>
-                            <div class="col-6 p-2 text-center">
-                                <label for="photo" class="d-block pb-2 pt-2">Photo</label>
-                                
-                                @if (UploadedImage != null)
-                                {
-                                    <img src="@UploadedImage" class="pb-2" alt="Preview image" style="max-width: 200px;" />
-                                }
+                            <div class="col-6 p-2 pt-0 text-center justify-content-start mb-4 pe-4">
+                                <label for="photo" class="d-block p-2 pt-3">Photo</label>
+                                <label class="image-upload pb-4 " >
+                                    <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
+                                    <div class="image-container">
+                                        @if (!string.IsNullOrEmpty(UploadedImage))
+                                        {
+                                            <img src="@UploadedImage" alt="Preview Image" style="display: block;">
 
-                                <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
+                                        }
+                                        else
+                                        {
+                                            <div class="placeholder">
+                                                <span class="plus"><i class="bi bi-plus-square-dotted"></i></span>
+                                            </div>
+                                        }
+                                    </div>
+                                </label>
                             </div>
                         </div>
                         <div class="mt-3">
-                            <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CloseModal">Cancel</button>
-                            <button type="submit" class="btn col-2 btn-func-success" @onclick="AddPortfolio">Save</button>
+                            <button type="button" class="btn col-2 btn-func mx-1 btn-danger p-2" @onclick="CloseModal">Cancel</button>
+                            <button type="submit" class="btn col-2 btn-func btn-success p-2" @onclick="AddPortfolio">Save</button>
                         </div>
                     </div>
                 </div>
@@ -325,5 +336,81 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+    .image-upload {
+        display: block;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        max-height: 550px;
+        max-width: 550px;
+        
+    }
+
+        .image-upload input {
+            display: none;
+        }
+
+
+
+    .image-container {
+        min-height: 270px;
+        width: 100%;
+        height: 100%;
+        background: #ddd;
+        z-index: 1500;
+        border-radius: 12px;
+        background-color: rgba(240,240,240,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+    .placeholder {
+        position: absolute;
+        display: flex;
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    .plus {
+        font-size: 40px;
+        
+        font-weight: bold;
+        color: #777;
+    }
+
+
+    .image-row-container {
+        width: 100%; 
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; 
+        background-color: #f3f3f3;
+    }
+
+    .fixed-image {
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+    }
+
+
 
 </style>

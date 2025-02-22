@@ -5,13 +5,13 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 ">
+        <div class="form-custom-border p-3 ">
             @if (!IsEdit && isEditable)
             {
                 <div class="row text-center">
                     <h3 class="col-7 offset-2"><b>My portfolio</b></h3>
-                    <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
-                    <button class="btn col-2 btn-func ms-2" @onclick="OpenModal"><i class="bi bi-plus"></i>   Add</button>
+                    <button class="btn col-2 btn-func btn-warning" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    <button class="btn col-2 btn-func btn-func-primary ms-2" @onclick="OpenModal"><i class="bi bi-plus-circle"></i>   Add</button>
                 </div>
             }
 
@@ -19,8 +19,8 @@
             @if (IsEdit && isEditable)
             {
                 <div class="row text-center">
-                    <h3 class="col-7 offset-2"><b>My portfolio</b></h3>
-                    <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Finish</button>
+                    <h3 class="col-8 offset-2"><b>My portfolio</b></h3>
+                    <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">Finish</button>
                 </div>
                 <hr />
             }
@@ -37,24 +37,26 @@
                         {
                             <div class="col-md-3 mb-4">
                                 <div class="card">
-
-                                    @if (portfolioDto.Photo != null && portfolioDto.Photo.Length > 0)
-                                    {
-                                        var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(portfolioDto.Photo)}";
-                                        <img src="@base64Image" class="card-img-top" alt="Portfolio Image" />
-                                    }
-                                    else
-                                    {
-                                        <div class="card-body text-center">
-                                            <p>No image available</p>
-                                        </div>
-                                    }
+                                    <div class="image-row-container">
+                                        @if (portfolioDto.Photo != null && portfolioDto.Photo.Length > 0)
+                                        {
+                                            var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(portfolioDto.Photo)}";
+                                            <img src="@base64Image" class="card-img-top fixed-image" alt="Portfolio Image" />
+                                        }
+                                        else
+                                        {
+                                            <div class="card-body text-center">
+                                                <p>No image available</p>
+                                            </div>
+                                        }
+                                    </div>
+                                    
                                     <div class="card-body">
-                                        <h3>@portfolioDto.masterName</h3>
+                                        <h4 class="text-primary">@portfolioDto.masterName</h4>
                                         <h5>@portfolioDto.Text</h5>
                                         @if (IsEdit)
                                         {
-                                            <button class="btn btn-func-danger" @onclick="()=>DeletePortfolio(portfolioDto.Id)"><i class="bi bi-trash"></i></button>
+                                            <button class="btn btn-danger p-2" @onclick="()=>DeletePortfolio(portfolioDto.Id)"><i class="bi bi-trash"></i></button>
                                         }
                                     </div>
                                 </div>
@@ -64,7 +66,7 @@
                 </div>
             </div>
 
-            <SfDialog ShowCloseIcon="true" IsModal="true" Width="800px" @bind-Visible="@IsModalOpen">
+            <SfDialog ShowCloseIcon="true" IsModal="true" Width="800px" Height="800px" @bind-Visible="@IsModalOpen">
                 <DialogTemplates>
                     <Header>
                         <div class="text-center">
@@ -72,29 +74,31 @@
                         </div>
                     </Header>
                     <Content>
-                        <div class="row text-center">
+                        <div class="row text-center justify-content-around">
                             @foreach (var masterPortfolio in mastersPortfolios)
                             {
-                                <div class="col-md-3 mb-4">
+                                <div class=" col-5  mb-4">
                                     <div class="row">
                                         <div class="col-1 me-1">
                                             <SfCheckBox @bind-Checked="@masterPortfolio.IsChecked" Label="Choose"></SfCheckBox>
 
                                         </div>
                                         <div class="card col-10">
-                                            @if (masterPortfolio.Photo != null && masterPortfolio.Photo.Length > 0)
-                                            {
-                                                var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(masterPortfolio.Photo)}";
-                                                <img src="@base64Image" class="card-img-top" alt="Portfolio Image" />
-                                            }
-                                            else
-                                            {
-                                                <div class="card-body text-center">
-                                                    <p>No image available</p>
-                                                </div>
-                                            }
+                                            <div class="image-row-container">
+                                                @if (masterPortfolio.Photo != null && masterPortfolio.Photo.Length > 0)
+                                                {
+                                                    var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(masterPortfolio.Photo)}";
+                                                    <img src="@base64Image" class="card-img-top fixed-image" alt="Portfolio Image" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="card-body text-center">
+                                                        <p>No image available</p>
+                                                    </div>
+                                                }
+                                            </div>
                                             <div class="card-body">
-                                                <h5>@masterPortfolio.masterName</h5>
+                                                <h5 class="text-primary">@masterPortfolio.masterName</h5>
                                                 <p>@masterPortfolio.Text</p>
                                             </div>
                                         </div>
@@ -234,3 +238,23 @@
         }
     }
 }
+
+<style>
+    .e-footer-content .e-btn.e-primary.e-flat:not([DISABLED]) {
+        background: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: #fff;
+    }
+
+    .e-footer-content .e-btn:hover.e-primary.e-flat:not([DISABLED]) {
+        background: var(--bs-primary-hover) !important;
+        border-color: var(--bs-primary-hover) !important;
+        color: #fff;
+    }
+
+    .e-dlg-header * {
+        color: var(--bs-secondary);
+        font-size: 30px;
+        font-weight: 500;
+    }
+</style>

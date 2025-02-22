@@ -4,19 +4,19 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 mt-3">
-            <div class="row text-end">
-                <div class="col-7 ">
-                    <h3>Schedule</h3>
+        <div class="form-custom-border  p-3 mt-3">
+            <div class="row text-center justify-content-around">
+                <div class="offset-3 col-4">
+                    <h2><strong>Schedule</strong></h2>
                 </div>
                 @if (isEditable)
                 {
-                    <div class="col-3">
-                        <button class="btn btn-func p-2" @onclick="AddSchedule">+  Add</button>
+                    <div class="col-2">
+                        <button class="btn btn-primary p-2" @onclick="AddSchedule"><i class="bi bi-plus-circle"></i>  Add</button>
                     </div>
                 }
             </div>
-            <div class="m-3 row">
+            <div class="m-3 row align-content-center">
                 <table class="table col-10">
                     <thead>
                         <tr>
@@ -33,15 +33,15 @@
                         @foreach (var time in schedule)
                         {
                             var dayOrDate = time.DayOfWeek != null ? Enum.GetName(typeof(DayOfWeek), time.DayOfWeek) : time.Date?.ToString("d");
-                            <tr>
-                                <td><h4>@dayOrDate</h4></td>
-                                <td><h4>@time.StartTime</h4></td>
-                                <td><h4>@time.EndTime</h4></td>
+                            <tr >
+                                <td class="align-content-center"><h4>@dayOrDate</h4></td>
+                                <td class="align-content-center"><h4 class="green-blue-text">@time.StartTime</h4></td>
+                                <td class="align-content-center"><h4 class="green-blue-text">@time.EndTime</h4></td>
                                 @if (isEditable)
                                 {
                                     <td>
-                                        <button class="btn btn-func" @onclick="() => EditSchedule(time.Id)">Edit</button>
-                                        <button class="btn btn-func-danger" @onclick="() => DeleteSchedule(time.Id)">Delete</button>
+                                        <button class="btn btn-warning p-2" @onclick="() => EditSchedule(time.Id)"><i class="bi bi-pencil-fill"></i></button>
+                                        <button class="btn btn-danger p-2" @onclick="() => DeleteSchedule(time.Id)"><i class="bi bi-trash"></i></button>
                                     </td>
                                 }
                             </tr>

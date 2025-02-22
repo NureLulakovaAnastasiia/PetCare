@@ -6,48 +6,57 @@
 
 <div class="d-flex justify-content-center mt-2">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 align-content-center">
+        <div class="form-custom-border p-3 align-content-center">
             <div class="row col-10 offset-1">
-                <h2>Reviews</h2>
+                <h2><strong>Reviews</strong></h2>
                 @foreach (var item in reviews)
                 {
                     var image = item.Photo != null ? $"data:image/png;base64,{Convert.ToBase64String(item.Photo)}" : null;
 
                     <div class="main-review p-2 m-1 text-start ">
-                        <div class="row align-items-center">
+                        <div class="ms-4 row align-items-center">
                             <h4 class="col-3">@item.AppUserName</h4>
 
-                            <SfRating Value=item.Rate Disabled="true" CssClass="col-2 text-start">
+                            <SfRating Value=item.Rate Disabled="true" CssClass="col-4 text-start">
                                 <FullTemplate>
-                                    <img src=@fullTemplateImage widht="14" height="14" />
+                                    <img src=@fullTemplateImage widht="25" height="25" />
                                 </FullTemplate>
                                 <EmptyTemplate>
-                                    <img src=@emptyTemplateImage widht="14" height="14" />
+                                    <img src=@emptyTemplateImage widht="25" height="25" />
                                 </EmptyTemplate>
                                 <LabelTemplate>@context+</LabelTemplate>
                             </SfRating>
+
+                            <div class="col-4 text-end">
+                                @if (item.isYours)
+                                {
+                                    <button class="btn-danger p-2" style="font-size: 1rem;" @onclick="() => DeleteReview(item.Id)">Delete</button>
+
+                                }
+                                @if ((item.Comments == null || item.Comments.Count == 0) && isOwner)
+                                {
+                                    <button class="btn btn-success p-2" style="font-size: 1rem;" @onclick="() => AddComment(item.Id)">Add comment</button>
+                                }
+                             </div>
                         </div>
                         @if (!String.IsNullOrEmpty(item.ServiceName))
                         {
-                            <p>For service: @item.ServiceName</p>
+                            <h6 class="ms-4 green-blue-text">For service: @item.ServiceName</h6>
                         }
-                        <p>@item.Text</p>
-                        @if (image != null)
-                        {
-                            <img src="@image" class="pb-2" alt="Answer image" style="max-width: 200px;" />
-                        }
-                        @if (item.isYours)
-                        {
-                            <button class="btn-func-danger" @onclick="() => DeleteReview(item.Id)">Delete</button>
+                        <hr />
 
-                        }
-                        @if ((item.Comments == null || item.Comments.Count == 0) && isOwner)
-                        {
-                            <div class="col-4">
-                                <button class="btn btn-success" @onclick="() => AddComment(item.Id)">Add comment</button>
-
+                        <div class="row ms-3">
+                            <div class="@(image != null ? "col-7" : "") ">
+                                <p>@item.Text</p>
                             </div>
-                        }
+                            @if (image != null)
+                            {
+                                <img src="@image" class="pb-2 col-4" alt="Answer image" style="max-width: 200px;" />
+                            }
+                         </div>
+                        
+                        
+                        
                     </div>
                     @if (item.Comments != null && item.Comments.Count > 0)
                     {
@@ -55,15 +64,21 @@
                             <div class="offset-2">
                                 @foreach (var comment in item.Comments)
                                 {
-                                    <div class="col-8 review-comment p-2 m-2">
-                                        <h4 class="">@comment.AppUserName</h4>
-                                        <p>@comment.Text</p>
-                                    
-                                    @if(comment.isYours){
-                                    <div class="col-2">
-                                            <button class="btn-func-danger" @onclick="() => DeleteComment(comment.Id)">Delete</button>
+                                    <div class="col-8 review-comment p-3 m-2">
+                                        <div class="row align-items-center">
+                                            <h4 class="col-9 ms-3">@comment.AppUserName</h4>
+                                            
+                                            @if (comment.isYours)
+                                            {
+                                                <div class="col-2 text-end">
+                                                    <button class="btn btn-danger p-2" @onclick="() => DeleteComment(comment.Id)"><i class="bi bi-trash"></i></button>
+                                                </div>
+                                            }
                                         </div>
-                                    }
+                                        <hr />
+                                        <p class="ms-3">@comment.Text</p>
+                                    
+                                    
                                     </div>
                                 }
                             </div>
@@ -71,13 +86,13 @@
                     }
                     
                 }
-                <SfDialog Width="250px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@isCommenting">
+                <SfDialog Width="350px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@isCommenting">
                     <DialogTemplates>
                         <Header> Add Comment </Header>
                         <Content> 
                             <div>
-                                <h4>Please, write your comment:</h4>
-                                <InputText @bind-Value="commentDto.Text"></InputText>
+                                <h5>Please, write your comment:</h5>
+                                <InputTextArea class="input-textarea-style" style="min-width: 100%" @bind-Value="commentDto.Text"></InputTextArea>
                             </div>
 
                         </Content>

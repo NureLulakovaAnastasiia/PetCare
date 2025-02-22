@@ -5,25 +5,25 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 justify-content-center">
+        <div class="form-custom-border p-3 justify-content-center">
             <div class="row text-center">
                 <h3 class="col-8 offset-2"><b>Requests</b></h3>
                 <hr />
             </div>
             @if (requests != null && requests.Count > 0)
             {
-                <div class="align-items-center justify-content-center">
+                <div class="row align-items-center justify-content-center">
                     @foreach (var request in requests)
                     {
-                        <div class="row col-10 offset-1 form-custom-border p-3 ">
-                            <div class="col-8 text-start offset-1">
+                        <div class="row col-10 form-custom-border p-3 m-3 main-review">
+                            <div class="col-8 text-start offset-1 green-blue-text">
                                 <h4>Request №@request.Id</h4>
                                 @if (role == "Organization")
                                 {
-                                    <NavLink @onclick="() => GoToMasterPage(request.AppUserId)" class="nav-link ">From: @request.UserName</NavLink>
+                                    <NavLink @onclick="() => GoToMasterPage(request.AppUserId)" class="nav-link nav-link-underline">From: <strong>@request.UserName</strong></NavLink>
                                 }
                                 else{
-                                    <NavLink @onclick="() => GoToOrgPage(request.OrganizationId)" class="nav-link ">Organization: @request.OrganizationName</NavLink>
+                                    <NavLink @onclick="() => GoToOrgPage(request.OrganizationId)" class="nav-link nav-link-underline">Organization: <strong>@request.OrganizationName</strong></NavLink>
                                 }
                                 <p>Date: @request.Date.ToString("F")</p>
 
@@ -31,8 +31,8 @@
                             <div class="col-3 align-items-center">
                                 @if (request.Status == "New" && role == "Organization")
                                 {
-                                    <button class="btn btn-func-success col-12 mb-1" @onclick="() => AcceptRequest(request.Id)">Accept</button>
-                                    <button class="btn btn-func-danger col-12" @onclick="() => RejectRequest(request.Id)">Reject</button>
+                                    <button class="btn  btn-success col-9 mb-1 p-2" @onclick="() => AcceptRequest(request.Id)">Accept</button>
+                                    <button class="btn  btn-danger col-9 p-2" @onclick="() => RejectRequest(request.Id)">Reject</button>
                                 }
                                 else
                                 {
@@ -138,11 +138,11 @@
         switch (status)
         {
             case "Accepted":
-                return "green";
+                return "var(--bs-primary)";
             case "Rejected":
-                return "red";
+                return "var(--bs-danger)";
             default:
-                return "blue";
+                return "var(--bs-info)";
         }
 
     }

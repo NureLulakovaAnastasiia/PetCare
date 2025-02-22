@@ -27,18 +27,24 @@
                 <div class="text-start">
                     @if (masterData != null)
                     {
-                        var base64Image = ""; 
-                        @* $"data:image/jpeg;base64,{Convert.ToBase64String(masterData.LastName)}"; *@
+                        if (String.IsNullOrEmpty(UploadedImage))
+                        {
+                            UploadedImage = $"data:image/jpeg;base64,{Convert.ToBase64String(masterData.Photo ?? [])}";
+
+                        }
                         <div class="row col-lg-12 m-3">
                             <div class="col-3 text-center">
                                 <h4>Profile photo</h4>
                                 <label class="image-upload pb-4">
-                                    <input type="file" accept="image/*" onchange="previewImage(event)">
+                                    <InputFile accept="image/*" OnChange="@HandleFileSelected" disabled="@(!IsEdit)" />
                                     <div class="image-container">
-                                        <img id="preview" src="" alt="Upload Image">
-                                        <div class="placeholder">
-                                            <span class="plus"><i class="bi bi-plus-square-dotted"></i></span>
-                                        </div>
+                                        <img id="profile image" src="@UploadedImage" alt="No image available">
+                                        @if (IsEdit)
+                                        {
+                                            <div class="placeholder">
+                                                <span class="plus"><i class="bi bi-plus-square-dotted"></i></span>
+                                            </div>
+                                        }
                                     </div>
                                 </label>
 
@@ -130,10 +136,23 @@
     private GetGeneralMasterDto initialMasterData { get; set; } = new GetGeneralMasterDto();
     public bool IsEdit = false;
     private bool IsModalOpen = false;
+    private IBrowserFile SelectedFile;
+    private string? UploadedImage;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        SelectedFile = e.File;
+
+        using var stream = new MemoryStream();
+        await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+        UploadedImage = $"data:{SelectedFile.ContentType};base64,{Convert.ToBase64String(stream.ToArray())}";
+        StateHasChanged();
+    }
 
     private void OnButtonClick()
     {
         IsEdit = !IsEdit;
+        UploadedImage = $"data:image/jpeg;base64,{Convert.ToBase64String(masterData.Photo ?? [])}";
         FillInitialData();
     }
 
@@ -143,11 +162,19 @@
         masterData.FirstName = initialMasterData.FirstName;
         masterData.LastName = initialMasterData.LastName;
         masterData.Contacts = initialMasterData.Contacts;
+        masterData.Photo = initialMasterData.Photo;
         OnButtonClick();
     }
 
     private async void UpdateMasterData()
     {
+        if (SelectedFile != null)
+        {
+            using var stream = new MemoryStream();
+            await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+
+            masterData.Photo = stream.ToArray();
+        }
         var res = await userService.UpdateGeneralMasterData(masterData);
         if (String.IsNullOrEmpty(res))
         {
@@ -195,15 +222,15 @@
     }
 
         .image-upload input {
-            display: none; /* Hide file input */
+            display: none;
         }
 
     .image-container {
-        width: 100%; 
-        height: 100%;
-        
+        width: 100%;
+        height: 330px;
         background: #ddd;
         border-radius: 12px;
+        background-color: rgba(240,240,240,0.4);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -215,7 +242,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: none; 
+            display: block; 
         }
 
     .placeholder {

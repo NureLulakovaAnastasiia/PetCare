@@ -256,6 +256,10 @@ namespace PetCareApp.Services
                         {
                             organization.Description = info.Description;
                         }
+                        if (info.Photo != null)
+                        {
+                            organization.Photo = info.Photo;
+                        }
 
                         _dbContext.Organizations.Update(organization);
                         return _dbContext.SaveChanges().ToString();
@@ -266,6 +270,7 @@ namespace PetCareApp.Services
                             AppUserId = user.Id,
                             Name = info.Name,
                             Description = info.Description,
+                            Photo = info.Photo,
                             Id = 0
                         };
                         _dbContext.Organizations.Add(organization);
@@ -299,6 +304,7 @@ namespace PetCareApp.Services
                             Id = organization.Id,
                             Name = organization.Name,
                             AppUserId = organization.AppUserId,
+                            Photo = organization.Photo,
                             Description = organization.Description
                         };
                     }
@@ -338,6 +344,7 @@ namespace PetCareApp.Services
                         Id = organization.Id,
                         Name = organization.Name,
                         AppUserId = organization.AppUserId,
+                        Photo = organization.Photo,
                         Description = organization.Description
                     };
                     if (organization.AppUser != null)
