@@ -5,13 +5,13 @@
         <div class="form-custom-border bg-body-secondary p-3">
             @if (data != null && slots.Count > 0)
             {
-                <h4>Estimated time: @data.Time min</h4>
+                <h4 class="text-primary">Estimated time: @data.Time min</h4>
                 <hr />
                 <h4>Choose needed slot</h4>
                 @foreach (var key in slots)
                 {
-                    <div>
-                        <h4>@key.Key.ToString("dddd, dd MMMM yyyy")</h4>
+                    <div class="mt-3">
+                        <h4 class="green-blue-text">@key.Key.ToString("dddd, dd MMMM yyyy")</h4>
                         <div class="row">
                             <div class="d-flex flex-wrap m-2 justify-content-center">
                                 @foreach (var item in key.Value)
@@ -27,7 +27,7 @@
                     </div>
                 }
                 <div>
-                    <button class="btn btn-success" @onclick="SubmitSlot">Submit</button>
+                    <button class="btn btn-func btn-success p-3 mt-3" @onclick="SubmitSlot">Submit</button>
                 </div>
             }
             else

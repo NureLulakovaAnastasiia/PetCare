@@ -3494,7 +3494,6 @@ textarea.form-control-lg {
     }
 
 .btn-info {
-    --bs-btn-font-size: 1.1rem;
     --bs-btn-color: #fff;
     --bs-btn-bg: var(--bs-info);
     --bs-btn-border-color: var(--bs-info);

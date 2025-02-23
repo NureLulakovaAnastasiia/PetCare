@@ -1,31 +1,68 @@
 ﻿@page "/master/{masterId}"
 @using WebPetCare.IServices
 @using WebPetCare.Components.Pages.Account
+@using LabelPosition = Syncfusion.Blazor.Inputs.LabelPosition
 @inject IUserService userService
 @inject NavigationManager Navigation
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 mb-5">
+        <div class="form-custom-border p-3 mb-5">
             @if (!String.IsNullOrEmpty(masterData.Id))
             {
-                <div>
-                    <h2>@masterData.FirstName   @masterData.LastName</h2>
-                </div>
-                @if (masterData.OrgId != null)
-                {
-                    <div>
-                        <h3>Organization: <NavLink @onclick="GoToOrgPage" class="nav-link">@masterData.OrgName</NavLink></h3>
-                    </div>
-                }
                 <div class="row">
-                    <div class="col-7">
-                        <label>Address</label>
-                        <h4>@masterData.Contacts.Address</h4>
+                    <div class="col-lg-4 ms-4">
+                        <div>
+                        @if (masterData.Photo != null && masterData.Photo.Length > 0)
+                        {
+                            var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(masterData.Photo)}";
+                            <img src="@base64Image" class="fixed-image" alt="Master Image" />
+                        }
+                        else
+                        {
+                            <div class="card-body text-center">
+                                <p>No image available</p>
+                            </div>
+                        }
+                        </div>
+                        <div class="row align-items-center">
+                            <div>
+                                <SfRating CssClass="col-10" @bind-Value=@masterData.Rate ShowLabel=true ShowTooltip="false" LabelPosition="LabelPosition.Left" Disabled="true">
+                                    <FullTemplate>
+                                        <img src=@fullTemplateImage style="max-width:30px; max-height:30px;" />
+                                    </FullTemplate>
+                                    <EmptyTemplate>
+                                        <img src=@emptyTemplateImage style="max-width:30px; max-height:30px;" />
+                                    </EmptyTemplate>
+                                    <LabelTemplate ><strong>Rate:</strong> @context+</LabelTemplate>
+                                </SfRating>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-5">
-                        <label>Phone</label>
-                        <h4>@masterData.Contacts.Phone</h4>
+
+                    <div class="col-7">
+                        <div class="mb-3">
+                            <h2>@masterData.LastName   @masterData.FirstName</h2>
+                            <hr/>
+
+                        </div>
+                        @if (masterData.OrgId != null)
+                        {
+                            <div class="col-8 offset-2">
+                                <label class="">Organization </label>
+                                <h4 class="green-blue-text"><NavLink @onclick="GoToOrgPage" class=" nav-link nav-link-underline ">@masterData.OrgName</NavLink></h4>
+                            </div>
+                        }
+                        
+                            <div class="col-8 offset-2">
+                                <label>Address</label>
+                            <h4 class="green-blue-text">@masterData.Contacts.Address</h4>
+                            </div>
+                            <div class="">
+                                <label>Phone</label>
+                            <h4 class="green-blue-text">@masterData.Contacts.Phone</h4>
+                            </div>
+                        
                     </div>
                 </div>
             }
@@ -69,6 +106,9 @@
     public string masterId { get; set; }
     public MasterDto masterData = new MasterDto();
     private MasterDataOptions options = MasterDataOptions.Services;
+    private string fullTemplateImage = "Images/star-fill.svg";
+    private string emptyTemplateImage = "Images/star.svg";
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -101,3 +141,17 @@
         Schedule, Map, Services, Reviews, Portfolio
     }
 }
+
+<style>
+    .e-rating-container .e-rating-label {
+        font-size: 20px;
+        line-height: 50px;
+        align-self: center;
+        margin-top: 10px;
+    }
+
+    .e-rating-container{
+        justify-content: center;
+        align-items: center;
+    }
+</style>

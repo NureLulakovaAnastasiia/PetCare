@@ -5,15 +5,15 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 ">
+        <div class="form-custom-border p-3 ">
             @if (serviceDto != null)
             {
                 @if (!IsEdit)
                 {
                     <div class="row text-center">
                         <h3 class="col-6 offset-3" ><b>Service Details</b></h3>
-                        <button class="btn col-2 me-3 btn-func-danger" @onclick="DeleteService"><i class="bi bi-trash"></i>    Delete</button>
-                        <button class="btn col-2 btn-func" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                        <button class="btn col-2 me-3 btn-func btn-danger" @onclick="DeleteService"><i class="bi bi-trash"></i>    Delete</button>
+                        <button class="btn col-2 btn-func btn-warning " @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
                     </div>
                 }
 
@@ -22,8 +22,8 @@
                 {
                     <div class="row text-center">
                             <h3 class="col-6 offset-3"><b>Service Details</b></h3>
-                        <button type="button" class="btn col-2 mx-1 btn-func-danger" @onclick="CancelEdit">Cancel</button>
-                        <button type="submit" class="btn col-2 btn-func-success">Save</button>
+                            <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">Cancel</button>
+                            <button type="submit" class="btn col-2 btn-func btn-success">Save</button>
                     </div>
                 }
 
@@ -31,7 +31,7 @@
 
                 <div class="text-start m-4 align-content-center">
                         <div class="row col-12 mb-2 ms-3">
-                            <div class="col-9">
+                            <div class="col-8">
                                     <div class="m-2 p-2">
                                         <h4>Name</h4>
                                         <InputText @bind-Value="serviceDto.Name"
@@ -63,9 +63,10 @@
                                     }
                                 </div>
                             </div>
-                            <div class="col-3 text-center p-3 mb-2">
-                                <buttton class="btn btn-func" @onclick="ChangeServiceVisibility"><i class="bi bi-eye@(serviceDto.IsHidden ? "" : "-slash")"></i>@(serviceDto.IsHidden ? " Show" : " Hide")</buttton>
-                                <buttton class="btn" @onclick="ToQuestionaryUpdate">Questionary</buttton>
+                            <div class="col-4 text-center p-3 mb-2">
+                                <buttton class="btn btn-info col-5 offset-1 m-3" @onclick="ToQuestionaryUpdate">Questionary</buttton>
+                                <buttton class="btn btn-secondary col-5 offset-1 m-3" @onclick="ChangeServiceVisibility"><i class="bi bi-eye@(serviceDto.IsHidden ? "" : "-slash")"></i>@(serviceDto.IsHidden ? " Show" : " Hide")</buttton>
+
                             </div>
                         </div>
 

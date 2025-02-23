@@ -2,28 +2,32 @@
 @inject IUserService _userService
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3">
+        <div class="form-custom-border p-3">
             @if (questionary != null && questionary.Count > 0)
             {
                 <form method="post" @onsubmit="SubmitAnswers">
                     <ol>
                         @foreach (var question in questionary)
                         {
-                            <li class="mb-3 text-start">
+                            <li class="mb-5 ms-5 text-start col-12">
                                 <div>
-                                    <h5 class="form-check-label">@question.Name</h5>
+                                    <h4 class="form-check-label">@question.Name</h4>
                                 </div>
-                                <div>
+                                <div class="d-flex align-items-top flex-wrap">
                                     @foreach(var answer in question.Answers)
                                     {
                                         var image = answer.Photo != null ? $"data:image/png;base64,{Convert.ToBase64String(answer.Photo)}" : null;
-                                        <div class="row m-1 align-items-center">
-                                            <input type="radio" class="col-1" name="@question.Name" value="@answer.IsSelected"
-                                            @onchange="() => UpdateSelection(question, answer)" />
-                                            <h6 class="col-5">@answer.Text</h6>
+                                        <div class="row m-3 col-4">
+                                            <div class="row">
+                                                <input type="radio" required class="col-1 mb-2" style="max-height:30px" name="@question.Name" value="@answer.IsSelected"
+                                                    @onchange="() => UpdateSelection(question, answer)" />
+                                                <h5 class="col-5 green-blue-text" >@answer.Text</h5>
+                                            </div>
                                             @if (image != null)
                                             {
-                                                <img src="@image" class="pb-2 col-4" alt="Answer image" style="max-width: 200px;" />
+                                                <div class=" image-row-container">
+                                                    <img src="@image" class="pb-2 col-4 fixed-image ms-0" alt="Answer image" style="max-width: 200px;" />
+                                                </div>
                                             }
                                         </div>
                                     }
@@ -31,7 +35,7 @@
                             </li>
                         }
                     </ol>
-                    <button type="submit" class="btn btn-success">Next</button>
+                    <button type="submit" class="btn btn-func btn-success p-2">Next <i class="bi bi-arrow-right-circle"></i></button>
                 </form>
             }
             else
@@ -133,4 +137,29 @@
                 IsTimeMinimum = answer.IsTimeMinimum
             };
     }
+
+    
 }
+
+<style>
+    ::marker {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .fixed-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-row-container {
+        width: 100%;
+        height: 200px;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        overflow: hidden;
+        background: none;
+    }
+</style>

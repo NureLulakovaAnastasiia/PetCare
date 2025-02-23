@@ -113,16 +113,21 @@ namespace PetCareApp.Services
                 .Include(u => u.Contacts)
                 .ThenInclude(c => c.Location)
                 .Include(u => u.Schedules)
+                .Include(u => u.Services)
+                .Include(u => u.Reviews)
                 .Include(u => u.Portfolios)
                 .Include(u => u.OrganizationEmployee)
                 .FirstOrDefault();
 
             if(master != null)
             {
+                var services = master.Services.Select(s => s.Id).ToList();
+                var reviews = services != null ? _dbContext.Reviews.Where(r => services.Contains(r.ServiceId ?? 0)).ToList() : null;
                 res.Id = master.Id;
                 res.FirstName = master.FirstName;
                 res.LastName = master.LastName;
                 res.Photo = master.Photo;
+                res.Rate = reviews != null && reviews.Count > 0 ? reviews.Average(u => u.Rate) : 0;
                 res.Schedules = _mapper.Map<List<ScheduleDto>>(master.Schedules);
                 res.Contacts = ContactsMapping.MapContact(master.Contacts);
                 res.Portfolios = _mapper.Map<List<PortfolioDto>>(master.Portfolios);
@@ -132,7 +137,7 @@ namespace PetCareApp.Services
                     var currentOrg = master.OrganizationEmployee.FirstOrDefault(e => e.DismissalDate == null);
                     if (currentOrg != null)
                     {
-                        var org = _dbContext.Organizations.FirstOrDefault(o => o.Id == currentOrg.Id);
+                        var org = _dbContext.Organizations.FirstOrDefault(o => o.Id == currentOrg.OrganizationId);
                         if (org != null)
                         {
                             res.OrgName = org.Name;

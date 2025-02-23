@@ -9,7 +9,7 @@ namespace PetCareApp.Dtos
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public byte[]? Photo { get; set; }
-
+        public double Rate { get; set; } = 0;
         public int? OrgId { get; set; }
         public string OrgName { get; set; } = string.Empty;
         public ContactsDto Contacts { get; set; } = new ContactsDto();

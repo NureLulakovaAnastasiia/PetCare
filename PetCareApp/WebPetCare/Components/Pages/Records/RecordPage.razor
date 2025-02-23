@@ -8,14 +8,14 @@
 <div class="container justify-content-center">
     <div class="offset-3 col-6 text-center">
         <h2>Record</h2>
-        <h4>For service: @serviceName</h4>
+        <h4 class="green-blue-text">For service: @serviceName</h4>
         @if (analisysDto != null && analisysDto.Description != null)
         {
             <div style="white-space: pre-line;">
                 <h5>@analisysDto.Description</h5>
             </div>
         }
-            <SfStepper ID="stepper" ActiveStep="@step" CssClass="custom-stepper mt-3">
+            <SfStepper ID="stepper" ActiveStep="@step" CssClass="mt-3">
                 <ChildContent>
                     <StepperSteps >
                         <StepperStep Disabled="true"></StepperStep>
@@ -36,14 +36,14 @@
             case 2:
                 <div class="d-flex justify-content-center">
                     <div class="col-lg-10 align-items-center text-center ">
-                        <div class="form-custom-border bg-body-secondary p-3">
+                        <div class="form-custom-border p-3">
                             <h3>Submit record</h3>
-                            <h4>Chosen time: @chosenSlot.Date.ToString("dddd, dd MMMM yyyy"), @chosenSlot.StartTime.ToString(@"hh\:mm") - @chosenSlot.EndTime.ToString(@"hh\:mm")</h4>
+                            <h4 class="green-blue-text">Chosen time: @chosenSlot.Date.ToString("dddd, dd MMMM yyyy"), @chosenSlot.StartTime.ToString(@"hh\:mm") - @chosenSlot.EndTime.ToString(@"hh\:mm")</h4>
                             <hr />
                             <div class=" d-flex flex-column align-items-center">
                                 <label>You can write comment to your record</label>
                                 <InputTextArea class="input-textarea-style col-8" @bind-Value="comment"></InputTextArea>
-                                <button class="btn btn-submit mt-4" @onclick="SubmitRecord">Submit</button>
+                                <button class="btn btn-primary btn-submit mt-4" @onclick="SubmitRecord">Submit</button>
                             </div>
                         </div>
                     </div>
@@ -137,7 +137,58 @@
 }
 
 <style>
-    
+    .e-stepper .e-stepper-steps .e-step-container {
+        background: var(--bs-tertiary);
+        
+    }
 
-   
+    e-step-container e-step-disabled{
+        color: var(--bs-primary) !important;
+        order: var(--bs-secondary) 1px solid !important;
+    }
+
+    .e-stepper .e-stepper-progressbar {
+        background-color: rgba(var(--bs-secondary-rgb), 0.3);
+        height:2px;
+    }
+
+    #stepper .e-step-completed  {
+        color: var(--bs-primary);
+    }
+
+    #stepper .e-step-inprogress {
+       
+    }
+
+    #stepper .e-step-notstarted{
+        color: #bdbdbd;
+    }
+
+    .e-stepper:not(.e-steps-focus) .e-step-selected .e-step {
+        background-color: var(--bs-secondary);
+    }
+
+    .e-stepper:not(.e-steps-focus) .e-step-selected .e-step {
+        box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--bs-secondary), 0 0 0 8px #fff;
+    }
+
+    .e-stepper .e-step-container:not(.e-step-focus).e-step-notstarted .e-step{
+        box-shadow: 0 0 0 6px rgba(171, 206, 222, 1);
+    }
+
+    .e-stepper:not(.e-steps-focus) .e-step-notstarted .e-step {
+        background-color: rgba(171, 206, 222, 1);
+    }
+
+    .e-stepper .e-step-container:not(.e-step-focus).e-step-completed .e-step{
+        box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--bs-primary), 0 0 0 8px #fff;
+    }
+
+    .e-stepper:not(.e-steps-focus) .e-step-completed .e-step {
+        background-color: var(--bs-primary);
+    }
+
+    .e-stepper .e-stepper-progressbar > .e-progressbar-value {
+        background-color: var(--bs-primary);
+    }
 </style>

@@ -1202,6 +1202,7 @@ namespace PetCareApp.Services
                         masterId = user.Id;
                     }
                 }
+               
 
                 var schedule = _dbContext.Schedules
                     .Where(s => s.AppUserId == masterId 
