@@ -1,17 +1,23 @@
 ﻿
 
-<form method="post" @onsubmit="FinishCreation">
+<EditForm Model="serviceDto" OnValidSubmit="FinishCreation">
+    <DataAnnotationsValidator />
+    
+
     <div class=" m-4 align-content-center text-center">
         <div class="col-12 mb-2 ms-3">
             <div class="m-2 p-2">
                 <h4>Name</h4>
                 <InputText @bind-Value="serviceDto.Name"
                            class="input-text-style col-12"></InputText>
+                <ValidationMessage For="@(() => serviceDto.Name)" class="text-danger" />
             </div>
             <div class="m-2 p-2">
                 <h4>Description</h4>
                 <InputTextArea @bind-Value="serviceDto.Description"
                                class="input-textarea-style col-12"></InputTextArea>
+                <ValidationMessage For="@(() => serviceDto.Description)" class="text-danger" />
+
             </div>
         </div>
 
@@ -19,10 +25,12 @@
             <div class="col-4 m-1">
                 <h4>Minimum Price, UAN</h4>
                 <InputNumber @bind-Value="@serviceDto.MinimumPrice" class="input-text-style col-7"></InputNumber>
+                <ValidationMessage For="@(() => serviceDto.MinimumPrice)" class="text-danger" />
             </div>
             <div class="col-4 m-1">
                 <h4>Maximum Price, UAN</h4>
                 <InputNumber @bind-Value="@serviceDto.MaximumPrice" class="input-text-style col-7"></InputNumber>
+                <ValidationMessage For="@(() => serviceDto.MaximumPrice)" class="text-danger" />
             </div>
         </div>
 
@@ -30,21 +38,24 @@
             <div class="col-3 m-1">
                 <h4>Time, min</h4>
                 <InputNumber @bind-Value="@serviceDto.RealTime" class="input-text-style col-7"></InputNumber>
+                <ValidationMessage For="@(() => serviceDto.RealTime)" class="text-danger" />
             </div>
             <div class="col-3 m-1">
                 <h4>Minimum Time, min</h4>
                 <InputNumber @bind-Value="@serviceDto.MinimumTime" class="input-text-style col-7"></InputNumber>
+                <ValidationMessage For="@(() => serviceDto.MinimumTime)" class="text-danger" />
             </div>
             <div class="col-3 m-1">
                 <h4>Maximum Time, min</h4>
                 <InputNumber @bind-Value="@serviceDto.MaximumTime" class="input-text-style col-7"></InputNumber>
+                <ValidationMessage For="@(() => serviceDto.MaximumTime)" class="text-danger" />
             </div>
         </div>
-        
-            <button type="submit" class="btn col-2 btn-func-success mt-3" style="font-size: 1.5em">Save</button>
+
+        <button type="submit" class="btn col-2 btn-func btn-success mt-5" style="font-size: 1.5em">Save</button>
             
     </div>
-</form>
+</EditForm>
 
 @code {
     [Parameter]

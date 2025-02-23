@@ -6,23 +6,23 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center">
-        <div class="form-custom-border bg-body-secondary p-3 ">
-            <div class="row text-center">
-                <button type="button" class="btn col-2 m-1 p-0 btn-func-danger" style="height: 3em" @onclick="Back">
+        <div class="form-custom-border p-3 ">
+            <div class="row text-center align-items-center">
+                <button type="button" class="btn col-2 p-1 ms-3 btn-func btn-danger" style="height: 3em" @onclick="Back">
                     <i class="bi bi-arrow-left"></i>   Back
                 </button>
 
                 @if (isServiceCreation){
-                <div class="col-6 offset-2">
+                <div class="col-4 offset-3 me-3 ps-0 pe-5">
                     <h3 ><b>Service Creation</b></h3>
-                    <p >Fill form with info about service</p>
+                    <p class="green-blue-text">Fill form with info about service</p>
                 </div>
                 }
                 else if (isQuestionaryCreation)
                 {
-                    <div class="col-6 offset-2">
+                    <div class="col-4 offset-3 me-3 ps-0 pe-5">
                         <h3><b>Questionary Creation</b></h3>
-                        <p>Create questionary or skip this step</p>
+                        <p class="green-blue-text">Create questionary or skip this step</p>
                     </div>
                 }
             </div>

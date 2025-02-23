@@ -5,23 +5,23 @@
 
 <div class="d-flex justify-content-center">
 <div class="col-lg-10 align-items-center">
-    <div class="form-custom-border bg-body-secondary p-3 ">
-        <div class="row text-center">
-            <button type="button" class="btn col-2 m-1 p-0 btn-func-danger" style="height: 3em" @onclick="Back">
-                <i class="bi bi-arrow-left"></i>   Back
-            </button>
-            <div class="col-6 offset-2">
+    <div class="form-custom-border p-3 ">
+            <div class="row text-center align-items-center">
+                <button type="button" class="btn col-2 p-1 ms-3 btn-func btn-danger" style="height: 3em" @onclick="Back">
+                    <i class="bi bi-arrow-left"></i>   Back
+                </button>
+                <div class="col-4 offset-3 me-3 ps-0 pe-5">
                 <h3><b>Questionary Modification</b></h3>
-                <p>Update or remove questionary</p>
+                <p  class="green-blue-text">Update or remove questionary</p>
             </div>
         </div>
         <hr />
         <div class=" m-4 align-content-center text-center">
             <div class="col-12 mb-2 ms-3">
                 <div class="m-2 p-2">
-                    <div class="form-check col-7">
+                        <div class="form-check align-items-center col-4 text-start">
                         <InputCheckbox @bind-Value="isNotNeeded" class="form-check-input" />
-                        <label class="form-check-label"><h4>Remove questionary</h4></label>
+                            <label class="form-check-label  ms-2"><h5 class=" text-info">Remove questionary</h5></label>
                     </div>
                 </div>
             </div>
@@ -37,9 +37,9 @@
                 }
             @if (!isNotNeeded)
             {
-                <div class="row justify-content-end">
-                    <button class="btn btn-func" type="button" @onclick="AddQuestion">Add Question</button>
-                </div>
+                    <div class="row justify-content-end">
+                        <button class="btn btn-func btn-success col-10" type="button" @onclick="AddQuestion"><i class="bi bi-plus-circle"></i> Add Question</button>
+                    </div>
                     <hr />
                     <form method="post" @onsubmit="SubmitAdding">
                         <ol>
@@ -54,11 +54,11 @@
                                             @{
                                                 var questionInd = questions.IndexOf(question);
                                             }
-                                            <div>
-                                                <button type="button" class="btn btn-danger" @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash3">Delete</i></button>
-                                                <button class="btn btn-func m-3" type="button" @onclick="() => AddAnswer(questionInd)">Add Answer</button>
-                                                <InputCheckbox @bind-Value="question.HasAnswerWithFixedTime" @onclick="() => ChooseFixedQuestion(questionInd)"></InputCheckbox>
-                                                <label class="form-check-label">Is Time Fixed</label>
+                                            <div class="row align-items-center justify-content-center offset-1">
+                                                <button class="btn btn-func btn-danger p-1 m-3 col-2 " @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash"></i>  Delete Question</button>
+                                                <button class="btn btn-func btn-success m-3 col-3" type="button" @onclick="() => AddAnswer(questionInd)"><i class="bi bi-plus-circle"></i> Add Answer</button>
+                                                <InputCheckbox class="col-1 ms-4 p-3 form-check-input" style="font-size: 20px;" @bind-Value="question.HasAnswerWithFixedTime" @onclick="() => ChooseFixedQuestion(questionInd)"></InputCheckbox>
+                                                <label class="form-check-label  col-3 text-start ms-2 ps-1">Is Time Fixed</label>
                                             </div>
                                             <ul>
                                                 @foreach (var answer in question.Answers)
@@ -67,7 +67,7 @@
                                                     var answerInd = questions[questionInd].Answers.IndexOf(answer);
                                                     var image = answer.Photo != null ? $"data:image/png;base64,{Convert.ToBase64String(answer.Photo)}" : null;
                                                     <li>
-                                                        <div class="row mt-2" @key="answer">
+                                                        <div class="row mt-2 align-items-top" @key="answer">
                                                             <div class="col-5">
                                                                 <label class="form-check-label">Answer</label>
                                                                 <InputText @bind-Value="answer.Text" class="form-control" />
@@ -97,7 +97,7 @@
                                                                     <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
                                                                 </div>
                                                                 <div class="col-1 mt-3 text-center">
-                                                                    <button type="button" class="btn btn-danger" @onclick="() => deleteAnswer(questionInd, answerInd)"><i class="bi bi-trash3">Delete</i></button>
+                                                                    <button type="button" class="btn  btn-danger p-2" @onclick="() => deleteAnswer(questionInd, answerInd)"><i class="bi bi-trash"> </i></button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -109,7 +109,7 @@
                                     </li>
                                 }
                             }
-                            <button type="submit" class="btn col-2 btn-func-success mt-3" style="font-size: 1.5em">Save</button>
+                            <button type="submit" class="btn col-2 btn-func-primary mt-3" style="font-size: 1.5em">Save</button>
 
                     </ol>
                 </form>
