@@ -1,38 +1,82 @@
 ﻿@inject IJSRuntime _JSRuntime
 @inject IUserService _userService
+@using Syncfusion.Blazor.Calendars
+
+
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3">
+        <div class="form-custom-border p-3">
             @if (data != null && slots.Count > 0)
             {
                 <h4 class="text-primary">Estimated time: @data.Time min</h4>
                 <hr />
-                <h4>Choose needed slot</h4>
-                @foreach (var key in slots)
-                {
-                    <div class="mt-3">
-                        <h4 class="green-blue-text">@key.Key.ToString("dddd, dd MMMM yyyy")</h4>
-                        <div class="row">
-                            <div class="d-flex flex-wrap m-2 justify-content-center">
-                                @foreach (var item in key.Value)
-                                {
-                                    <div class="badge text-white d-inline-flex align-items-center m-2"
-                                         style="@(chosenSlot == item ? "box-shadow: 0px 0px 3px #c71c71; background-color: #d63384; border: #c71c71": "") "
-                                         @onclick="() => ChooseSlot(item)">
-                                        @item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")
-                                    </div>
-                                }
-                            </div>
+                <h4 class="mb-4">Choose needed slot</h4>
+
+
+                <div class="row">
+                    <div class="col-4 mt-2 mb-5">
+                        <div class="control-wrapper">
+                            <SfCalendar TValue="DateTime?" @bind-Value="@DateValue">
+                                <CalendarEvents TValue="DateTime?" OnRenderDayCell="CustomDates" ValueChange="@onChange"></CalendarEvents>
+                            </SfCalendar>
                         </div>
                     </div>
-                }
-                <div>
+                    <div class="col-8 align-items-center">
+
+                        @{
+                            if (DateValue != null)
+                            {
+                                var date = DateValue.Value.Date;
+                                var hasDate = availableDates.Contains(date);
+                                var isOptimized = !isAllSlots && (optimizedSlots.ContainsKey(date) && optimizedSlots[date].Count > 0);
+                                if (!isOptimized)
+                                {
+                                    isAllSlots = true;
+                                }
+                                else
+                                {
+                                    isAllSlots = false;
+                                }
+                                if (hasDate)
+                                {
+                                    <SfCheckBox Label="Show all slots" @bind-Checked="isAllSlots" Disabled="@(!optimizedSlots.ContainsKey(date))" @onclick="AllSlotsChanged"></SfCheckBox>
+                                    <h4 class="green-blue-text">@(DateValue != null ? DateValue?.ToString("dddd, dd MMMM yyyy") : DateTime.Now.ToString("dddd, dd MMMM yyyy"))</h4>
+                                    <div class="mt-3">
+                                        <div class="row">
+                                            <div class="d-flex flex-wrap m-2 justify-content-center">
+                                                @foreach (var item in isOptimized ? optimizedSlots[date] : slots[date])
+                                                {
+                                                    <div class="badge text-white d-inline-flex align-items-center m-2"
+                                                            style="@(chosenSlot == item ? "box-shadow: 0px 0px 3px #c71c71; background-color: #d63384; border: #c71c71": "") "
+                                                            @onclick="() => ChooseSlot(item)">
+                                                        @item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                                else
+                                {
+                                    <h4 class="green-blue-text mt-5">This date is not available</h4>
+                                }
+                            }
+                            else
+                            {
+                                <h4 class="green-blue-text mt-5">No available time on this date</h4>
+                            }
+                        }
+                        
+                    </div>
+                </div>
+                <div class="mt-5 mb-5">
                     <button class="btn btn-func btn-success p-3 mt-3" @onclick="SubmitSlot">Submit</button>
                 </div>
             }
             else
             {
-                <h3>No available time</h3>
+                <h3 class="green-blue-text mt-5">No available time</h3>
             }
 
         </div>
@@ -45,13 +89,17 @@
     [Parameter]
     public QuestionaryAnalisysDto data { get; set; }
     public TimeSlot chosenSlot { get; set; } = new TimeSlot();
-
+    public DateTime? DateValue { get; set; } = DateTime.Now;
     [Parameter]
     public EventCallback ToNextStep { get; set; }
     [Parameter]
     public EventCallback<TimeSlot> OnSlotSubmit { get; set; }
 
     public Dictionary<DateTime, List<TimeSlot>> slots = new Dictionary<DateTime, List<TimeSlot>>();
+    public Dictionary<DateTime, List<TimeSlot>> optimizedSlots = new Dictionary<DateTime, List<TimeSlot>>();
+    private List<DateTime> availableDates = new List<DateTime>();
+    private bool isAllSlots { get; set; } = false;
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -59,21 +107,30 @@
         {
             if (data.Slots != null && data.Slots.Count > 0)
             {
-                var dates = data.Slots.Select(s => s.Date.Date).Distinct().ToList();
-                foreach (var date in dates)
-                {
-                    slots[date] = new List<TimeSlot>();
-                }
-
-                foreach (var slot in data.Slots)
-                {
-                    slots[slot.Date.Date].Add(slot);
-                }
-
+                slots = makeSlotsDictionary(data.Slots);
+                optimizedSlots = makeSlotsDictionary(data.OptimizedSlots);
+                isAllSlots = false;
+                availableDates = slots.Keys.ToList();
                 StateHasChanged();
             }
 
         }
+    }
+
+    private Dictionary<DateTime, List<TimeSlot>> makeSlotsDictionary(List<TimeSlot> timeSlots)
+    {
+        var res = new Dictionary<DateTime, List<TimeSlot>>();
+        var dates = timeSlots.Select(s => s.Date.Date).Distinct().ToList();
+        foreach (var date in dates)
+        {
+            res[date] = new List<TimeSlot>();
+        }
+
+        foreach (var slot in timeSlots)
+        {
+            res[slot.Date.Date].Add(slot);
+        }
+        return res;
     }
 
     private void ChooseSlot(TimeSlot slot)
@@ -82,6 +139,29 @@
         StateHasChanged();
     }
 
+    private void AllSlotsChanged()
+    {
+        isAllSlots = !isAllSlots;
+        StateHasChanged();
+    }
+
+    private void onChange(Syncfusion.Blazor.Calendars.ChangedEventArgs<DateTime?> args)
+    {
+        isAllSlots = false;
+        DateValue = args.Value;
+        StateHasChanged();
+    }
+
+
+
+    public DateTime? CurrentDate { get; set; } = DateTime.Now;
+    public void CustomDates(RenderDayCellEventArgs args)
+    {
+        if (availableDates.Contains(args.Date.Date))
+        {
+            args.CellData.ClassList += " available-day";
+        }
+    }
     public async Task SubmitSlot()
     {
         if (chosenSlot != null && chosenSlot.Date != null)
@@ -102,3 +182,65 @@
         }
     }
 }
+
+<style>
+   
+   
+    .control-wrapper {
+        width: 100%;
+        height: 200px;
+
+        margin: 0 auto;
+        padding-top: 20px;
+    }
+
+    .e-calendar {
+        border-spacing: 0;
+        max-width: 400px;
+        max-height: 450px;
+        min-width: 240px;
+        width: 100%;
+        height: auto;
+        padding: 0;
+        color: var(--bs-secondary);
+    }
+
+        .e-calendar .e-content span {
+            color: var(--bs-secondary);
+        }
+
+        .e-calendar .e-header .e-title {
+            color: var(--bs-secondary);
+        }
+    .e-calendar .e-content .e-cell.available-day span.e-day {
+        color: var(--bs-primary);
+        font-weight: 700;
+    }
+
+        .e-calendar .e-content td.e-selected.e-focused-date span.e-day {
+            background: var(--bs-warning);
+            color: #fff;
+        }
+
+        .e-calendar .e-content td.e-today span.e-day, .e-calendar .e-content td.e-focused-date.e-today span.e-day {
+            background: none;
+            border: none;
+            border-radius: 4px;
+            box-shadow: inset 2px 0 var(--bs-secondary), inset 0 2px var(--bs-secondary), inset -2px 0 var(--bs-secondary), inset 0 -2px var(--bs-secondary);
+            color: var(--bs-secondary);
+        }
+
+        .e-calendar .e-btn.e-today.e-flat.e-primary, .e-calendar .e-css.e-btn.e-today.e-flat.e-primary {
+            background-color: var(--bs-secondary);
+            border: 0;
+            border-color: var(--bs-secondary);
+            color: #fff;
+        }
+
+        .e-calendar .e-btn.e-today.e-flat.e-primary, .e-calendar .e-css.e-btn.e-today.e-flat.e-primary:hover{
+                background-color: #023c57;
+            border: 0;
+                border-color: #023c57;
+            color: #fff;
+        }
+</style>

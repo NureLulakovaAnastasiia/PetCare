@@ -20,7 +20,7 @@ namespace PetCareApp.Interfaces
 
         public List<TimeSlot> GetWorkTimeSlots(string masterId);
         public List<TimeSlot> GetFreeTimeSlots(int time, int serviceId, string? masterId = null);
-
+        public List<TimeSlot> GetBetterFreeTimeSlots(int time, int serviceId, string? masterId = null);
         public Task<string> MakeAppointment(RecordDto recordDto);
 
         public Task<string> UpdateAppointments(List<GetRecordDto> recordDto);

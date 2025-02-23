@@ -591,6 +591,66 @@ namespace PetCareApp.Services
             return resSlots;
         }
 
+
+        //creates optimized slots for some amount of time from empty slots for some procedure
+        public List<TimeSlot> GetBetterFreeTimeSlots(int time, int serviceId, string? masterId = null)
+        {
+            var resSlots = new List<TimeSlot>();
+            var service = _dbContext.Services.FirstOrDefault(s => s.Id == serviceId);
+
+            if (masterId == null)
+            {
+                if (service != null)
+                {
+                    masterId = service.AppUserId;
+                }
+                else
+                {
+                    return resSlots;
+                }
+            }
+            var workSlots = GetAllEmptySlots(masterId);
+            var limitations = _dbContext.ServiceLimitations.Where(x => x.ServiceId == serviceId &&
+                                                                x.Date > DateTime.Now).ToList();
+            var limitDates = limitations.Select(x => x.Date).ToList();
+            var limitDayOfWeek = limitations.Select(x => x.DayOfWeek).ToList();
+            if (!workSlots.Any())
+            {
+                return resSlots;
+            }
+            foreach (var slot in workSlots)
+            {
+                if (limitDates.Contains(slot.Date.Date) || limitDayOfWeek.Contains((int)slot.Date.DayOfWeek))
+                {
+                    continue;
+                }
+                var startTime = slot.StartTime;
+                var difference = slot.EndTime - startTime;
+                if(difference.Minutes > service.MinimumTime)
+                {
+                    continue;
+                }
+                while (startTime < slot.EndTime)
+                {
+                    var endTime = startTime.Add(TimeSpan.FromMinutes((double)time));
+                    if (endTime > slot.EndTime)
+                    {
+                        break;
+                    }
+                    resSlots.Add(new TimeSlot
+                    {
+                        Date = slot.Date,
+                        StartTime = startTime,
+                        EndTime = endTime
+                    });
+
+                    startTime = startTime.Add(TimeSpan.FromMinutes((double)serviceInterval));
+                }
+            }
+            return resSlots;
+        }
+
+
         public int AnalizeQuestionary(List<QuestionDto> questionary, int serviceId)
         {
             var service = _dbContext.Services.FirstOrDefault(x => x.Id == serviceId);

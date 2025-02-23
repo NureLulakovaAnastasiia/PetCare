@@ -6,7 +6,7 @@ namespace PetCareApp.Dtos
     {
         public int Time {  get; set; }
         public List<TimeSlot> Slots { get; set; }
-
+        public List<TimeSlot> OptimizedSlots { get; set; }
         public string Description { get; set; }
     }
 }

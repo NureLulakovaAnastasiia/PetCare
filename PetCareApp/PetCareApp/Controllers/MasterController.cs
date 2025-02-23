@@ -259,6 +259,8 @@ namespace PetCareApp.Controllers
                 return StatusCode(500, "Error during analizing questionary");
             }
             var slots = _masterService.GetFreeTimeSlots(time, serviceId, masterId);
+            var optimizedSlots  = _masterService.GetBetterFreeTimeSlots(time, serviceId, masterId);
+
             if (!slots.Any())
             {
                 return StatusCode(500, "Error during getting timeslots");
@@ -269,6 +271,7 @@ namespace PetCareApp.Controllers
             {
                 Time = time,
                 Slots = slots,
+                OptimizedSlots = optimizedSlots,
                 Description = descr
             });
         }
