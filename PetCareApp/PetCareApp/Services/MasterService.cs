@@ -28,6 +28,17 @@ namespace PetCareApp.Services
             _dbContext = context;
         }
 
+        private void AddHistoryEvent(HistoryEvent historyEvent){
+            try
+            {
+                _dbContext.Add(historyEvent);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
         public async Task<string> AddContacts(AddContactsDto contacts)
         {
             try
@@ -169,7 +180,12 @@ namespace PetCareApp.Services
                         }
                     }
                     
-                    return _dbContext.SaveChanges().ToString();
+                    var result = _dbContext.SaveChanges();
+                    if (result > 0)
+                    {
+                        AddHistoryEvent(HistoryEventFactory.CreateQuestionaryUpdateEvent(user.Id, service.Name));
+                    }
+                    return result.ToString();
                 }
                 return "Error during adding data";
             }
@@ -446,7 +462,17 @@ namespace PetCareApp.Services
                         {
                             record.AppUserId = user.Id;
                             _dbContext.Add(record);
-                            return _dbContext.SaveChanges().ToString();
+                            var result = _dbContext.SaveChanges();
+                            if (result > 0)
+                            {
+                                AddHistoryEvent(HistoryEventFactory.CreateNewAppointmentEvent(user.Id, service.Name, record.StartTime));
+                                if (user.Id != service.AppUserId)
+                                {
+                                    AddHistoryEvent(HistoryEventFactory.CreateNewAppointmentEvent(service.AppUserId, service.Name, record.StartTime));
+                                }
+
+                            }
+                            return result.ToString();
                         }
                     }
                     else
@@ -724,7 +750,12 @@ namespace PetCareApp.Services
                         AppUserId = user.Id,
                         OrganizationId = organizationId
                     });
-                    return _dbContext.SaveChanges().ToString();
+                    var result = _dbContext.SaveChanges();
+                    if (result > 0)
+                    {
+                        AddHistoryEvent(HistoryEventFactory.CreateNewOrgRequestEvent(user.Id, organization.Name));
+                    }
+                    return result.ToString();
                 }
                 else
                 {
@@ -763,7 +794,12 @@ namespace PetCareApp.Services
                             Reason = reason,
                             Date = DateTime.UtcNow
                         });
-                        return _dbContext.SaveChanges().ToString();
+                        var result = _dbContext.SaveChanges();
+                        if (result > 0)
+                        {
+                            AddHistoryEvent(HistoryEventFactory.CreateRecordCancellationEvent(user.Id, record.Service.Name, record.StartTime));
+                        }
+                        return result.ToString();
                     }
                     return "You cannnot cancel this record";
                 }
@@ -971,7 +1007,12 @@ namespace PetCareApp.Services
                 if (questions.Count > 0)
                 {
                     _dbContext.RemoveRange(questions);
-                    return _dbContext.SaveChanges().ToString();
+                    var result = _dbContext.SaveChanges();
+                    if (result > 0)
+                    {
+                        AddHistoryEvent(HistoryEventFactory.CreateQuestionaryDeleteEvent(user.Id, service.Name));
+                    }
+                    return result.ToString();
                 }
             }
             catch (Exception ex)

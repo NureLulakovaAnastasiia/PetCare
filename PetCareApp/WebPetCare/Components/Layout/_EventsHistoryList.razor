@@ -1,0 +1,96 @@
+﻿@inject IUserService _userService
+
+
+<div class="history-overlay" @onclick="CloseHistory">
+    <div class="history-panel" @onclick:stopPropagation="true">
+        <div class="history-header">
+            <h2 class="text-primary">Event History</h2>
+            <button class="close-btn" @onclick="CloseHistory">✖</button>
+        </div>
+
+        <div class="history-content">
+            <ul>
+                @if(Error != null)
+                {
+                    <h5 class="text-danger">@Error</h5>
+                }
+
+                @if(Events != null && Events.Count > 0){
+                
+                    foreach (var eventItem in Events)
+                    {
+                        <div class="">
+                            <h4>@eventItem.Title</h4>
+                            <p>@eventItem.Created</p>
+                            <p class="">@eventItem.Description</p>
+                            <hr />
+                        </div>
+                    }
+                }
+                else
+                {
+                    <h5 class="text-danger">No data to display</h5>
+
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    public List<HistoryEvent> Events { get; set; } = new List<HistoryEvent>();
+
+    public string? Error { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public bool IsShowed { get; set; } = false;
+
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (IsShowed)
+    //     {
+    //         await GetEventsHistory();
+    //     }
+    // }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsShowed)
+        {
+            await GetEventsHistory();
+        }
+    }
+
+    public async Task GetEventsHistory()
+    {
+        var data = await _userService.GetEventsHistory();
+        if (data == null)
+        {
+            Error = "Error during getting data";
+        }
+        else
+        {
+            if (data.IsSuccess)
+            {
+                Events = data.Data;
+            }
+            else
+            {
+                Error = data.ErrorMessage;
+            }
+        }
+    }
+
+
+
+    private async Task CloseHistory()
+    {
+        await OnClose.InvokeAsync();
+    }
+}

@@ -27,5 +27,6 @@ namespace PetCareApp.Models
         public List<Review> Reviews { get; set; } = new List<Review>(); //user written reviews
         public List<Portfolio> Portfolios { get; set; } = new List<Portfolio>();
         public List<RecordCancel> RecordCancels { get; set; } = new List<RecordCancel>();
+        public List<HistoryEvent> HistoryEvents { get; set; }  = new List<HistoryEvent>();
     }
 }

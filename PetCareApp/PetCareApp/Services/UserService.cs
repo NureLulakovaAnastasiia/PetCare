@@ -21,6 +21,17 @@ namespace PetCareApp.Services
             _mapper = mapper;
         }
 
+        private void AddHistoryEvent(HistoryEvent historyEvent)
+        {
+            try
+            {
+                _dbContext.Add(historyEvent);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+            }
+        }
         public async Task<Result<int>> AddPet(PetDto pet)
         {
             var res = new Result<int>();
@@ -37,7 +48,11 @@ namespace PetCareApp.Services
                 {
                     petToAdd.AppUserId = user.Id;
                     _dbContext.Add(petToAdd);
-                    _dbContext.SaveChanges();
+                    var result = _dbContext.SaveChanges();
+                    if (result > 0)
+                    {
+                        AddHistoryEvent(HistoryEventFactory.CreateNewPetEvent(user.Id, petToAdd.Name));
+                    }
                     res.Data = petToAdd.Id;
                     return res;
                 }
@@ -95,7 +110,12 @@ namespace PetCareApp.Services
                     {
                         _dbContext.Pets.Remove(item);
                     }
-                    return _dbContext.SaveChanges().ToString();
+                    var result = _dbContext.SaveChanges();
+                    if (result > 0)
+                    {
+                        AddHistoryEvent(HistoryEventFactory.CreateDeletePetEvent(user.Id, item.Name));
+                    }
+                    return result.ToString();
                 }
                 return "Error during deleting";
             }
@@ -255,7 +275,8 @@ namespace PetCareApp.Services
                     res.ErrorMessage = "There is no such user";
                     return res;
                 }
-                var record = _dbContext.Records.FirstOrDefault(r => r.Id == recordId);
+                var record = _dbContext.Records.Where(r => r.Id == recordId)
+                    .Include(r => r.Service).FirstOrDefault();
                 if (record != null)
                 {
                     if(record.AppUserId == user.Id)
@@ -270,7 +291,14 @@ namespace PetCareApp.Services
                         record.Status = "Cancelled";
                         _dbContext.Add(cancel);
                         _dbContext.Update(record);
-                        res.Data = _dbContext.SaveChanges() > 1;
+                        var result = _dbContext.SaveChanges();
+                        if (result > 0)
+                        {
+                            AddHistoryEvent(HistoryEventFactory.CreateRecordCancellationEvent(user.Id, record.Service.Name, record.StartTime));
+                            AddHistoryEvent(HistoryEventFactory.CreateRecordCancellationEvent(record.Service.AppUserId, record.Service.Name, record.StartTime));
+
+                        }
+                        res.Data = result > 1;
 
                     }
                     else
@@ -310,7 +338,14 @@ namespace PetCareApp.Services
                     {
                         reviewToAdd.AppUserId = user.Id;
                         _dbContext.Add(reviewToAdd);
-                        res.Data = _dbContext.SaveChanges() == 1;
+                        var result = _dbContext.SaveChanges();
+                        if (result > 0)
+                        {
+                            AddHistoryEvent(HistoryEventFactory.CreateNewReviewEvent(user.Id, service.Name));
+                            AddHistoryEvent(HistoryEventFactory.CreateNewReviewEventMaster(user.Id, service.Name));
+
+                        }
+                        res.Data = result == 1;
                     }
                     else
                     {
@@ -408,13 +443,64 @@ namespace PetCareApp.Services
                     res.ErrorMessage = "There is no such user";
                     return res;
                 }
-
-                var comment = _mapper.Map<ReviewComment>(reviewComment);
-                if (comment != null)
+                var review = _dbContext.Reviews.Where(r => r.Id == reviewComment.ReviewId)
+                    .Include(r => r.Service).FirstOrDefault();
+                if (review != null)
                 {
-                    comment.AppUserId = user.Id;
-                    _dbContext.Add(comment);
-                    res.Data = _dbContext.SaveChanges() > 0;
+                    var comment = _mapper.Map<ReviewComment>(reviewComment);
+                    if (comment != null)
+                    {
+                        comment.AppUserId = user.Id;
+                        _dbContext.Add(comment);
+                        var result = _dbContext.SaveChanges();
+                        if (result > 0)
+                        {
+                            AddHistoryEvent(HistoryEventFactory.CreateNewReviewCommentEvent(review.AppUserId, review.Service.Name));
+                        }
+
+                        res.Data = result > 0;
+
+
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "No such review";
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<List<HistoryEvent>>> GetEventsHistory()
+        {
+           var res = new Result<List<HistoryEvent>>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user == null)
+                {
+                    res.ErrorMessage = "Not authorized";
+                }
+                else
+                {
+                    var events = _dbContext.HistoryEvent
+                        .Where(e => e.AppUserId == user.Id)
+                        .OrderByDescending(e => e.Created)
+                        .ToList();
+                    if(events != null)
+                    {
+                        events.ForEach(e => e.AppUser = null);
+                        res.Data = events;
+                    }
+                    else
+                    {
+                        res.ErrorMessage = "No data found";
+                    }
                 }
             }
             catch (Exception ex)

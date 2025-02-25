@@ -57,5 +57,7 @@ namespace WebPetCare.IServices
         public Task<string> AddMasterSchedule(ScheduleDto schedules);
 
         public Task<string> UserRoleToMaster();
+
+        public Task<Result<List<HistoryEvent>>> GetEventsHistory();
     }
 }

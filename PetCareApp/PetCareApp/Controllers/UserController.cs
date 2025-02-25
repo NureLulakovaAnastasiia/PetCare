@@ -194,5 +194,17 @@ namespace PetCareApp.Controllers
             }
             return BadRequest(res.ErrorMessage);
         }
+
+        [HttpGet("getEventsHistory")]
+        public async Task<IActionResult> GetEventsHistory()
+        {
+            var data = await _userService.GetEventsHistory();
+            if (data == null)
+            {
+                return NotFound("No records were found");
+            }
+
+            return Ok(data);
+        }
     }
 }

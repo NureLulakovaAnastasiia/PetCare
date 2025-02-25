@@ -8,6 +8,7 @@ using PetCareApp.Models;
 using WebPetCare.Components.Pages.Account;
 using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
+using System.ComponentModel.Design;
 
 namespace WebPetCare.Services
 {
@@ -992,6 +993,42 @@ namespace WebPetCare.Services
             catch (Exception ex)
             {
                 res = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<List<HistoryEvent>>> GetEventsHistory()
+        {
+            var res = new Result<List<HistoryEvent>>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/User/getEventsHistory";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<Result<List<HistoryEvent>>>(result, options);
+                    if (data != null)
+                    {
+                        return data;
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = result;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
             }
 
             return res;

@@ -1,5 +1,6 @@
 ﻿@inject IJSRuntime JSRuntime
 @inject IAuthorizationService _authService
+@inject IUserService _userService
 @inject NavigationManager Navigation
 @using Syncfusion.Blazor.SplitButtons
 
@@ -8,6 +9,25 @@
         <p class=" mx-5 brand-logo">PetCare</p>
     </div>
     <ul class="navbar-nav  flex-row-reverse align-content-center">
+        @if (isLogged)
+        {
+            <li class="nav-item p-0 mx-4">
+                <button class="nav-link nav-link-big bell-btn"  @onclick="ToggleHistory">
+                    <i class="bi bi-bell-fill"></i>
+                    @if (eventsHistory.Count > 0)
+                    {
+                        <span class="badge">@eventsHistory.Count</span>
+                    }
+                </button>
+            </li>
+
+            @if (isHistoryShowed)
+            {
+                <_EventsHistoryList IsShowed="isHistoryShowed" OnClose="ToggleHistory" />
+            }
+        }
+
+        
         <li class="nav-item p-0 mx-4">
             <a class="nav-link nav-link-big" href="" Match="NavLinkMatch.All">
                 Home
@@ -49,6 +69,12 @@
     [Parameter]
     public bool isLogged { get; set; } = false;
 
+    public string? ErrorMessage { get; set; }
+
+    public bool isHistoryShowed = false;
+
+    public List<HistoryEvent> eventsHistory { get; set; } = new List<HistoryEvent>();
+
     public Task UpdateNavMenuAsync(bool isAuthenticated)
     {
         isLogged = isAuthenticated;
@@ -74,8 +100,14 @@
         }
     }
 
-    
+   
 
+    public void ToggleHistory()
+    {
+        isHistoryShowed = !isHistoryShowed;
+        StateHasChanged();
+
+    }
 }
 
 <style>
@@ -130,6 +162,79 @@
                 background-color: rgba(241, 237, 234, .8) !important;
                 color: rgb(3, 62, 89);
         }
+
+
+
+
+
+    .history-overlay {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100vw;
+        height: 100vh;
+/*         background: rgba(0, 0, 0, 0.3);
+ */        display: flex;
+        justify-content: flex-end;
+        z-index: 1000;
+    }
+
+    .history-panel {
+        width: 350px;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border-left: 2px solid rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 10px;
+    }
+
+    .history-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+        .history-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .history-content li {
+            padding: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--bs-secondary);
+    }
+
+    .bell-btn {
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        position: relative;
+    }
+
+   
+
 </style>
 
 
