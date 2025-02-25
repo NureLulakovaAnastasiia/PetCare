@@ -23,7 +23,7 @@
     </div>
 }
 <SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" EnableAdaptiveUI="true" StartHour="6:00" ShowQuickInfo="false" EnableAllDayScroll="true" Height="700"
-            SelectedDateChanged="DateRangeChanged">
+            SelectedDateChanged="DateRangeChanged" >
     <ScheduleTemplates>
         <EditorTemplate>
          
@@ -94,11 +94,12 @@
                                 <div>
                                     @if (data.Status.Id == 3)
                                     {
-                                        <h4 class="text-danger">Cancelled</h4>
-                                    }
+                                        <h5 class="text-danger">Cancelled</h5>
+                                    }else{
                                     <SfDropDownList TValue="int" TItem="Status" Placeholder="Change status" DataSource="@StatusData" @bind-Value="@data.Status.Id">
                                         <DropDownListFieldSettings Value="Id" Text="Name" ></DropDownListFieldSettings>
                                     </SfDropDownList>
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -107,7 +108,7 @@
             </table>
         </EditorTemplate>
     </ScheduleTemplates>
-    
+
     <ScheduleEventSettings TValue="AppointmentData" DataSource="@events" >
 @*         <ScheduleField Id="Id">
             <FieldSubject Name="ServiceName"></FieldSubject>
@@ -121,7 +122,7 @@
 
     </ScheduleEventSettings>
 
-    <ScheduleEvents TValue="AppointmentData" ActionCompleted="UpdateDataInDb"></ScheduleEvents>
+    <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen" ActionCompleted="UpdateDataInDb"></ScheduleEvents>
     <ScheduleViews>
         <ScheduleView Option="View.Day"></ScheduleView>
         <ScheduleView Option="View.Week"></ScheduleView>
@@ -449,7 +450,20 @@
         }
     }
 
-    
+    private async void OnPopupOpen(PopupOpenEventArgs<AppointmentData> args)
+    {
+        if (args.Type == PopupType.Editor)
+        {
+            if (args.Data is AppointmentData appointment && (appointment.Status.Id == 3 || appointment.Status.Id == 0 || appointment.StartTime < DateTime.Now))
+            {
+                await _JSRuntime.InvokeVoidAsync("hideDeleteButton");
+            }
+            else
+            {
+                await _JSRuntime.InvokeVoidAsync("showDeleteButton");
+            }
+        }
+    }
 
     private async Task DeleteRecords(List<AppointmentData> records, string reason)
     {
@@ -483,7 +497,17 @@
 
         if (String.IsNullOrEmpty(temp))
         {
-            showToastr("", "Data were succefully deleted");
+            showToastr("", "Record was succesfully cancelled");
+            foreach(var item in records)
+            {
+                if(item.Type == "Record")
+                {
+                    item.CssClass = "e-red";
+                    item.Status = new Status() { Id = 3, Name = "Cancelled" };
+                    events.Add(item);
+                }
+            }
+            StateHasChanged();
         }
         else
         {
@@ -932,3 +956,24 @@
         box-shadow: inset 1px 1px var(--bs-secondary), inset -1px 0 var(--bs-secondary), inset 0 -1px var(--bs-secondary);
     }
 </style>
+
+    <script>
+    window.hideDeleteButton = function () {
+        setTimeout(() => {
+            let deleteButton = document.querySelector('.e-event-delete');
+            if (deleteButton) {
+                deleteButton.style.display = 'none';
+            }
+        }, 100);
+    };
+
+    window.showDeleteButton = function () {
+        setTimeout(() => {
+            let deleteButton = document.querySelector('.e-event-delete');
+            if (deleteButton) {
+                deleteButton.style.display = 'block';
+            }
+        }, 100);
+    };
+
+    </script>

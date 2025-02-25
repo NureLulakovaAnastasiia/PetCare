@@ -28,3 +28,22 @@ window.showToastr = function (type, message) {
     }
 };
 
+
+window.hideDeleteButton = function () {
+    setTimeout(() => {
+        let deleteButton = document.querySelector('.e-event-delete');
+        if (deleteButton) {
+            deleteButton.style.display = 'none';
+        }
+    }, 100);
+};
+
+window.showDeleteButton = function () {
+    setTimeout(() => {
+        let deleteButton = document.querySelector('.e-event-delete');
+        if (deleteButton) {
+            deleteButton.style.display = 'block';
+        }
+    }, 100);
+};
+

@@ -203,7 +203,12 @@
     .history-content {
         flex: 1;
         overflow-y: auto;
+        scrollbar-width: none;
         padding: 10px;
+    }
+
+        .history-content::-webkit-scrollbar {
+            display: none;
     }
 
         .history-content ul {
@@ -222,7 +227,7 @@
         border: none;
         font-size: 1.5rem;
         cursor: pointer;
-        color: var(--bs-secondary);
+        accent-color: var(--bs-secondary);
     }
 
     .bell-btn {

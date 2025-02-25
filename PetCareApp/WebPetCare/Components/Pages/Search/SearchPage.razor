@@ -156,7 +156,7 @@
                                         <div class="row mt-0 pt-0 align-items-start" style="max-height:30px;">
                                             <p class="col-1 pt-1">Rate:</p>
                                             <div class="col-5 pt-0 mt-0 justify-content-start align-items-start" style="max-height:20px;">
-                                                <SfRating @bind-Value=item.ServiceDto.Rate ShowTooltip="false" CssClass="custom-rate" Disabled>
+                                                <SfRating Value=@(item.ServiceDto.Rate * 1.0)  ShowTooltip="false" CssClass="custom-rate" Disabled>
                                                     <FullTemplate>
                                                         <img src=@fullTemplateImage widht="15" height="15" />
                                                     </FullTemplate>
