@@ -11,7 +11,7 @@
 
 <div class="justify-content-center offset-2">
     <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border bg-body-secondary p-3 ">
+        <div class="form-custom-border p-3 ">
             <div class="row">
                 <div class="col-3">
                     <SfDropDownList TValue="int" TItem="CityDropdownItem" Placeholder="Select a city" AllowFiltering="true" DataSource="@CityList" CssClass="e-outline" FloatLabelType="FloatLabelType.Always">
@@ -21,118 +21,123 @@
                 </div>
 
                 <div class=" row col-5">
-                <div class="row col-4 m-0 p-0 text-center justify-content-center">
-                    <div class="m-0">
-                    <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnFiter">
-                        <ContentTemplate>
-                            <div id='democontent' >
-                                    <div class="ms-0 text-center">
-                                        <h4>Rate</h4>
-                                    <SfRating @bind-Value=Rate ShowLabel=true ShowTooltip="false"  LabelPosition="LabelPosition.Left" >
-                                        <FullTemplate>
-                                            <img src=@fullTemplateImage widht="30" height="30" />
-                                        </FullTemplate>
-                                        <EmptyTemplate>
-                                            <img src=@emptyTemplateImage widht="30" height="30" />
-                                        </EmptyTemplate>
-                                        <LabelTemplate >@context+</LabelTemplate>
-                                    </SfRating>
-                                    <hr/>
-                                </div>
-                                    <div class="ps-4 pe-4 mt-1 text-center">
-                                        <h4>Price</h4>
-                                        <div class="row justify-content-around mt-2">
-                                            <InputNumber @bind-Value="RangeValue[0]" class="input-textarea-style col-5 p-1"></InputNumber>
-                                            <InputNumber @bind-Value="RangeValue[1]" class="input-textarea-style col-5 p-1"></InputNumber>
+                    <div class="row col-4 m-0 p-0 text-center justify-content-center">
+                        <div class="m-0">
+                            <SfTooltip CssClass="e-tooltip-css" OpensOn="Focus" Target="#btnFiter">
+                                <ContentTemplate>
+                                    <div id='democontent'>
+                                        <div class="ms-0 text-center">
+                                            <h4>Rate</h4>
+                                            <SfRating @bind-Value=Rate ShowLabel=true LabelPosition="LabelPosition.Left">
+                                                <FullTemplate>
+                                                    <img src=@fullTemplateImage widht="30" height="30" />
+                                                </FullTemplate>
+                                                <EmptyTemplate>
+                                                    <img src=@emptyTemplateImage widht="30" height="30" />
+                                                </EmptyTemplate>
+                                                <LabelTemplate>@context+</LabelTemplate>
+                                            </SfRating>
+                                            <hr />
                                         </div>
-                                        <SfSlider @bind-Value=@RangeValue Type="SliderType.Range" Min="minValue" Max="maxValue" Step="1"></SfSlider>
-                                </div>
-                                <hr/>
-                                <div class="row justify-content-center">
-                                    <button class="btn col-6 btn-danger btn-func-little-padding">Clear filters</button>
-                                </div>
-                            </div>
-                        </ContentTemplate>
-                        <ChildContent>
-                            <button class="btn m-0 p-3" ID="btnFiter"><i class="bi bi-funnel-fill"></i>   Filter </button>
-                        </ChildContent>
-                    </SfTooltip>
+                                        <div class="ps-4 pe-4 mt-1 text-center">
+                                            <h4>Price</h4>
+                                            <div class="row justify-content-around mt-2">
+                                                <InputNumber @bind-Value="RangeValue[0]" class="input-textarea-style col-5 p-1"></InputNumber>
+                                                <InputNumber @bind-Value="RangeValue[1]" class="input-textarea-style col-5 p-1"></InputNumber>
+                                            </div>
+                                            <SfSlider @bind-Value=@RangeValue Type="SliderType.Range" Min="minValue" Max="maxValue" Step="1"></SfSlider>
+                                        </div>
+                                        <hr />
+                                        <div class="row justify-content-center">
+                                            <button class="btn col-6 btn-danger p-1">Clear filters</button>
+                                        </div>
+                                    </div>
+                                </ContentTemplate>
+                                <ChildContent>
+                                    <button class="btn btn-info m-0 p-3" ID="btnFiter"><i class="bi bi-funnel-fill"></i>   Filter </button>
+                                </ChildContent>
+                            </SfTooltip>
+                        </div>
                     </div>
-                </div>
-                <div class="row col-4  m-0 p-0 text-center justify-content-center">
-                    <div class=" ">
-                        <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnSort">
+                    <div class=" col-4  m-0 p-0 text-center justify-content-center">
+                        <div class=" ">
+                            <SfTooltip CssClass="e-tooltip-css" Width="700" OpensOn="Focus" Target="#btnSort">
+                                <ContentTemplate>
+                                    <div id='democontent' class="row">
+                                        <div class="ms-0 text-center col-4 ">
+                                            <div class="row m-2 align-items-center">
+                                                <SfCheckBox @bind-Checked="sorting.ByRate" @onchange="@(() => ChangeSortType("Rate"))" CssClass="col-1 offset-2"></SfCheckBox>
+                                                <h5 class="col-8 text-start ps-3 m-0 p-0 green-blue-text">By Rate</h5>
+                                            </div>
+                                            <div class="row">
+                                                <SfRadioButton CssClass="col-12" Label="From highest" Name="rates" Value="false" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
+                                                <SfRadioButton CssClass="col-12" Label="From lowest" Name="rates" Value="true" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
+                                            </div>
+                                        </div>
+
+                                        <div class="ms-0 text-center col-4" style="border-color: var(--bs-border-color);border-left: 0.2em solid;">
+                                            <div class="row m-2 align-items-center">
+                                                <SfCheckBox @bind-Checked="sorting.ByPrice" @onchange="@(() => ChangeSortType("Price"))" CssClass="col-1 offset-2"></SfCheckBox>
+                                                <h5 class="col-8 text-start ps-3 m-0 p-0 green-blue-text">By Price</h5>
+
+                                            </div>
+                                            <div class="row">
+                                                <SfRadioButton CssClass="col-12" Label="From highest" Name="prices" Value="false" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
+                                                <SfRadioButton CssClass="col-12" Label="From lowest" Name="prices" Value="true" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
+                                            </div>
+                                        </div>
+
+                                        <div class="ms-0 text-center col-4">
+                                            <div class="row m-2 align-items-center">
+                                                <SfCheckBox @bind-Checked="sorting.ByNumOfReviews" @onchange="@(() => ChangeSortType("Reviews"))" CssClass="col-1 offset-2"></SfCheckBox>
+                                                <h5 class="col-8 text-start ps-3 m-0 p-0 green-blue-text">By Reviews</h5>
+
+                                            </div>
+                                            <div class="row">
+                                                <SfRadioButton CssClass="col-12" Label="From highest" Name="reviews" Value="false" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
+                                                <SfRadioButton CssClass="col-12" Label="From lowest" Name="reviews" Value="true" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </ContentTemplate>
+                                <ChildContent>
+                                    <button class="btn m-0 btn-info" ID="btnSort"><i class="bi bi-arrow-down-up"></i>   Sort </button>
+                                </ChildContent>
+                            </SfTooltip>
+                        </div>
+                    </div>
+                    <div class="row col-4 m-0 p-0 text-center justify-content-center">
+                        <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnTags">
                             <ContentTemplate>
                                 <div id='democontent'>
-                                    <div class="ms-0 text-center">
-                                        <h4>By Rate</h4>
-                                        <SfCheckBox @bind-Checked="sorting.ByRate" @onchange="@(() => ChangeSortType("Rate"))"></SfCheckBox>
-                                            <div>
-                                            <SfRadioButton Label="From highest" Name="rates" Value="false" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
-                                            <SfRadioButton Label="From lowest" Name="rates" Value="true" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
-                                            </div>
-                                        <hr />
-                                    </div>
-                                        
-                                    <div class="ms-0 text-center">
-                                        <h4>By Price</h4>
-                                        <SfCheckBox @bind-Checked="sorting.ByPrice" @onchange="@(() => ChangeSortType("Price"))"></SfCheckBox>
-                                        <div>
-                                            <SfRadioButton Label="From highest" Name="prices" Value="false" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
-                                            <SfRadioButton Label="From lowest" Name="prices" Value="true" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
-                                        </div>
-                                        <hr />
-                                    </div>
-
-                                    <div class="ms-0 text-center">
-                                        <h4>By Reviews</h4>
-                                        <SfCheckBox @bind-Checked="sorting.ByNumOfReviews" @onchange="@(() => ChangeSortType("Reviews"))"></SfCheckBox>
-                                        <div>
-                                            <SfRadioButton Label="From highest" Name="reviews" Value="false" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
-                                            <SfRadioButton Label="From lowest" Name="reviews" Value="true" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
-                                        </div>
-
-                                        <hr />
-                                    </div>
-                                       
+                                    <_TagSearch selectedTags="selectedTags"></_TagSearch>
                                 </div>
                             </ContentTemplate>
                             <ChildContent>
-                                <button class="btn m-0" ID="btnSort"><i class="bi bi-arrow-down-up"></i>   Sort </button>
+                                <button class="btn m-0 btn-secondary" ID="btnTags"><i class="bi bi-tags-fill"></i>   Tags </button>
                             </ChildContent>
                         </SfTooltip>
                     </div>
-                </div>
-                <div class="row col-4 m-0 p-0 text-center justify-content-center">
-                    <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnTags">
-                        <ContentTemplate>
-                            <div id='democontent'>
-                                <_TagSearch selectedTags="selectedTags"></_TagSearch>
-                            </div>
-                        </ContentTemplate>
-                        <ChildContent>
-                            <button class="btn m-0" ID="btnTags"><i class="bi bi-tags-fill"></i>   Tags </button>
-                        </ChildContent>
-                    </SfTooltip>
-                </div>
                 </div>
 
                 <div class=" row col-3">
                     <div class="col-10 align-content-center">
                         <label>Search</label>
-                        <InputText @bind-Value="search" DisplayName="Search" class="input-textarea-style col-11" ></InputText>
+                        <InputText @bind-Value="search" DisplayName="Search" class="input-textarea-style col-11"></InputText>
                     </div>
                     <div class="col-1 m-0">
-                        <button class="btn" @onclick="GetFilteredData"><i class="bi bi-search"></i></button>
+                        <button class="btn btn-primary" @onclick="GetFilteredData"><i class="bi bi-search"></i></button>
                     </div>
                 </div>
             </div>
-            
+
 
         </div>
     </div>
     <div class="col-lg-10 align-items-center text-center mt-3">
-        <div class="form-custom-border bg-body-secondary p-3 ">
+        <div class="form-custom-border p-3 ">
             <div class="row">
                 @if (filteredServices.Count > 0)
                 {
@@ -140,15 +145,36 @@
                         <_Map @ref="mapComponent" services="filteredServices"></_Map>
                     </div>
                     <div class="col-6">
-                        @foreach (var item in filteredServices)
-                        {
-                            <div class="m-2 p-2" style="box-shadow: @(item.Selected ? "0px 0px 15px #c4b991" : "") " @onclick="(() => HandleParentServiceSelection(item))">
-                                <h4>@item.ServiceDto.Name</h4>
-                                <p>@item.ServiceDto.MinimumPrice  -  @item.ServiceDto.MaximumPrice</p>
-                                <p>Rate: @item.ServiceDto.Rate</p>
-                                <button class="btn btn-success mt-2" @onclick="() => GoToService(item.ServiceDto.Id)">Details</button> 
-                            </div>
-                        }
+                        <div style="max-height: 500px; overflow-y: auto;">
+                            @foreach (var item in filteredServices)
+                            {
+                                <div class="row m-2 form-custom-border no-borders  text-start" style="background-color: #fff; box-shadow: @(item.Selected ? "0px 0px 10px rgba(var(--bs-secondary-rgb), 0.2)" : "") " @onclick="(() => HandleParentServiceSelection(item))">
+                                    <div class="col-10 p-3">
+                                        <h4 class="text-primary">@item.ServiceDto.Name</h4>
+                                        <hr />
+                                        <p>Price: <span class="green-blue-text">@item.ServiceDto.MinimumPrice  -  @item.ServiceDto.MaximumPrice </span>  UAN</p>
+                                        <div class="row mt-0 pt-0 align-items-start" style="max-height:30px;">
+                                            <p class="col-1 pt-1">Rate:</p>
+                                            <div class="col-5 pt-0 mt-0 justify-content-start align-items-start" style="max-height:20px;">
+                                                <SfRating @bind-Value=item.ServiceDto.Rate ShowTooltip="false" CssClass="custom-rate" Disabled>
+                                                    <FullTemplate>
+                                                        <img src=@fullTemplateImage widht="15" height="15" />
+                                                    </FullTemplate>
+                                                    <EmptyTemplate>
+                                                        <img src=@emptyTemplateImage widht="15" height="15" />
+                                                    </EmptyTemplate>
+                                                </SfRating>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 m-0 p-0 align-content-end">
+                                        <button class="btn-fill" @onclick="() => GoToService(item.ServiceDto.Id)"><h5 class="text-white">Details<br /><i class="bi bi-arrow-right-circle"></i> </h5></button>
+
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
                     </div>
                 }
                 else
@@ -179,43 +205,53 @@
     public List<Tag> selectedTags { get; set; } = new List<Tag>();
     public string search = "";
 
+    protected override async void OnInitialized()
+    {
+        await GetCitiesAsync();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            var data = await GetCities();
-            if (data != null)
-            {
-                CityList = data
-                    .GroupBy(g => g.Name)
-                    .SelectMany(group =>
-                        group.Count() > 1
-                            ? group.Select(city => new CityDropdownItem
-                                {
-                                    GeonameId = city.Id,
-                                    NameFormatted = $"{city.Name} ({city.AdminName})"
-                                })
-                            : group.Select(city => new CityDropdownItem
-                                {
-                                    GeonameId = city.Id,
-                                    NameFormatted = city.Name
-                                })
-                    )
-                    .OrderBy(c => c.NameFormatted)
-                    .ToList();
-            }
-            else
-            {
-                CityList = new List<CityDropdownItem>();
-            }
-            CityList.Insert(0, new CityDropdownItem
-                {
-                    GeonameId = 0,
-                    NameFormatted = "----"
-                });
+            await GetCitiesAsync();
 
         }
         StateHasChanged();
+    }
+
+    private async Task GetCitiesAsync()
+    {
+        var data = await GetCities();
+        if (data != null)
+        {
+            CityList = data
+                .GroupBy(g => g.Name)
+                .SelectMany(group =>
+                    group.Count() > 1
+                        ? group.Select(city => new CityDropdownItem
+                            {
+                                GeonameId = city.Id,
+                                NameFormatted = $"{city.Name} ({city.AdminName})"
+                            })
+                        : group.Select(city => new CityDropdownItem
+                            {
+                                GeonameId = city.Id,
+                                NameFormatted = city.Name
+                            })
+                )
+                .OrderBy(c => c.NameFormatted)
+                .ToList();
+        }
+        else
+        {
+            CityList = new List<CityDropdownItem>();
+        }
+        CityList.Insert(0, new CityDropdownItem
+            {
+                GeonameId = 0,
+                NameFormatted = "----"
+            });
     }
 
     private async Task HandleParentServiceSelection(ServiceSelection service)
@@ -276,7 +312,8 @@
         {
             filteredServices.Sort(SortByRate);
             ascending = sorting.AscendingRate;
-        }else if (sorting.ByNumOfReviews)
+        }
+        else if (sorting.ByNumOfReviews)
         {
             filteredServices.Sort(SortByReviews);
             ascending = sorting.AscendingReview;
@@ -323,7 +360,7 @@
 
     public async Task GetFilteredData()
     {
-        if(Rate != 0)
+        if (Rate != 0)
         {
             filters.Rate = Rate;
         }
@@ -332,7 +369,7 @@
             filters.MaxPrice = RangeValue[1];
             filters.MinPrice = RangeValue[0];
         }
-        if(selectedTags.Count > 0)
+        if (selectedTags.Count > 0)
         {
             filters.Tags = selectedTags;
         }
@@ -342,7 +379,7 @@
         }
         var res = await _searchService.GetFilteredData(filters);
         filteredServices.Clear();
-        foreach(var item in res)
+        foreach (var item in res)
         {
             filteredServices.Add(new ServiceSelection
                 {
@@ -356,7 +393,7 @@
 
     public void GoToService(int serviceId)
     {
-         Navigation.NavigateTo($"/service-id={serviceId}");
+        Navigation.NavigateTo($"/service-id={serviceId}");
     }
 
     private async void showToastr(string res, string successMessage = "")
@@ -447,21 +484,186 @@
 
 <style>
     .e-tooltip-wrap.e-popup {
-        background-color: #e3dccc;
-        border: 0px;
-        box-shadow: 0px 0px 7px #b5ab94;
+        background-color: var(--bs-tertiary);
+        border: 3px solid var(--bs-tertiary);
+        box-shadow: 0 0 10px rgba(var(--bs-secondary-rgb), 0.3);
     }
 
-    .e-tooltip-wrap{
+    .e-tooltip-wrap .e-arrow-tip-inner.e-tip-right, .e-tooltip-wrap .e-arrow-tip-inner.e-tip-left, .e-tooltip-wrap .e-arrow-tip-inner.e-tip-bottom, .e-tooltip-wrap .e-arrow-tip-inner.e-tip-top {
+        color: var(--bs-tertiary);
+        box-shadow: 0 0 10px rgba(var(--bs-secondary-rgb), 0.3);
+    }
+
+    .e-tooltip-wrap .e-arrow-tip-outer.e-tip-top {
+        border-bottom: 8px solid var(--bs-tertiary);
+        border-left: 8px solid rgba(0, 0, 0, 0);
+        border-right: 8px solid rgba(0, 0, 0, 0);
+    }
+
+    .e-tooltip-wrap {
         background-color: #e3dccc;
     }
 
     .e-rating-container .e-rating-label.e-label-right, .e-rating-container .e-rating-label.e-label-left {
-         min-width: 0px;
+        min-width: 0px;
     }
 
     .e-rating-container .e-rating-label.e-label-left {
-        color: brown;
+        color: var(--bs-green-blue);
         font-size: large;
     }
+
+    .e-control-wrapper.e-slider-container .e-slider .e-range {
+        background-color: var(--bs-primary);
+    }
+
+    .e-control-wrapper.e-slider-container .e-slider .e-handle {
+        background-color: var(--bs-primary);
+        border-width: 1px;
+        border-style: solid;
+        border-image: initial;
+        border-color: var(--bs-primary);
+    }
+
+        .e-control-wrapper.e-slider-container .e-slider .e-handle:hover {
+            background-color: #048c69;
+            border-color: #048c69;
+        }
+
+        .e-control-wrapper.e-slider-container .e-slider .e-handle:active {
+            background-color: #048c69;
+            border-color: #048c69;
+        }
+
+        .e-control-wrapper.e-slider-container .e-slider .e-handle:focused {
+            border: none;
+            border-color: #048c69;
+        }
+
+    e-control-wrapper.e-slider-container .e-slider .e-handle.e-handle-focused.e-handle-active {
+        box-shadow: 0 0 10px #048c69;
+        border: none;
+    }
+
+
+    .e-control-wrapper.e-slider-container .e-slider .e-handle.e-tab-handle {
+        background-color: #048c69;
+        box-shadow: rgba(4, 140, 105, 0.25) 0px 0px 0px 4px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: rgb(255, 255, 255);
+        border-image: initial;
+    }
+
+    .e-input-group, .e-input-group.e-control-wrapper, .e-float-input, .e-float-input.e-input-group, .e-float-input.e-control-wrapper, .e-float-input.e-input-group.e-control-wrapper {
+        background: #fff;
+        color: var(--bs-secondary);
+    }
+
+        .e-float-input input[readonly], .e-float-input.e-control-wrapper input[readonly], .e-float-input textarea[readonly], .e-float-input.e-control-wrapper textarea[readonly] {
+            background: #e9ecef;
+            color: var(--bs-secondary);
+        }
+
+
+    .e-dropdownbase .e-list-item, .e-dropdownbase .e-list-item.e-item-focus {
+        color: var(--bs-secondary);
+        font-family: var(--bs-font-sans-serif);
+        min-height: 29px;
+    }
+
+        .e-dropdownbase .e-list-item.e-item-focus, .e-dropdownbase .e-list-item.e-active, .e-dropdownbase .e-list-item.e-active.e-hover, .e-dropdownbase .e-list-item.e-hover {
+            color: #023c57;
+            background-color: rgba(var(--bs-secondary-rgb), 0.1);
+        }
+
+    .e-outline.e-input-group.e-input-focus:hover:not(.e-success):not(.e-warning):not(.e-error):not(.e-disabled):not(.e-float-icon-left), .e-outline.e-input-group.e-input-focus.e-control-wrapper:hover:not(.e-success):not(.e-warning):not(.e-error):not(.e-disabled):not(.e-float-icon-left), .e-outline.e-input-group.e-input-focus:not(.e-success):not(.e-warning):not(.e-error):not(.e-disabled), .e-outline.e-input-group.e-control-wrapper.e-input-focus:not(.e-success):not(.e-warning):not(.e-error):not(.e-disabled) {
+        border-color: var(--bs-secondary);
+        box-shadow: inset 1px 1px var(--bs-secondary), inset -1px 0 var(--bs-secondary), inset 0 -1px var(--bs-secondary);
+    }
+
+    .e-float-input.e-control-wrapper:not(.e-error) input ~ label.e-label-top.e-float-text, .e-float-input.e-control-wrapper:not(.e-error) input[readonly] ~ label.e-label-top.e-float-text {
+        color: var(--bs-secondary);
+        font-family: var(--bs-font-sans-serif);
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .e-rating-container .e-rating-item-container {
+        cursor: pointer;
+        font-size: 10px;
+        padding: 0px 4px 4px 4px;
+        display: block;
+        min-width: 1px;
+        min-height: 1px;
+        position: relative;
+        align-items: center;
+    }
+
+    .btn-fill {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(var(--bs-primary-rgb), 0.6);
+        border-start-end-radius: 12px;
+        border-end-end-radius: 12px;
+    }
+
+
+        .btn-fill:hover {
+            background-color: rgba(var(--bs-primary-rgb), 0.9);
+            box-shadow: inset 0 0 5px #048c69;
+        }
+
+    .text-white {
+        color: #fff !important;
+    }
+
+    .no-borders {
+        padding: 0px;
+    }
+
+
+    .e-checkbox-wrapper .e-frame.e-check, .e-css.e-checkbox-wrapper .e-frame.e-check {
+        background-color: var(--bs-green-blue);
+        border-color: var(--bs-green-blue);
+        color: #fff;
+    }
+
+    .e-radio:checked + label::before {
+        background-color: var(--bs-secondary);
+        border-color: var(--bs-secondary);
+    }
+
+    .e-radio:checked:disabled + label::before {
+        background-color: rgba(var(--bs-secondary-rgb), 0.6);
+        border-color: rgba(var(--bs-secondary-rgb), 0.6);
+    }
+
+    .e-radio:disabled + label::before {
+        background-color: #fff;
+        border-color: rgba(var(--bs-secondary-rgb), 0.6);
+    }
+
+    .e-checkbox-wrapper .e-checkbox:focus + .e-frame, .e-checkbox-wrapper .e-checkbox:active + .e-frame, .e-css.e-checkbox-wrapper .e-checkbox:focus + .e-frame, .e-css.e-checkbox-wrapper .e-checkbox:active + .e-frame {
+        background-color: #fff;
+        border-color: var(--bs-green-blue);
+        box-shadow: 0 0 0 4px rgba(3, 136, 145, .25);
+    }
+
+     
+
+    .e-checkbox-wrapper:hover .e-frame.e-check, .e-css.e-checkbox-wrapper:hover .e-frame.e-check {
+        background-color: #038891;
+        border-color: #038891;
+        box-shadow: 0 0 0 4px rgba(3, 136, 145, .25);
+        color: #fff;
+        }
+
+        .e-checkbox-wrapper .e-checkbox:focus + .e-frame.e-check, .e-checkbox-wrapper .e-checkbox:active + .e-frame.e-check, .e-css.e-checkbox-wrapper .e-checkbox:focus + .e-frame.e-check, .e-css.e-checkbox-wrapper .e-checkbox:active + .e-frame.e-check {
+            background-color: #038891;
+            border-color: #038891;
+            box-shadow: 0 0 0 4px rgba(3, 136, 145, .25);
+            color: #fff;
+        }
+
 </style>
