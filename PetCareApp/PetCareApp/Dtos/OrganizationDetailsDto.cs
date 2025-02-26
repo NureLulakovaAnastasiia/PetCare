@@ -8,6 +8,8 @@
         public string Description { get; set; } = string.Empty;
         public byte[]? Photo { get; set; }
 
+        public bool IsInOrg { get; set; } = false;
+
         public GetContactsDto Contacts { get; set; }
 
     }

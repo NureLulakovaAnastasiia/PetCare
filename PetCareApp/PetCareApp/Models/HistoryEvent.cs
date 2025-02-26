@@ -250,7 +250,7 @@ namespace PetCareApp.Models
 
         public static HistoryEvent CreateChangeServiceVisibilityEvent(string appUserId, string serviceName, bool isHidden)
         {
-            var type = isHidden ? "not visible" : "hidden";
+            var type = isHidden ? "hidden" : "visible";
             return new HistoryEvent
             {
                 AppUserId = appUserId,

@@ -738,6 +738,12 @@ namespace PetCareApp.Services
                 {
                     return "No such organization";
                 }
+                var employee = _dbContext.OrganizationEmployees.Where(e => e.AppUserId == user.Id && e.DismissalDate == null).FirstOrDefault();
+                if (employee != null)
+                {
+                    return "You are already part of this organization";
+
+                }
 
                 var request = _dbContext.RequestsToOrganization
                     .Where(r => r.OrganizationId == organizationId && r.AppUserId == user.Id && r.Status == "New")

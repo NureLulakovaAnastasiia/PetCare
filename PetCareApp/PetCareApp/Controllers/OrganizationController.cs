@@ -108,7 +108,7 @@ namespace PetCareApp.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetOrganizationDetails([FromQuery]int organizationId)
         {
-            var res = _organizationService.GetOrganizationDetails(organizationId);
+            var res = await _organizationService.GetOrganizationDetails(organizationId);
             if (res != null && res.IsSuccess)
             {
                 return Ok(res.Data);

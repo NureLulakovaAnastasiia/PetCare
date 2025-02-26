@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +55,15 @@ namespace PetCareApp.Services
                 }else if(request.OrganizationId != organization.Id)
                 {
                     return "You don't have access to this function";
+                }
+
+                var employee = _dbContext.OrganizationEmployees
+                    .Where(e => e.AppUserId == request.AppUserId && e.DismissalDate == null)
+                    .FirstOrDefault();
+
+                if (employee != null)
+                {
+                    return "This user is already your employee";
                 }
                 request.Status = "Accepted";
                 _dbContext.Update(request);
@@ -113,8 +123,8 @@ namespace PetCareApp.Services
 
                 if (res > 0)
                 {
-                    AddHistoryEvent(HistoryEventFactory.CreateRejectRequestMasterEvent(user.Id, organization.Name));
-                    AddHistoryEvent(HistoryEventFactory.CreateRejectRequestEvent(organization.AppUserId, user.FirstName + user.LastName));
+                    AddHistoryEvent(HistoryEventFactory.CreateRejectRequestMasterEvent(request.AppUserId, organization.Name));
+                    AddHistoryEvent(HistoryEventFactory.CreateRejectRequestEvent(user.Id, user.FirstName + user.LastName));
                 }
 
                 return res.ToString();
@@ -366,11 +376,13 @@ namespace PetCareApp.Services
             return res;
         }
 
-        public Result<OrganizationDetailsDto> GetOrganizationDetails(int organizationId)
+        public async Task<Result<OrganizationDetailsDto>> GetOrganizationDetails(int organizationId)
         {
             var res = new Result<OrganizationDetailsDto>();
             try
             {
+                var user = await GetCurrentUserAsync();
+
                 var organization = _dbContext.Organizations.Where(o => o.Id == organizationId)
                    .Include(o => o.AppUser) 
                    .ThenInclude(u => u.Contacts)
@@ -387,6 +399,18 @@ namespace PetCareApp.Services
                         Photo = organization.Photo,
                         Description = organization.Description
                     };
+
+                    if (user != null)
+                    {
+                        var employee = _dbContext.OrganizationEmployees
+                            .Where(e => e.AppUserId == user.Id && e.DismissalDate == null)
+                            .FirstOrDefault();
+                        if (employee != null)
+                        {
+                            data.IsInOrg = true;
+                        }
+                    }
+
                     if (organization.AppUser != null)
                     {
                         var contacts = ContactsMapping.MapContact(organization.AppUser.Contacts);
@@ -611,6 +635,14 @@ namespace PetCareApp.Services
                     {
                         return "Your organization was not found";
                     }
+                    var existingPortfolios = _dbContext.OrganizationPorfolios
+                        .Where(o => portfolioIds.Contains(o.PortfolioId))
+                        .Select(o => o.PortfolioId)
+                        .ToList();
+                    if(existingPortfolios != null)
+                    {
+                        portfolioIds = portfolioIds.Except(existingPortfolios).ToList();
+                    }
                     var portfoliosToAdd = _dbContext.Portfolios.Where(p => portfolioIds.Contains(p.Id)).ToList();
                     if (portfoliosToAdd != null)
                     {
@@ -642,6 +674,10 @@ namespace PetCareApp.Services
                                     AddHistoryEvent(HistoryEventFactory.CreateOrgAddPortfolioEvent(employee.Id, organization.Name));
                                     AddHistoryEvent(HistoryEventFactory.CreateOrgAddPortfolioOrgEvent(organization.AppUserId, employee.FirstName + employee.LastName));
                                 }
+                            }
+                            else
+                            {
+                                return "No data were added";
                             }
 
                             return res.ToString();

@@ -14,7 +14,7 @@ namespace PetCareApp.Interfaces
         public Task<string> UpsertMasterBreaks(List<BreakDto> breakDto, string masterId);
         public Task<Result<OrganizationInfo>> GetOrganizationInfo(); 
         public Task<string> UpdateOrgInfo(OrganizationInfo info);
-        public Result<OrganizationDetailsDto> GetOrganizationDetails(int organizationId);
+        public Task<Result<OrganizationDetailsDto>> GetOrganizationDetails(int organizationId);
         public Result<List<GetEmployeeDto>> GetOrgEmployees(int orgId);
         public string DismissEmployee(int employeeId);
         public Result<List<OrganizationPortfolioDto>> GetOrganizationPortfolio(int orgId);

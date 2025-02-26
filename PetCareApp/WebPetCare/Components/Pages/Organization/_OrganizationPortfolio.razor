@@ -202,7 +202,9 @@
         var res = await orgService.getOrgMastersPortfolios(orgId);
         if (res.IsSuccess)
         {
-            mastersPortfolios = res.Data.Except(portfolio).ToList();
+            mastersPortfolios = res.Data
+            .Where(x => !portfolio.Any(y => y.Id == x.Id))
+                .ToList();
             StateHasChanged();
         }
         else

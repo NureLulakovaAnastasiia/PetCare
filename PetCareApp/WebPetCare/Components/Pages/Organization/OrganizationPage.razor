@@ -50,7 +50,15 @@
                 @if(role == "Master")
                 {
                     <div class="mt-2">
+
+                    @if (data.IsInOrg)
+                    {
+                        <h4 class="text-primary">You're already part of this organization</h4>
+                    }
+                    else
+                    {
                         <button class="btn btn-primary" @onclick="MakeRequest">Make request to organization</button>
+                    }
                     </div>
                 }
             }
