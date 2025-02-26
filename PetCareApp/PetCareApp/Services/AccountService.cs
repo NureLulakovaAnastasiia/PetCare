@@ -105,6 +105,12 @@ namespace PetCareApp.Services
             }
         }
 
+        public void AddChangePasswordHistory(string userId, bool isSuccess)
+        {
+            _dBContext.Add(HistoryEventFactory.CreatePasswordChangeEvent(userId, isSuccess));
+            _dBContext.SaveChanges();
+        }
+
         //public async Task<string> ChangeRoleToMaster()
         //{
         //    try

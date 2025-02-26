@@ -14,6 +14,8 @@ namespace PetCareApp.Interfaces
 
         public string CreateOrganization(string userId);
 
+        public void AddChangePasswordHistory(string userId, bool isSuccess);
+
         //public Task<string> ChangeRoleToMaster();
     }
 }

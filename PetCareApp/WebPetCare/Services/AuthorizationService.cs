@@ -110,11 +110,11 @@ namespace WebPetCare.Services
             return result;
         }
 
-        private async Task<ResultData> SendEmail(string email)
+        private async Task<ResultData> SendEmail(string email, bool IsPasswordRestore = false)
         {
             var result = new ResultData();
             var randomNum = GenerateCode();
-            var data = new EmailConfirmationDto { Email = email, checkNumber = randomNum };
+            var data = new EmailConfirmationDto { Email = email, checkNumber = randomNum, IsPasswordChange = IsPasswordRestore };
 
             JsonSerializerOptions options = new JsonSerializerOptions
             {
@@ -149,19 +149,15 @@ namespace WebPetCare.Services
             return generator.Next(0, 1000000).ToString("D6");
         }
 
-        public async Task<bool> ConfirmEmail(string email)
+        public async Task<bool> ConfirmEmail(string email, string? newPassword)
         {
-            JsonSerializerOptions options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            };
-            string json = JsonSerializer.Serialize(email, options);
-            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            var client = new HttpClient();
             try
             {
-                string fullUrl = $"{_apiUrl}/api/account/confirmEmail";
+                var type = newPassword != null ? $"&newPassword={newPassword}" : "";
+                string fullUrl = $"{_apiUrl}/api/account/confirmEmail?email={email}{type}";
 
-                HttpResponseMessage response = await _httpClient.PatchAsync(fullUrl, content);
+                HttpResponseMessage response = await client.PatchAsync(fullUrl, null);
                 if (response.IsSuccessStatusCode)
                 {
                     return true;
@@ -175,7 +171,6 @@ namespace WebPetCare.Services
             {
                 return false;
             }
-            return false;
         }
 
 
@@ -196,6 +191,22 @@ namespace WebPetCare.Services
             {
                 return ex.Message;
             }
+        }
+
+        public async Task<ResultData> SendEmailForPasswordRestore(string email)
+        {
+            var res = new ResultData();
+            if (String.IsNullOrEmpty(email))
+            {
+                res.Error = "Email field is empty";
+            }
+            else
+            {
+                var data = await SendEmail(email, true);
+                return data;
+            }
+
+            return res;
         }
     }
 

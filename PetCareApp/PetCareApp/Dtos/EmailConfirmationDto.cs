@@ -4,5 +4,7 @@
     {
         public string Email { get; set; } = string.Empty;
         public string checkNumber { get; set; } = string.Empty;
+
+        public bool IsPasswordChange { get; set; } = false;
     }
 }

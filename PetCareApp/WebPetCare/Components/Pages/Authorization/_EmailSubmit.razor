@@ -4,23 +4,40 @@
 
 
 <div class="d-flex flex-column m-2 p-2 align-items-center text-center">
-    <div>
-        <h3>Confirm Code</h3>
-    </div>
-    <div class="code-input-container">
-        @for (int i = 0; i < CodeLength; i++)
-        {
-            var localIndex = i;
+    @if (IsPasswordGetting)
+    {
+        <div>
+            <h3>Enter new password</h3>
+        </div>
 
-            <input type="text" maxlength="1" class="code-input"
-                   id="codeInput_@localIndex"
-                   value="@Code[localIndex]"
-                   @oninput="(e) => OnInput(e, localIndex)"
-                   @onkeydown="(e) => OnKeyDown(e, localIndex)" />
-        }
-    </div>
+            <div class="col-8 form-group py-2 text-center">
+                <h5>New password</h5>
+                <InputText typeof="password" class="form-control col-10" @bind-Value="passwordChange.NewPassword" DisplayName="Email" />
+                <h5>Confirm new Password</h5>
+                <InputText typeof="password" class="form-control col-10" @bind-Value="passwordChange.NewPasswordSubmit" />
+            </div>
+            <button type="submit" class="btn btn-primary col-4 mt-3" @onclick="ChangePassword">Submit</button>
+    }
+    else
+    {
+        <div>
+            <h3>Confirm Code</h3>
+        </div>
+        <div class="code-input-container">
+            @for (int i = 0; i < CodeLength; i++)
+            {
+                var localIndex = i;
+
+                <input type="text" maxlength="1" class="code-input"
+                id="codeInput_@localIndex"
+                value="@Code[localIndex]"
+                @oninput="(e) => OnInput(e, localIndex)"
+                @onkeydown="(e) => OnKeyDown(e, localIndex)" />
+            }
+        </div>
 
     <button class="btn btn-primary mt-3" @onclick="SubmitEmail">Submit</button>
+    }
 </div>
 
 @code {
@@ -28,6 +45,15 @@
     public int CodeLength { get; set; } = 6;
     [Parameter]
     public string realCode { get; set; }
+
+    [Parameter]
+    public bool IsPasswordRestore { get; set; }
+
+    [Parameter]
+    public EventCallback ToLoginPage { get; set; }
+
+    private bool IsPasswordGetting { get; set; } = false;
+    private PasswordChange passwordChange { get; set; } = new PasswordChange();
 
     [Parameter]
     public string email { get; set; }
@@ -62,13 +88,71 @@
     {
         if (String.Equals(realCode, String.Join("", Code)))
         {
-            var res = await authService.ConfirmEmail(email);
-            if (res)
+            if (IsPasswordRestore)
             {
-                await UpdateAuthenticationStatus(true);
-                Navigation.NavigateTo("/");
+                IsPasswordGetting = true;
             }
+            else
+            {
+                var res = await authService.ConfirmEmail(email);
+                if (!res)
+                {
+                    showToastr("Eror during confirming");
+                }
+
+                if (ToLoginPage.HasDelegate)
+                {
+                    await ToLoginPage.InvokeAsync();
+                }
+            }
+
+        }
+        else
+        {
+            showToastr("Code mismatch");
+
         }
     }
 
+    private async Task ChangePassword()
+    {
+        try
+        {
+            if (passwordChange != null && passwordChange.NewPassword.Equals(passwordChange.NewPasswordSubmit))
+            {
+                var res = await authService.ConfirmEmail(email, passwordChange.NewPassword);
+                if (res)
+                {
+                    showToastr("Password was succesfully changed");
+                }
+            }
+            else
+            {
+                showToastr("Error during password change");
+            }
+        }
+        catch (Exception ex)
+        {
+            showToastr(ex.Message);
+
+        }
+        if (ToLoginPage.HasDelegate)
+        {
+            await ToLoginPage.InvokeAsync();
+        }
+
+    }
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+  
 }

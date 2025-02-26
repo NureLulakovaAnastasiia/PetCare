@@ -10,4 +10,10 @@ namespace PetCareApp.Dtos
         [Required]
         public string Password { get; set; }
     }
+
+    public class PasswordChange
+    {
+        public string NewPassword { get; set; } = string.Empty;
+        public string NewPasswordSubmit { get; set; } = string.Empty;
+    }
 }

@@ -73,7 +73,7 @@ namespace PetCareApp.Models
             {
                 AppUserId = appUserId,
                 Title = "Password change",
-                Description = isSuccess ? "Password was changed succesfully" : "Error occured while changing password. Try again."
+                Description = isSuccess ? "Password was changed succesfully." : "Error occured while changing password. Try again."
             };
         }
 

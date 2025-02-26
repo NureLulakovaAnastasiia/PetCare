@@ -135,7 +135,7 @@ namespace PetCareApp.Controllers
             try
             {
                 var checkUser = await _userManager.FindByEmailAsync(emailConfirm.Email);
-                if (checkUser != null && !checkUser.EmailConfirmed)
+                if (checkUser != null && (!checkUser.EmailConfirmed || emailConfirm.IsPasswordChange))
                 {
                     var res = _userService.SendEmail(emailConfirm);
                     if(!String.Equals(res, "Success")) { 
@@ -155,19 +155,33 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPatch("confirmEmail")]
-        public async Task<IActionResult> ConfirmEmail([FromBody] string email)
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string email,  string? newPassword)
         {
             try
             {
                 var checkUser = await _userManager.FindByEmailAsync(email);
-                if (checkUser != null && !checkUser.EmailConfirmed) 
+                if (checkUser != null) 
                 {
-                   var res = _userService.SubmitEmail(email);
-                    if (int.TryParse(res, out int num))
+                    if (!checkUser.EmailConfirmed) {
+                        var res = _userService.SubmitEmail(email);
+                        if (int.TryParse(res, out int num))
+                        {
+                            return Ok("Email was confirmed");
+                        }
+                        return StatusCode(500, res);
+                    }else if (!String.IsNullOrEmpty(newPassword))
                     {
-                        return Ok("Email was confirmed");
+                        var token = await _userManager.GeneratePasswordResetTokenAsync(checkUser);
+                        var res = await _userManager.ResetPasswordAsync(checkUser, token, newPassword);
+                        if (res.Succeeded)
+                        {
+                            _userService.AddChangePasswordHistory(checkUser.Id, true);
+                            return Ok("You succesfully changed your password");
+                        }
+                        _userService.AddChangePasswordHistory(checkUser.Id, false);
+                        return StatusCode(500, res);
                     }
-                    return StatusCode(500, res);
+                    return Unauthorized("User is not found");
                 }
                 else
                 {

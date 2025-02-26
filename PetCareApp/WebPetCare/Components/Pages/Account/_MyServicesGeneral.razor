@@ -38,8 +38,14 @@
                                 </div>
                             
                             </div>
-
                         }
+
+                    @if (services.Count > maxItems)
+                    {
+                        <div class="col align-content-end text-end justify-content-end">
+                            <p >More services on tab "My services"</p>
+                        </div>
+                    }
                 </div>
                 }
                 else
