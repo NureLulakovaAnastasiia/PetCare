@@ -1248,7 +1248,9 @@ namespace PetCareApp.Services
                         return res;
                     }
                 }
-                var services = _dbContext.Services.Where(s => s.AppUserId == (masterId == null ? user.Id : masterId)).ToList();
+                var services = _dbContext.Services
+                    .Where(s => s.AppUserId == (masterId == null ? user.Id : masterId))
+                    .ToList();
                 if (services == null || services.Count == 0)
                 {
                     res.ErrorMessage = "No services were found";

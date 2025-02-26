@@ -9,12 +9,37 @@
         <div class="form-custom-border p-3 ">
             <h3 class=""><b>My records</b></h3>
             <hr />
-
+           
             @if (records.Count > 0)
             {
+                <div class="row justify-content-end">
+                    <div class="col-3">
+                        <h6>Sort by start time</h6>
+                        <SfDropDownList TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
+                                        DataSource="SortTypes" @bind-Value="sortType">
+                            <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+                            <DropDownListEvents TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
+                                                ValueChange="SortRecords"></DropDownListEvents>
+                        </SfDropDownList>
+                    </div>
+                    <div class="col-3">
+                        <h6>Filter by status</h6>
+                        <SfDropDownList TValue="SortOptions.FilterByRecordStatus" TItem="SelectListItem<SortOptions.FilterByRecordStatus>"
+                                        DataSource="FilterTypes" @bind-Value="filterType">
+                            <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+                            <DropDownListEvents TValue="SortOptions.FilterByRecordStatus" TItem="SelectListItem<SortOptions.FilterByRecordStatus>"
+                                                ValueChange="FilterRecords"></DropDownListEvents>
+                        </SfDropDownList>
+                    </div>
+
+                    @if(filteredRecords.Count == 0)
+                    {
+                        <h3 class="mt-5">No records were found.</h3>
+                    }
+                </div>
                 <div class="container my-4 align-content-center">
                     <div class="row text-start">
-                        @foreach (var record in records)
+                        @foreach (var record in filteredRecords)
                         {
                             <_ServiceReview serviceName="@record.ServiceName" IsReview="IsReview"
                                             CancelReview="CancelReview" PageUpdate="ReloadData" serviceId="@(record.ServiceId ?? 0)"></_ServiceReview>
@@ -114,8 +139,27 @@
 
 @code {
     public List<RecordInfoDto> records = new List<RecordInfoDto>();
+    public List<RecordInfoDto> filteredRecords = new List<RecordInfoDto>();
     private bool IsReview { get; set; } = false;
     private bool IsCancel { get; set; } = false;
+    private SortOptions.SortDirection sortType = SortOptions.SortDirection.Newest;
+    private SortOptions.FilterByRecordStatus filterType = SortOptions.FilterByRecordStatus.All;
+
+    private List<SelectListItem<SortOptions.SortDirection>> SortTypes = new List<SelectListItem<SortOptions.SortDirection>>();
+    private List<SelectListItem<SortOptions.FilterByRecordStatus>> FilterTypes = new List<SelectListItem<SortOptions.FilterByRecordStatus>>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        SortTypes = Enum.GetValues(typeof(SortOptions.SortDirection))
+            .Cast<SortOptions.SortDirection>()
+            .Select(e => new SelectListItem<SortOptions.SortDirection>(e))
+            .ToList();
+        FilterTypes = Enum.GetValues(typeof(SortOptions.FilterByRecordStatus))
+       .Cast<SortOptions.FilterByRecordStatus>()
+       .Select(e => new SelectListItem<SortOptions.FilterByRecordStatus>(e))
+       .ToList();
+    }
+
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -125,6 +169,8 @@
             if (data.IsSuccess)
             {
                 records = data.Data;
+                FilterRecords();
+                SortRecords();
                 StateHasChanged();
             }
             else
@@ -176,6 +222,44 @@
     {
         Navigation.NavigateTo($"/service-id={serviceId}");
     }
+
+    public void SortRecords()
+    {
+        switch (sortType)
+        {
+            case SortOptions.SortDirection.Newest:
+                filteredRecords = filteredRecords.OrderBy(e => e.StartTime).ToList();
+                break;
+            case SortOptions.SortDirection.Oldest:
+                filteredRecords = filteredRecords.OrderByDescending(e => e.StartTime).ToList();
+
+                break;
+        }
+    }
+
+    public void FilterRecords()
+    {
+        switch (filterType)
+        {
+            case SortOptions.FilterByRecordStatus.All:
+                filteredRecords = records.ToList();
+                break;
+            case SortOptions.FilterByRecordStatus.Created:
+                filteredRecords = records.Where(e => e.Status == "Created").ToList();
+                break;
+            case SortOptions.FilterByRecordStatus.Finished:
+                filteredRecords = records.Where(e => e.Status == "Finished").ToList();
+                break;
+            case SortOptions.FilterByRecordStatus.Cancelled:
+                filteredRecords = records.Where(e => e.Status == "Cancelled").ToList();
+                break;
+
+        }
+
+        SortRecords();
+
+    }
+
 
     private async void showToastr(string res, string successMessage = "")
     {

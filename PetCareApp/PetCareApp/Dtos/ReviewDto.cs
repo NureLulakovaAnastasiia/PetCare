@@ -12,6 +12,8 @@ namespace PetCareApp.Dtos
         public byte[]? Photo { get; set; } = [];
         [Range(1, 5)]
         public int Rate { get; set; }
+        public DateTime Date { get; set; } = DateTime.UtcNow;
+
         public string? AppUserId { get; set; }
         public string? AppUserName { get; set; }
         public int? ServiceId { get; set; }

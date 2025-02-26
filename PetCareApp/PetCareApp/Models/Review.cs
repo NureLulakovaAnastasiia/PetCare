@@ -12,6 +12,8 @@ namespace PetCareApp.Models
         public byte[]? Photo { get; set; } = [];
         [Range(1, 5)]
         public int Rate { get; set; }
+
+        public DateTime Date { get; set; } 
         public string? AppUserId { get; set; }
         [DeleteBehavior(DeleteBehavior.ClientCascade)]
         public AppUser? AppUser { get; set; }

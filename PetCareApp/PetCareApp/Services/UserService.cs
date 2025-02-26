@@ -341,8 +341,8 @@ namespace PetCareApp.Services
                         var result = _dbContext.SaveChanges();
                         if (result > 0)
                         {
-                            AddHistoryEvent(HistoryEventFactory.CreateNewReviewEvent(user.Id, service.Name));
-                            AddHistoryEvent(HistoryEventFactory.CreateNewReviewEventMaster(user.Id, service.Name));
+                            AddHistoryEvent(HistoryEventFactory.CreateNewReviewEvent(review.AppUserId, service.Name));
+                            AddHistoryEvent(HistoryEventFactory.CreateNewReviewEventMaster(service.AppUserId, service.Name));
 
                         }
                         res.Data = result == 1;

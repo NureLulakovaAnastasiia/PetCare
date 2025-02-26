@@ -137,7 +137,8 @@ namespace PetCareApp.Services
 
         public List<GetServiceDto>? FindServices(FiltersModel filters)
         {
-            var services = _dbContext.Services.Include(s => s.Reviews)
+            var services = _dbContext.Services
+                .Include(s => s.Reviews)
                     .Include(s => s.AppUser).ThenInclude(u => u.Contacts)
                     .Include(s => s.Tags)
                     .Where(s => !s.IsHidden)

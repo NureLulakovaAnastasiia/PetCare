@@ -9,6 +9,18 @@
         <div class="form-custom-border p-3 align-content-center">
             <div class="row col-10 offset-1">
                 <h2><strong>Reviews</strong></h2>
+                <hr />
+                <div class="row justify-content-end">
+                    <div class="col-3">
+                        <h6>Sort</h6>
+                        <SfDropDownList TValue="SortOptions.SortTypesReview" TItem="SelectListItem<SortOptions.SortTypesReview>"
+                                        DataSource="SortTypes" @bind-Value="sortType">
+                            <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+                            <DropDownListEvents TValue="SortOptions.SortTypesReview" TItem="SelectListItem<SortOptions.SortTypesReview>"
+                                                ValueChange="SortReviews"></DropDownListEvents>
+                        </SfDropDownList>
+                    </div>
+                </div>
                 @foreach (var item in reviews)
                 {
                     var image = item.Photo != null ? $"data:image/png;base64,{Convert.ToBase64String(item.Photo)}" : null;
@@ -43,13 +55,15 @@
                         {
                             <h6 class="ms-4 green-blue-text">For service: @item.ServiceName</h6>
                         }
+                        <p class="ms-4">@item.Date.ToString("g")</p>
+
                         <hr />
 
                         <div class="row ms-3">
                             <div class="@(image != null ? "col-7" : "") ">
                                 <p>@item.Text</p>
                             </div>
-                            @if (image != null)
+                            @if (image != null && item.Photo.Count() > 0)
                             {
                                 <img src="@image" class="pb-2 col-4" alt="Answer image" style="max-width: 200px;" />
                             }
@@ -123,6 +137,17 @@
     private bool isOwner = false;
     private bool isCommenting = false;
     private ReviewCommentDto commentDto = new ReviewCommentDto();
+    private SortOptions.SortTypesReview sortType = SortOptions.SortTypesReview.Newest;
+    private List<SelectListItem<SortOptions.SortTypesReview>> SortTypes = new List<SelectListItem<SortOptions.SortTypesReview>>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        SortTypes = Enum.GetValues(typeof(SortOptions.SortTypesReview))
+            .Cast<SortOptions.SortTypesReview>()
+            .Select(e => new SelectListItem<SortOptions.SortTypesReview>(e))
+            .ToList();
+
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -150,6 +175,7 @@
 
                 }
             }
+            SortReviews();
             StateHasChanged();
         }
     }
@@ -206,6 +232,25 @@
         else
         {
             showToastr(res);
+        }
+    }
+
+    public void SortReviews()
+    {
+        switch (sortType)
+        {
+            case SortOptions.SortTypesReview.Newest:
+                reviews = reviews.OrderByDescending(e => e.Date).ToList();
+                break;
+            case SortOptions.SortTypesReview.Oldest:
+                reviews = reviews.OrderBy(e => e.Date).ToList();
+                break;
+            case SortOptions.SortTypesReview.HighRate:
+                reviews = reviews.OrderByDescending(e => e.Rate).ToList();
+                break;
+            case SortOptions.SortTypesReview.LowRate:
+                reviews = reviews.OrderBy(e => e.Rate).ToList();
+                break;
         }
     }
 

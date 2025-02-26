@@ -12,8 +12,35 @@
             </div>
             @if (requests != null && requests.Count > 0)
             {
+                <div class="row justify-content-end">
+                    <div class="col-3">
+                        <h6>Sort by date</h6>
+                        <SfDropDownList TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
+                                        DataSource="SortTypes" @bind-Value="sortType">
+                            <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+                            <DropDownListEvents TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
+                                                ValueChange="SortRequests"></DropDownListEvents>
+                        </SfDropDownList>
+                    </div>
+                    <div class="col-3">
+                        <h6>Filter by status</h6>
+                        <SfDropDownList TValue="SortOptions.FilterByRequestStatus" TItem="SelectListItem<SortOptions.FilterByRequestStatus>"
+                                        DataSource="FilterTypes" @bind-Value="filterType">
+                            <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+                            <DropDownListEvents TValue="SortOptions.FilterByRequestStatus" TItem="SelectListItem<SortOptions.FilterByRequestStatus>"
+                                                ValueChange="FilterRequests"></DropDownListEvents>
+                        </SfDropDownList>
+                    </div>
+
+                    @if (filteredRequests.Count == 0)
+                    {
+                        <h3 class="mt-5">No requests were found.</h3>
+                    }
+                </div>
+
                 <div class="row align-items-center justify-content-center">
-                    @foreach (var request in requests)
+
+                    @foreach (var request in filteredRequests)
                     {
                         <div class="row col-10 form-custom-border p-3 m-3 main-review">
                             <div class="col-8 text-start offset-1 green-blue-text">
@@ -57,6 +84,25 @@
     [Parameter]
     public string role { get; set; } = "Master";
     public List<GetRequestDto> requests { get; set; } = new List<GetRequestDto>();
+    public List<GetRequestDto> filteredRequests { get; set; } = new List<GetRequestDto>();
+
+    private SortOptions.SortDirection sortType = SortOptions.SortDirection.Newest;
+    private SortOptions.FilterByRequestStatus filterType = SortOptions.FilterByRequestStatus.All;
+
+    private List<SelectListItem<SortOptions.SortDirection>> SortTypes = new List<SelectListItem<SortOptions.SortDirection>>();
+    private List<SelectListItem<SortOptions.FilterByRequestStatus>> FilterTypes = new List<SelectListItem<SortOptions.FilterByRequestStatus>>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        SortTypes = Enum.GetValues(typeof(SortOptions.SortDirection))
+            .Cast<SortOptions.SortDirection>()
+            .Select(e => new SelectListItem<SortOptions.SortDirection>(e))
+            .ToList();
+        FilterTypes = Enum.GetValues(typeof(SortOptions.FilterByRequestStatus))
+       .Cast<SortOptions.FilterByRequestStatus>()
+       .Select(e => new SelectListItem<SortOptions.FilterByRequestStatus>(e))
+       .ToList();
+    }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -66,6 +112,9 @@
             if (data != null)
             {
                 requests = data;
+                FilterRequests();
+                SortRequests();
+
             }
             else
             {
@@ -146,6 +195,42 @@
         }
 
     }
+
+    public void SortRequests()
+    {
+        switch (sortType)
+        {
+            case SortOptions.SortDirection.Newest:
+                filteredRequests = filteredRequests.OrderByDescending(e => e.Date).ToList();
+                break;
+            case SortOptions.SortDirection.Oldest:
+                filteredRequests = filteredRequests.OrderBy(e => e.Date).ToList();
+
+                break;
+        }
+    }
+
+    public void FilterRequests()
+    {
+        switch (filterType)
+        {
+            case SortOptions.FilterByRequestStatus.All:
+                filteredRequests = requests.ToList();
+                break;
+            case SortOptions.FilterByRequestStatus.New:
+                filteredRequests = requests.Where(e => e.Status == "New").ToList();
+                break;
+            case SortOptions.FilterByRequestStatus.Accepted:
+                filteredRequests = requests.Where(e => e.Status == "Accepted").ToList();
+                break;
+            case SortOptions.FilterByRequestStatus.Rejected:
+                filteredRequests = requests.Where(e => e.Status == "Rejected").ToList();
+                break;
+
+        }
+        SortRequests();
+    }
+
     private async void showToastr(string res, string successMessage = "")
     {
         if (String.IsNullOrEmpty(res))

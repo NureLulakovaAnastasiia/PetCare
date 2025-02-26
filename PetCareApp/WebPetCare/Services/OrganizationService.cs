@@ -2,6 +2,7 @@
 using Microsoft.JSInterop;
 using PetCareApp.Dtos;
 using PetCareApp.Models;
+using System.Text;
 using System.Text.Json;
 using WebPetCare.IServices;
 
@@ -457,6 +458,7 @@ namespace WebPetCare.Services
             var res = new Result<List<GetServiceDto>>();
             try
             {
+                
                 httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
                 var strToAdd = orgId != null ? $"?orgId={orgId}" : "";
                 string fullUrl = $"{_apiUrl}/api/Organization/getOrganizationServices{strToAdd}";
@@ -466,6 +468,7 @@ namespace WebPetCare.Services
                 if (response.IsSuccessStatusCode)
                 {
                     string result = await response.Content.ReadAsStringAsync();
+
                     JsonSerializerOptions options = new JsonSerializerOptions
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
