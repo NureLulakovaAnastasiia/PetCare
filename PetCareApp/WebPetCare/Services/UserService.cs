@@ -802,12 +802,13 @@ namespace WebPetCare.Services
             return res;
         }
 
-        public async Task<string> UpdateMasterSchedule(List<ScheduleDto> schedules)
+        public async Task<string> UpdateMasterSchedule(List<ScheduleDto> schedules, bool fromOrg, string? masterId = null)
         {
             try
             {
                 httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
-                string fullUrl = $"{_apiUrl}/api/Master/updateSchedule";
+                var endpoint = fromOrg ? $"Organization/upsertSchedule?masterId={masterId}" : "Master/updateSchedule";
+                string fullUrl = $"{_apiUrl}/api/{endpoint}";
                 JsonSerializerOptions options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -823,7 +824,12 @@ namespace WebPetCare.Services
                 }
                 else
                 {
-                   return await response.Content.ReadAsStringAsync();
+                   var res = await response.Content.ReadAsStringAsync();
+                    if(res == null)
+                    {
+                        return "Error during update";
+                    }
+                    return res;
                 }
             }
             catch (Exception ex)

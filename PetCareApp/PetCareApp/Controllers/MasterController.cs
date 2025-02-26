@@ -159,7 +159,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPost("upsertSchedule")]
-        [Authorize(Roles = "Master,Organization,Admin")]
+        [Authorize(Roles = "Master,Admin")]
         public async Task<IActionResult> UpsertSchedule(List<ScheduleDto> scheduleDto)
         {
             if (!ModelState.IsValid)

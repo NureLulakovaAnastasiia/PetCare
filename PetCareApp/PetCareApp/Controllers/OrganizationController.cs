@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
 using PetCareApp.Models;
+using PetCareApp.Services;
 
 namespace PetCareApp.Controllers
 {
@@ -81,6 +83,24 @@ namespace PetCareApp.Controllers
             {
                 return Ok(num);
             }
+            return StatusCode(500, res);
+        }
+
+        [HttpPut("upsertSchedule")]
+        [Authorize(Roles = "Organization,Admin")]
+        public async Task<IActionResult> UpsertSchedule(List<ScheduleDto> scheduleDto, [FromQuery]string masterId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await _organizationService.UpsertMasterSchedule(scheduleDto, masterId);
+            if (int.TryParse(res, out int num))
+            {
+                return Ok("Schedule was successfully added or updated!");
+            }
+
             return StatusCode(500, res);
         }
 

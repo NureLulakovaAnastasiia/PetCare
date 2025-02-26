@@ -221,7 +221,7 @@
         {
             var itemsToUpdate = new List<ScheduleDto>();
             itemsToUpdate.Add(editedSchedule);
-            var res = await _userService.UpdateMasterSchedule(itemsToUpdate);
+            var res = await _userService.UpdateMasterSchedule(itemsToUpdate, masterId != null, masterId);
             if (String.IsNullOrEmpty(res))
             {
                 showToastr("", "Schedule was succesfully updated");
