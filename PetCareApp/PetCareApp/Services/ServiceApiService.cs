@@ -21,6 +21,18 @@ namespace PetCareApp.Services
             _dbContext = context;
         }
 
+        private void AddHistoryEvent(HistoryEvent historyEvent)
+        {
+            try
+            {
+                _dbContext.Add(historyEvent);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
         public async Task<string> AddService(AddServiceDto serviceDto)
         {
             try
@@ -36,7 +48,12 @@ namespace PetCareApp.Services
                 {
                     service.AppUserId = user.Id;
                     _dbContext.Add(service);
-                    await _dbContext.SaveChangesAsync();
+                    var result = await _dbContext.SaveChangesAsync();
+                    if (result > 0)
+                    {
+                        AddHistoryEvent(HistoryEventFactory.CreateNewServiceEvent(user.Id, service.Name));
+                    }
+                   
                     return service.Id.ToString();
                 }
                 return "Error during adding";
@@ -180,7 +197,12 @@ namespace PetCareApp.Services
                 if (service != null && service.AppUserId == user.Id)
                 {
                     _dbContext.Remove(service);
-                    return _dbContext.SaveChanges().ToString();
+                    var result = _dbContext.SaveChanges();
+                    if (result > 0)
+                    {
+                        AddHistoryEvent(HistoryEventFactory.CreateDeleteServiceEvent(user.Id, service.Name));
+                    }
+                    return result.ToString();
                 }
                 return "Error during adding";
             }
@@ -205,7 +227,12 @@ namespace PetCareApp.Services
                 {
                     service.IsHidden = !service.IsHidden;
                     _dbContext.Update(service);
-                    return _dbContext.SaveChanges().ToString();
+                    var result = _dbContext.SaveChanges();
+                    if (result > 0)
+                    {
+                        AddHistoryEvent(HistoryEventFactory.CreateChangeServiceVisibilityEvent(user.Id, service.Name, service.IsHidden));
+                    }
+                    return result.ToString();
                 }
                 return "Error during adding";
             }

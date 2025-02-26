@@ -754,6 +754,8 @@ namespace PetCareApp.Services
                     if (result > 0)
                     {
                         AddHistoryEvent(HistoryEventFactory.CreateNewOrgRequestEvent(user.Id, organization.Name));
+                        AddHistoryEvent(HistoryEventFactory.CreateNewOrgRequestOrgEvent(organization.AppUserId, user.FirstName + user.LastName));
+
                     }
                     return result.ToString();
                 }

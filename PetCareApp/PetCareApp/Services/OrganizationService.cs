@@ -21,6 +21,17 @@ namespace PetCareApp.Services
             _mapper = mapper;
         }
 
+        private void AddHistoryEvent(HistoryEvent historyEvent)
+        {
+            try
+            {
+                _dbContext.Add(historyEvent);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+            }
+        }
         public async Task<string> AcceptMasterRequest(int requestId)
         {
             try
@@ -53,6 +64,13 @@ namespace PetCareApp.Services
                     AcceptanceDate = DateTime.UtcNow
                 });
                 var res = _dbContext.SaveChanges();
+                
+                if (res > 0)
+                {
+                    AddHistoryEvent(HistoryEventFactory.CreateAcceptRequestMasterEvent(request.AppUserId, organization.Name));
+                    AddHistoryEvent(HistoryEventFactory.CreateAcceptRequestEvent(organization.AppUserId, user.FirstName + user.LastName));
+
+                }
                 if (res != 2)
                 {
                     return "Error during accepting";
@@ -91,7 +109,15 @@ namespace PetCareApp.Services
                 }
                 request.Status = "Rejected";
                 _dbContext.Update(request);
-                return _dbContext.SaveChanges().ToString();
+                var res = _dbContext.SaveChanges();
+
+                if (res > 0)
+                {
+                    AddHistoryEvent(HistoryEventFactory.CreateRejectRequestMasterEvent(user.Id, organization.Name));
+                    AddHistoryEvent(HistoryEventFactory.CreateRejectRequestEvent(organization.AppUserId, user.FirstName + user.LastName));
+                }
+
+                return res.ToString();
             }
             catch (Exception ex)
             {
@@ -164,7 +190,14 @@ namespace PetCareApp.Services
                                     _dbContext.Update(item);
                                 }
                             }
-                            return _dbContext.SaveChanges().ToString();
+                            var res = _dbContext.SaveChanges();
+
+                            if (res > 0)
+                            {
+                                AddHistoryEvent(HistoryEventFactory.CreateOrgScheduleUpdateEvent(masterId));
+                            }
+
+                            return res.ToString();
                         }
                     }
                     return "This master is not in your organization";
@@ -206,7 +239,14 @@ namespace PetCareApp.Services
                                     _dbContext.Update(item);
                                 }
                             }
-                            return _dbContext.SaveChanges().ToString();
+                            var res = _dbContext.SaveChanges();
+
+                            if (res > 0)
+                            {
+                                AddHistoryEvent(HistoryEventFactory.CreateOrgScheduleUpdateEvent(masterId));
+                            }
+
+                            return res.ToString();
                         }
                     }
                     return "This master is not in your organization";
@@ -405,7 +445,10 @@ namespace PetCareApp.Services
         {
             try
             {
-                var employee = _dbContext.OrganizationEmployees.FirstOrDefault(e => e.Id == employeeId);
+                var employee = _dbContext.OrganizationEmployees.Where(e => e.Id == employeeId)
+                    .Include(e => e.Organization)
+                    .Include(e => e.AppUser)
+                    .FirstOrDefault();
                 if (employee != null)
                 {
                     var portfolios = _dbContext.Portfolios.Where(p => p.AppUserId == employee.AppUserId)
@@ -420,7 +463,16 @@ namespace PetCareApp.Services
                     }
                     employee.DismissalDate = DateTime.UtcNow;  
                     _dbContext.Update(employee);
-                    return _dbContext.SaveChanges().ToString();
+                    var res = _dbContext.SaveChanges();
+
+                    if (res > 0)
+                    {
+                        AddHistoryEvent(HistoryEventFactory.CreateDismissEmployeeEvent(employee.AppUserId,employee.Organization.Name));
+                        AddHistoryEvent(HistoryEventFactory.CreateDismissEmployeeOrgEvent(employee.Organization.AppUserId, employee.AppUser.FirstName + employee.AppUser.LastName));
+
+                    }
+
+                    return res.ToString();
                 }
                 return "Error during getting employee";
             }
@@ -567,6 +619,7 @@ namespace PetCareApp.Services
                             .Where(e => e.DismissalDate == null)
                             .Select(e => e.AppUserId)
                             .Distinct().ToList();
+
                         if(users != null && employees != null && users.All(item => employees.Contains(item)))
                         {
                             var items = new List<OrganizationPorfolio>();
@@ -579,7 +632,19 @@ namespace PetCareApp.Services
                                 });
                             }
                             _dbContext.AddRange(items);
-                            return _dbContext.SaveChanges().ToString();
+                            var res = _dbContext.SaveChanges();
+
+                            if (res > 0)
+                            {
+                                var appUsers = _dbContext.Users.Where(u => users.Contains(u.Id)).ToList();
+                                foreach (var employee in appUsers)
+                                {
+                                    AddHistoryEvent(HistoryEventFactory.CreateOrgAddPortfolioEvent(employee.Id, organization.Name));
+                                    AddHistoryEvent(HistoryEventFactory.CreateOrgAddPortfolioOrgEvent(organization.AppUserId, employee.FirstName + employee.LastName));
+                                }
+                            }
+
+                            return res.ToString();
                         }
                         return "You are trying to add portfolio of non-employee master";
                     }

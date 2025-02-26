@@ -55,8 +55,17 @@ namespace PetCareApp.Models
                 Title = "Organization request",
                 Description = $"Request to organization {orgName} was succesfully sent. "
             };
-        }
+        } //for master
 
+        public static HistoryEvent CreateNewOrgRequestOrgEvent(string appUserId, string masterName) //for organization
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Organization request",
+                Description = $"You have new request from {masterName}. "
+            };
+        }
 
         public static HistoryEvent CreatePasswordChangeEvent(string appUserId, bool isSuccess)
         {
@@ -126,6 +135,127 @@ namespace PetCareApp.Models
                 AppUserId = appUserId,
                 Title = "New review comment",
                 Description = $"Your review to service \"{serviceName}\" got a comment from service provider."
+            };
+        }
+
+        public static HistoryEvent CreateAcceptRequestEvent(string appUserId, string masterName) //for organization
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Accepted Request",
+                Description = $"You succesfully accepted request from {masterName}. Now he/she became your employee."
+            };
+        }
+
+        public static HistoryEvent CreateAcceptRequestMasterEvent(string appUserId, string orgName) //for master
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Accepted Request",
+                Description = $"Your request to {orgName} was succesfully accepted. Now you became its employee."
+            };
+        }
+
+        public static HistoryEvent CreateRejectRequestEvent(string appUserId, string masterName) //for organization
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Rejected Request",
+                Description = $"You rejected request from {masterName}."
+            };
+        }
+
+        public static HistoryEvent CreateRejectRequestMasterEvent(string appUserId, string orgName) //for master
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Rejected Request",
+                Description = $"Your request to {orgName} was rejected."
+            };
+        }
+
+        public static HistoryEvent CreateOrgScheduleUpdateEvent(string appUserId) //for master
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Updated schedule",
+                Description = $"Your schedule was updated by your organization."
+            };
+        }
+
+        public static HistoryEvent CreateDismissEmployeeEvent(string appUserId, string orgName) //for master
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Employee dismiss",
+                Description = $"You were dismissed from your organization {orgName}."
+            };
+        }
+
+        public static HistoryEvent CreateDismissEmployeeOrgEvent(string appUserId, string masterName) //for organization
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Employee dismiss",
+                Description = $"Yu have dismissed master {masterName} from your organization."
+            };
+        }
+
+        public static HistoryEvent CreateOrgAddPortfolioEvent(string appUserId, string orgName) //for master
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Portfolio addition",
+                Description = $"Your potfolio were added to your organization {orgName} portfolio."
+            };
+        }
+
+        public static HistoryEvent CreateOrgAddPortfolioOrgEvent(string appUserId, string masterName) //for organization
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Portfolio addition",
+                Description = $"You have added {masterName} potfolio to your organization portfolio."
+            };
+        }
+
+        public static HistoryEvent CreateNewServiceEvent(string appUserId, string serviceName) 
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "New service",
+                Description = $"You have succesfully created new service \"{serviceName}\"."
+            };
+        }
+
+        public static HistoryEvent CreateDeleteServiceEvent(string appUserId, string serviceName)
+        {
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Service deletion",
+                Description = $"You have succesfully deleted your service \"{serviceName}\"."
+            };
+        }
+
+        public static HistoryEvent CreateChangeServiceVisibilityEvent(string appUserId, string serviceName, bool isHidden)
+        {
+            var type = isHidden ? "not visible" : "hidden";
+            return new HistoryEvent
+            {
+                AppUserId = appUserId,
+                Title = "Service visibility",
+                Description = $"You made your service \"{serviceName}\"  { type } to public."
             };
         }
 
