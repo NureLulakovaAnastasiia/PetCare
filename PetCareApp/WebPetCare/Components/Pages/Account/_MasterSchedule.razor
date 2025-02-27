@@ -1,18 +1,21 @@
 ﻿@inject IUserService _userService
 @inject SfDialogService DialogService
 @inject IJSRuntime _JSRuntime
+@inject IStringLocalizer<Account> Localizer
+
+
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border  p-3 mt-3">
             <div class="row text-center justify-content-around">
                 <div class="@(isEditable ? "col-4 offset-3" : "col-12")">
-                    <h2><strong>Schedule</strong></h2>
+                    <h2><strong>@Localizer["Schedule"]</strong></h2>
                 </div>
                 @if (isEditable)
                 {
                     <div class="col-2">
-                        <button class="btn btn-primary p-2" @onclick="AddSchedule"><i class="bi bi-plus-circle"></i>  Add</button>
+                        <button class="btn btn-primary p-2" @onclick="AddSchedule"><i class="bi bi-plus-circle"></i>  @Localizer["Add"]</button>
                     </div>
                 }
             </div>
@@ -20,12 +23,12 @@
                 <table class="table col-10">
                     <thead>
                         <tr>
-                            <th>Day</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
+                            <th>@Localizer["Day"]</th>
+                            <th>@Localizer["Start Time"]</th>
+                            <th>@Localizer["End Time"]</th>
                             @if (isEditable)
                             {
-                                <th>Actions</th>
+                                <th>@Localizer["Actions"]</th>
                             }
                         </tr>
                     </thead>
@@ -53,13 +56,15 @@
 
                 <SfDialog Width="450px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@isEdit">
                     <DialogTemplates>
-                        <Header> @(isAdding ? "Add schedule" : "Update schedule") </Header>
+                        <Header>
+                            @(isAdding ? @Localizer["Add schedule"] : Localizer["Update schedule"])
+                        </Header>
                         <Content>
                             <div>
                                 @if (isAdding)
                                 {
                                     <div class="row mb-3">
-                                        <SfCheckBox Label="Is date" @bind-Checked="@isDate"></SfCheckBox>
+                                        <SfCheckBox Label="@Localizer["Is date"]" @bind-Checked="@isDate"></SfCheckBox>
                                     </div>
                                 }
                                 <div>
@@ -71,7 +76,7 @@
                                         }
                                         else
                                         {
-                                            <SfDropDownList TValue="int" TItem="DayOfWeekItem" Placeholder="Select a day" DataSource="@DaysOfWeek" @bind-Value="selectedDayOfWeek.ID">
+                                            <SfDropDownList TValue="int" TItem="DayOfWeekItem" Placeholder="@Localizer["Select a day"]" DataSource="@DaysOfWeek" @bind-Value="selectedDayOfWeek.ID">
                                                 <DropDownListFieldSettings Value="ID" Text="Text"></DropDownListFieldSettings>
                                             </SfDropDownList>
                                         }
@@ -79,14 +84,14 @@
                                     </div>
                                     <div class="container row mt-3 text-center">
                                         <div class="col-5 offset-1">
-                                            <label>Start Time</label>
+                                            <label>@Localizer["Start Time"]</label>
                                             <SfTimePicker TValue="TimeSpan" @bind-Value="@editedSchedule.StartTime">
                                                 <TimePickerMaskPlaceholder Hour="hour" Minute="minute"></TimePickerMaskPlaceholder>
                                             </SfTimePicker>
                                         </div>
 
                                         <div class="col-5">
-                                            <label>End Time</label>
+                                            <label>@Localizer["End Time"]</label>
 
                                             <SfTimePicker TValue="TimeSpan" @bind-Value="@editedSchedule.EndTime">
                                                 <TimePickerMaskPlaceholder Hour="hour" Minute="minute"></TimePickerMaskPlaceholder>
@@ -100,8 +105,8 @@
                         </Content>
                     </DialogTemplates>
                     <DialogButtons>
-                        <DialogButton Content="Save" IsPrimary="true" OnClick="@UpsertSchedule" />
-                        <DialogButton Content="Cancel" OnClick="@CancelEdit" />
+                        <DialogButton Content="@Localizer["Save"]" IsPrimary="true" OnClick="@UpsertSchedule" />
+                        <DialogButton Content="@Localizer["Cancel"]" OnClick="@CancelEdit" />
                     </DialogButtons>
                 </SfDialog>
 
@@ -138,6 +143,7 @@
                     Text = day.ToString()
                 }).ToList();
     }
+   
     protected override async Task OnParametersSetAsync()
     {
         if (schedule == null || schedule.Count == 0)
@@ -157,14 +163,14 @@
         }
         else
         {
-            //showToastr(data.ErrorMessage);
+            showToastr(data.ErrorMessage);
         }
     }
     public bool CheckSchedule()
     {
         if(editedSchedule.StartTime > editedSchedule.EndTime)
         {
-            showToastr("start time cannot be bigger then end time");
+            showToastr(Localizer["StartBiggerEnd"]);
             return false;
         }
         return true;
@@ -189,7 +195,7 @@
         
         if (editedSchedule == null)
         {
-            showToastr("Nothing to add or update");
+            showToastr(Localizer["Nothing to add or update"]);
             return;
         }
         if (!CheckSchedule())
@@ -224,7 +230,7 @@
             var res = await _userService.UpdateMasterSchedule(itemsToUpdate, masterId != null, masterId);
             if (String.IsNullOrEmpty(res))
             {
-                showToastr("", "Schedule was succesfully updated");
+                showToastr("", Localizer["Schedule was succesfully updated"]);
                 var newSchedule = new ScheduleDto(editedSchedule);
                 var sch = schedule.Where(s => s.Id == editedSchedule.Id).FirstOrDefault();
                 var ind = schedule.IndexOf(sch);
@@ -251,13 +257,13 @@
         editedSchedule = schedule.FirstOrDefault(s => s.Id == scheduleId);
         if (editedSchedule != null)
         {
-            var isConfirm = await DialogService.ConfirmAsync("Are you sure you want to delete this schedule? \nRecords will not be removed if they exists", "Delete schedule");
+            var isConfirm = await DialogService.ConfirmAsync(Localizer["SureToDeleteSchedule"], Localizer["Delete schedule"]);
             if (isConfirm)
             {
                 var res = await _userService.DeleteMasterSchedule(scheduleId);
                 if (String.IsNullOrEmpty(res))
                 {
-                    showToastr("", "Schedule was succefully removed");
+                    showToastr("", Localizer["Schedule was succefully removed"]);
                     schedule.Remove(editedSchedule);
                     StateHasChanged();
                 }

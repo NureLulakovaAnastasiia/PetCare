@@ -2,19 +2,20 @@
 @inject SfDialogService DialogService
 @inject IUserService userService
 @inject IJSRuntime _JSRuntime
+@inject IStringLocalizer<Account> Localizer
 
 <SfDialog ShowCloseIcon="true" IsModal="true" Width="700px" @bind-Visible="@IsReview">
         <DialogTemplates>
             <Header>
                 <div class="text-center">
-                    <h2>Add review to service</h2>
+                <h2>@Localizer["Add review to service"]</h2>
                     <h4> @serviceName</h4>
                 </div>
             </Header>
             <Content>
                 <div class="row text-center">
                     <div class="col col-6 p-2">
-                        <label for="rate" class="p-2">Rate</label>
+                        <label for="rate" class="p-2">@Localizer["Rate"]</label>
                         <div>
                             <SfRating @bind-Value=Rate ShowLabel=true ShowTooltip="false" LabelPosition="LabelPosition.Left">
                                 <FullTemplate>
@@ -28,11 +29,11 @@
                         </div>
                         <hr />
 
-                        <label for="description" class="p-2">Description</label>
+                        <label for="description" class="p-2">@Localizer["Description"]</label>
                         <textarea id="description" @bind="Description" class="form-control"></textarea>
                     </div>
                     <div class="col-6 p-2 text-center">
-                        <label for="photo" class="d-block pb-2">Photo</label>
+                        <label for="photo" class="d-block pb-2">@Localizer["Photo"]</label>
                         <label class="image-upload pb-4 ">
                             <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
                             <div class="image-container">

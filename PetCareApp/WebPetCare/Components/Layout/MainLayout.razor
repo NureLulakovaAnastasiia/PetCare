@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Globalization
+@inherits LayoutComponentBase
 @inject IJSRuntime JSRuntime
 
 <div class="page flex-column"> 
@@ -23,6 +24,7 @@
 @code {
     private bool isAuthenticated;
     private NavMenu navMenu;
+    private string CurrentCulture { get; set; } = "uk";
 
     private async Task UpdateAuthenticationStatus(bool status)
     {

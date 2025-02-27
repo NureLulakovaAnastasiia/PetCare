@@ -1,0 +1,465 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About me" xml:space="preserve">
+    <value>About me</value>
+  </data>
+  <data name="About organization" xml:space="preserve">
+    <value>About organization</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Add comment" xml:space="preserve">
+    <value>Add comment</value>
+  </data>
+  <data name="Add new item to portfolio" xml:space="preserve">
+    <value>Add new item to portfolio</value>
+  </data>
+  <data name="Add new pet" xml:space="preserve">
+    <value>Add new pet</value>
+  </data>
+  <data name="Add Review" xml:space="preserve">
+    <value>Add Review</value>
+  </data>
+  <data name="Add review to service" xml:space="preserve">
+    <value>Add review to service</value>
+  </data>
+  <data name="Add schedule" xml:space="preserve">
+    <value>Add schedule</value>
+  </data>
+  <data name="AreadyWrittenReview" xml:space="preserve">
+    <value>You've already wrote a review to this service</value>
+  </data>
+  <data name="Become a master" xml:space="preserve">
+    <value>Become a master</value>
+  </data>
+  <data name="Break" xml:space="preserve">
+    <value>Break</value>
+  </data>
+  <data name="Breed" xml:space="preserve">
+    <value>Breed</value>
+  </data>
+  <data name="Calendar" xml:space="preserve">
+    <value>Calendar</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Cancel Appointment" xml:space="preserve">
+    <value>Cancel Appointment</value>
+  </data>
+  <data name="Cancel Reason" xml:space="preserve">
+    <value>Cancel Reason</value>
+  </data>
+  <data name="Cancel Record" xml:space="preserve">
+    <value>Cancel Record</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="Change role to master" xml:space="preserve">
+    <value>Change role to master</value>
+  </data>
+  <data name="Change status" xml:space="preserve">
+    <value>Change status</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="Comment was succesfully added" xml:space="preserve">
+    <value>Comment was succesfully added</value>
+  </data>
+  <data name="Comment was succesfully deleted" xml:space="preserve">
+    <value>Comment was succesfully deleted</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="Data updated and saved successfully!" xml:space="preserve">
+    <value>Data updated and saved successfully!</value>
+  </data>
+  <data name="Data were succefully added" xml:space="preserve">
+    <value>Data were succefully added</value>
+  </data>
+  <data name="Data were succefully gotten" xml:space="preserve">
+    <value>Data were succefully gotten</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Day</value>
+  </data>
+  <data name="Delete schedule" xml:space="preserve">
+    <value>Delete schedule</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Edit location" xml:space="preserve">
+    <value>Edit location</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Employees" xml:space="preserve">
+    <value>Employees</value>
+  </data>
+  <data name="End Time" xml:space="preserve">
+    <value>End Time</value>
+  </data>
+  <data name="Enter reason to cancel appointment:" xml:space="preserve">
+    <value>Enter reason to cancel appointment:</value>
+  </data>
+  <data name="Enter your address" xml:space="preserve">
+    <value>Enter your address</value>
+  </data>
+  <data name="Filter by status" xml:space="preserve">
+    <value>Filter by status</value>
+  </data>
+  <data name="Filter by visibility" xml:space="preserve">
+    <value>Filter by visibility</value>
+  </data>
+  <data name="Finished" xml:space="preserve">
+    <value>Finished</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="For service" xml:space="preserve">
+    <value>For service</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Is date" xml:space="preserve">
+    <value>Is date</value>
+  </data>
+  <data name="Item was succefully deleted" xml:space="preserve">
+    <value>Item was succefully deleted</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="Master" xml:space="preserve">
+    <value>Master</value>
+  </data>
+  <data name="MoreServicesTab" xml:space="preserve">
+    <value>More services on tab "My services"</value>
+  </data>
+  <data name="My pets" xml:space="preserve">
+    <value>My pets</value>
+  </data>
+  <data name="My portfolio" xml:space="preserve">
+    <value>My portfolio</value>
+  </data>
+  <data name="My records" xml:space="preserve">
+    <value>My records</value>
+  </data>
+  <data name="My requests" xml:space="preserve">
+    <value>My requests</value>
+  </data>
+  <data name="My services" xml:space="preserve">
+    <value>My services</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="No data was found" xml:space="preserve">
+    <value>No data was found</value>
+  </data>
+  <data name="No description available" xml:space="preserve">
+    <value>No description available</value>
+  </data>
+  <data name="No image available" xml:space="preserve">
+    <value>No image available</value>
+  </data>
+  <data name="No records were found." xml:space="preserve">
+    <value>No records were found.</value>
+  </data>
+  <data name="No services available." xml:space="preserve">
+    <value>No services available.</value>
+  </data>
+  <data name="No services were found" xml:space="preserve">
+    <value>No services were found</value>
+  </data>
+  <data name="NoPets" xml:space="preserve">
+    <value>You don't have pets yet.</value>
+  </data>
+  <data name="NoPortfolio" xml:space="preserve">
+    <value>You don't have portfolio yet.</value>
+  </data>
+  <data name="Nothing to add or update" xml:space="preserve">
+    <value>Nothing to add or update</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Organization logo" xml:space="preserve">
+    <value>Organization logo</value>
+  </data>
+  <data name="OrgName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Pet was succesfully added" xml:space="preserve">
+    <value>Pet was succesfully added</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Photo" xml:space="preserve">
+    <value>Photo</value>
+  </data>
+  <data name="Please upload an image" xml:space="preserve">
+    <value>Please upload an image</value>
+  </data>
+  <data name="Please, write your comment" xml:space="preserve">
+    <value>Please, write your comment</value>
+  </data>
+  <data name="Portfolio" xml:space="preserve">
+    <value>Portfolio</value>
+  </data>
+  <data name="Portfolio was succesfully saved" xml:space="preserve">
+    <value>Portfolio was succesfully saved</value>
+  </data>
+  <data name="Portfolio was succesfully updated" xml:space="preserve">
+    <value>Portfolio was succesfully updated</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="Profile photo" xml:space="preserve">
+    <value>Profile photo</value>
+  </data>
+  <data name="Rate" xml:space="preserve">
+    <value>Rate</value>
+  </data>
+  <data name="Reason cannot be empty" xml:space="preserve">
+    <value>Reason cannot be empty</value>
+  </data>
+  <data name="Record" xml:space="preserve">
+    <value>Record</value>
+  </data>
+  <data name="Record was succesfully cancelled" xml:space="preserve">
+    <value>Record was succesfully cancelled</value>
+  </data>
+  <data name="Records were succesfully gotten" xml:space="preserve">
+    <value>Records were succesfully gotten</value>
+  </data>
+  <data name="Records were succesfully updated" xml:space="preserve">
+    <value>Records were succesfully updated</value>
+  </data>
+  <data name="Recurrence" xml:space="preserve">
+    <value>Recurrence</value>
+  </data>
+  <data name="Requests" xml:space="preserve">
+    <value>Requests</value>
+  </data>
+  <data name="Review was succesfully deleted" xml:space="preserve">
+    <value>Review was succesfully deleted</value>
+  </data>
+  <data name="Reviews" xml:space="preserve">
+    <value>Reviews</value>
+  </data>
+  <data name="Role was succesfully changed" xml:space="preserve">
+    <value>Role was succesfully changed</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Schedule" xml:space="preserve">
+    <value>Schedule</value>
+  </data>
+  <data name="Schedule was succefully removed" xml:space="preserve">
+    <value>Schedule was succefully removed</value>
+  </data>
+  <data name="Schedule was succesfully updated" xml:space="preserve">
+    <value>Schedule was succesfully updated</value>
+  </data>
+  <data name="Select a day" xml:space="preserve">
+    <value>Select a day</value>
+  </data>
+  <data name="Select a service name" xml:space="preserve">
+    <value>Select a service name</value>
+  </data>
+  <data name="Service Name" xml:space="preserve">
+    <value>Service Name</value>
+  </data>
+  <data name="Services" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="Sort" xml:space="preserve">
+    <value>Sort</value>
+  </data>
+  <data name="Sort by start time" xml:space="preserve">
+    <value>Sort by start time</value>
+  </data>
+  <data name="Start Time" xml:space="preserve">
+    <value>Start Time</value>
+  </data>
+  <data name="StartBiggerEnd" xml:space="preserve">
+    <value>Start time cannot be bigger then end time</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>Submit</value>
+  </data>
+  <data name="SureCancelRecord" xml:space="preserve">
+    <value>Are you sure you want to cancel this record?</value>
+  </data>
+  <data name="SureRoleChange" xml:space="preserve">
+    <value>Are you sure you want to change role to master?</value>
+  </data>
+  <data name="SureToDeleteSchedule" xml:space="preserve">
+    <value>Are you sure you want to delete this schedule? Records will not be removed if they exists</value>
+  </data>
+  <data name="There is no data to display" xml:space="preserve">
+    <value>There is no data to display</value>
+  </data>
+  <data name="There is no reviews" xml:space="preserve">
+    <value>There is no reviews</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="Update schedule" xml:space="preserve">
+    <value>Update schedule</value>
+  </data>
+</root>

@@ -1,12 +1,16 @@
 ﻿@inject NavigationManager Navigation
+@inject IStringLocalizer<Account> Localizer
+
+
+
 
 <div class="d-flex justify-content-center mt-4">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border p-3 ">
             <div class="row text-center">
 
-                <h3 class="col-8 offset-2"><b>My services</b></h3>
-                <button class="btn col-2 btn-func btn-func-primary" @onclick="GoToServiceCreation"><i class="bi bi-plus-circle"></i>     Add</button>
+                <h3 class="col-8 offset-2"><b>@Localizer["My services"]</b></h3>
+                <button class="btn col-2 btn-func btn-func-primary" @onclick="GoToServiceCreation"><i class="bi bi-plus-circle"></i>     @Localizer["Add"]</button>
             </div>
             <hr />
 
@@ -26,8 +30,8 @@
                                 <hr class="mt-0 pt-0 text-center" />
                                 <div class="row text-start green-blue-text justify-content-center align-items-center">
                                     <div class="col-8 m-0">
-                                        <h6>Price: <br />@services[i].MinimumPrice - @services[i].MaximumPrice</h6>
-                                        <h6>Reviews: @services[i].Reviews.Count</h6>
+                                        <h6>@Localizer["Price"]: <br />@services[i].MinimumPrice - @services[i].MaximumPrice</h6>
+                                        <h6>@Localizer["Reviews"]: @services[i].Reviews.Count</h6>
                                     </div>
                                     <div class="col-4 m-0 align-items-center" style="line-height: 50%">
                                         <button class="btn rounded-circle btn-secondary p-0 ps-1 pe-1 me-2" 
@@ -43,7 +47,7 @@
                     @if (services.Count > maxItems)
                     {
                         <div class="col align-content-end text-end justify-content-end">
-                            <p >More services on tab "My services"</p>
+                            <p>@Localizer["MoreServicesTab"]</p>
                         </div>
                     }
                 </div>
@@ -51,7 +55,7 @@
                 else
                 {
                     <div class="text-center">
-                        <h4>No services available.</h4>
+                        <h4>@Localizer["No services available."]</h4>
                     </div>
                 }
             </div>

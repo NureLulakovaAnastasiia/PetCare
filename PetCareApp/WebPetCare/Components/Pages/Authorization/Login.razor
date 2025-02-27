@@ -1,69 +1,66 @@
 ﻿@page "/login"
+@using System.Globalization
+
 
 @inject IAuthorizationService authService
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
-
+@inject IStringLocalizer<Authorization> Localizer
 
 
 <PageTitle>Login</PageTitle>
 
 
 <div class="row text-center justify-content-center mt-5">
-
-    @* <div class="text-danger">
-    <p class="alert-primary">@error</p>
-    </div> *@
-
     <div class="col-8 offset-4">
         @if (IsLogin)
         {
             <div class="col-7">
-                <h1>With returning</h1>
+                <h1>@Localizer["WithReturning"]</h1>
                 <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="LoginFunc" class="">
                     <div class="form-group py-2 text-center">
-                        <h5>Email</h5>
+                        <h5>@Localizer["Email"]</h5>
                         <InputText class="form-control" @bind-Value="LoginModel.Email" DisplayName="Email" />
-                        <h5>Password</h5>
+                        <h5>@Localizer["Password"]</h5>
                         <InputText typeof="password" class="form-control" @bind-Value="LoginModel.Password" />
-                        <a @onclick="ShowEmailEnter">Forgot your password?</a>
+                        <a @onclick="ShowEmailEnter">@Localizer["ForgotPassword"]</a>
                     </div>
-                    <button type="submit" class="btn btn-primary col-10 mt-3">Login</button>
+                    <button type="submit" class="btn btn-primary col-10 mt-3">@Localizer["Login"]</button>
                 </EditForm>
                 <div class="mt-3">
-                    <h6>Don't have an account? <a @onclick="() => SelectTab(false)">Register</a></h6>
+                    <h6>@Localizer["NoAccount"] <a @onclick="() => SelectTab(false)">@Localizer["Register"]</a></h6>
                 </div>
             </div>
         }
         else if (EmailEnter)
         {
             <div class="col-7">
-                <h1>Restore password</h1>
+                <h1>@Localizer["RestorePassword"]</h1>
                     <div class="form-group py-2 text-center">
-                        <h5>Enter your Email to get code</h5>
+                    <h5>@Localizer["EmailForCode"]</h5>
                         <InputText class="form-control" @bind-Value="LoginModel.Email" DisplayName="Email" />
                     </div>
-                    <button type="submit" @onclick="ForgotPassword" class="btn btn-primary col-10 mt-3">Send</button>
+                    <button type="submit" @onclick="ForgotPassword" class="btn btn-primary col-10 mt-3">@Localizer["Send"]</button>
             </div>
         }
         else if (!IsLogin && !IsCode)
         {
             <div class="col-7">
-                <h1>Create new account</h1>
+                <h1>@Localizer["NewAccount"]</h1>
                 <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="RegisterFunc" class="">
                     <div class="form-group py-2 text-center">
                         <div class="row justify-content-between mb-3">
                             <div class="col-6">
-                                <h5>First Name</h5>
+                                <h5>@Localizer["FirstName"]</h5>
                                 <InputText class="form-control" @bind-Value="RegisterModel.FirstName" />
                             </div>
                             <div class="col-6">
-                                <h5>Last Name</h5>
+                                <h5>@Localizer["LastName"]</h5>
                                 <InputText class="form-control" @bind-Value="RegisterModel.LastName" />
                             </div>
                         </div>
                         <div>
-                            <h5>Choose your role</h5>
+                            <h5>@Localizer["ChoseRole"]</h5>
                             <div class="row justify-content-center">
                             <InputRadioGroup @bind-Value="role">
                                 @foreach (var Erole in Enum.GetValues<Roles>())
@@ -79,19 +76,19 @@
                             </div>
 
                             <div class="mt-3">
-                                <h5>Email</h5>
+                                <h5>@Localizer["Email"]</h5>
                                 <InputText class="form-control" @bind-Value="RegisterModel.Email" />
                             </div>
                             <div class="mt-3">
-                                <h5>Password</h5>
+                                <h5>@Localizer["Password"]</h5>
                                 <InputText typeof="password" class="form-control" @bind-Value="RegisterModel.Password" />
                              </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary  col-10 mt-3">Register</button>
+                    <button type="submit" class="btn btn-primary  col-10 mt-3">@Localizer["Register"]</button>
                 </EditForm>
                 <div class="mt-3">
-                    <h6>Already have an account? <a @onclick="() => SelectTab(true)">Login</a></h6>
+                    <h6>@Localizer["HaveAnAccount"] <a @onclick="() => SelectTab(true)">@Localizer["Login"]</a></h6>
                 </div>
             </div>
         }
@@ -147,6 +144,7 @@
     }
 
 
+
     public async Task LoginFunc()
     {
         var result = await authService.Login(LoginModel);
@@ -188,7 +186,7 @@
     {
         if (String.IsNullOrEmpty(realCode))
         {
-            error = "Something went wrong"; //generate new?
+            error = Localizer["Something went wrong"]; //generate new?
             showToastr(error);
         }
         else
@@ -216,12 +214,16 @@
     private async Task ForgotPassword()
     {
         await GotCode();
-        if(String.IsNullOrEmpty(error)){
+        if (String.IsNullOrEmpty(error))
+        {
             EmailEnter = false;
             IsCode = true;
 
-            showToastr("Email was succesfuly sent");
-
+            showToastr(Localizer["Email was succesfuly sent"]);
+        }
+        else
+        {
+            showToastr(error);
         }
     }
 

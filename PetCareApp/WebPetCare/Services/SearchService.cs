@@ -1,5 +1,4 @@
 ﻿using Microsoft.JSInterop;
-using MudBlazor.Charts;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PetCareApp.Dtos;

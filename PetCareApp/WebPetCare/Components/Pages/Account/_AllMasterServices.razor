@@ -2,6 +2,7 @@
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
 @inject IOrganizationService orgService
+@inject IStringLocalizer<Account> Localizer
 
 
 <div class="d-flex justify-content-center">
@@ -9,13 +10,13 @@
         <div class="form-custom-border p-3 ">
             @if(services == null || services.Count == 0)
             {
-                <h3>No services were found</h3>
+                <h3>@Localizer["No services were found"]</h3>
             }
             else
             {
                 <div class="row justify-content-end">
                     <div class="col-3">
-                        <h6>Sort</h6>
+                        <h6>@Localizer["Sort"]</h6>
                         <SfDropDownList TValue="SortOptions.SortTypesService" TItem="SelectListItem<SortOptions.SortTypesService>"
                                         DataSource="SortTypes" @bind-Value="sortType">
                             <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
@@ -26,7 +27,7 @@
                     @if (masterId == null && orgId == null)
                     {
                         <div class="col-3">
-                            <h6>Filter by visibility</h6>
+                            <h6>@Localizer["Filter by visibility"]</h6>
                             <SfDropDownList TValue="SortOptions.FilterByServiceVisibility" TItem="SelectListItem<SortOptions.FilterByServiceVisibility>"
                             DataSource="FilterTypes" @bind-Value="filterType">
                                 <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
@@ -37,7 +38,7 @@
                     }
                     @if (filteredServices.Count == 0)
                     {
-                        <h3 class="mt-5">No services were found.</h3>
+                        <h3 class="mt-5">@Localizer["No services were found"].</h3>
                     }
                 </div>
                 <div class="container my-4">
@@ -71,13 +72,13 @@
                                                 <LabelTemplate>@context+</LabelTemplate>
                                             </SfRating>
                                         </div>
-                                        <h5>Price: @service.MinimumPrice - @service.MaximumPrice</h5>
-                                        <h5>Time: @service.MinimumTime - @service.MaximumTime min</h5>
+                                        <h5>@Localizer["Price"]: @service.MinimumPrice - @service.MaximumPrice</h5>
+                                        <h5>@Localizer["Time"]: @service.MinimumTime - @service.MaximumTime min</h5>
                                         <div class="align-bottom">
                                         @if (!String.IsNullOrEmpty(service.AppUserName) && orgId != null)
                                         {
                                             <hr/>
-                                            <h6 class="">Master: @service.AppUserName</h6>
+                                            <h6 class="">@Localizer["Master"]: @service.AppUserName</h6>
                                         }
                                         </div>
                                     </div>

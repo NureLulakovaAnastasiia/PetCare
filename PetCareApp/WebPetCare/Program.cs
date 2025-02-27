@@ -3,10 +3,11 @@ using PetCareApp.Models;
 using WebPetCare.Components;
 using WebPetCare.IServices;
 using WebPetCare.Services;
-using MudBlazor.Services;
 using Syncfusion;
 using Syncfusion.Blazor;
 using Syncfusion.Blazor.Popups;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1feHRRQmlfUE1wWUY=");
@@ -23,7 +24,7 @@ builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 
 builder.Services.AddHttpClient();
-builder.Services.AddMudServices();
+builder.Services.AddLocalization();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddScoped<SfDialogService>();
 builder.Services.AddDistributedMemoryCache();
@@ -47,6 +48,17 @@ else
     app.UseDeveloperExceptionPage();
 }
 app.UseHttpsRedirection();
+
+string[] supportedCultures =["en","uk"];
+
+
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
 
 app.UseStaticFiles();
 app.UseRouting();

@@ -1,10 +1,11 @@
 ﻿@inject IUserService _userService
+@inject IStringLocalizer<Authorization> Localizer
 
 
 <div class="history-overlay" @onclick="CloseHistory">
     <div class="history-panel" @onclick:stopPropagation="true">
         <div class="history-header">
-            <h2 class="text-primary">Event History</h2>
+            <h2 class="text-primary">@Localizer["Event History"]</h2>
             <button class="close-btn" @onclick="CloseHistory"><i class="bi bi-x-lg"></i></button>
         </div>
 
@@ -29,7 +30,7 @@
                 }
                 else
                 {
-                    <h5 class="text-danger">No data to display</h5>
+                    <h5 class="text-danger">@Localizer["No data to display"]</h5>
 
                 }
             </ul>
@@ -51,13 +52,6 @@
     public bool IsShowed { get; set; } = false;
 
 
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (IsShowed)
-    //     {
-    //         await GetEventsHistory();
-    //     }
-    // }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -72,7 +66,7 @@
         var data = await _userService.GetEventsHistory();
         if (data == null)
         {
-            Error = "Error during getting data";
+            Error = Localizer["Error during getting data"];
         }
         else
         {

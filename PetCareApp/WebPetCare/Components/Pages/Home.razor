@@ -1,5 +1,7 @@
 ﻿@page "/"
+@using WebPetCare.Resources
 @inject NavigationManager Navigation
+@inject IStringLocalizer<WebPetCare.Resources.Authorization> Localizer
 
 
 <PageTitle>Home</PageTitle>
@@ -8,20 +10,20 @@
     <div class="row mt-5 offset-1">
             <div class="offset-1 ms-5 mt-5 col-6">
                 <div>
-                    <h1 class="mb-3">Find the Best Care for Your Pet – Anytime, Anywhere!</h1>
+                    <h1 class="mb-3">@Localizer["HomeTitle"]</h1>
                     <h5>
-                        &emsp;Welcome to PetCare, your go-to platform for finding top-rated pet care professionals! From grooming to pet sitting, training, and more – we make it easy.
+                    &emsp;@Localizer["Description"]
 
-                        <br>&emsp;✅ Search & Book – Find the best services with our map and filters.
-                        <br>&emsp;⭐ Verified Experts – Check reviews and portfolios before booking.
-                        <br>&emsp;📅 Simple Scheduling – Manage appointments with ease.
+                        <br>&emsp;✅ @Localizer["SearchBook"]
+                        <br>&emsp;⭐ @Localizer["Verified Experts"]
+                        <br>&emsp;📅 @Localizer["Scheduling"]
 
-                        <br>Give your pet the best care – start today!
+                    <br> @Localizer["GiveBest"]
                     </h5>
                 </div>
                 <div class="row col-8 mt-4">
-                    <button class="col-5 me-2 btn btn-primary" @onclick="GoToLogin">Login/Sign Up</button>
-                <button class="col-5 btn btn-outline-primary" @onclick="GoToSearch">Search</button>
+                    <button class="col-5 me-2 btn btn-primary" @onclick="GoToLogin">@Localizer["Login/Sign Up"]</button>
+                <button class="col-5 btn btn-outline-primary" @onclick="GoToSearch">@Localizer["Search"]</button>
                 </div>
             </div>
             <div class="col-4 mt-3">

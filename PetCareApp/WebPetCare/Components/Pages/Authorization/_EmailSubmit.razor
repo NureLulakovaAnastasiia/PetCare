@@ -1,27 +1,27 @@
 ﻿@inject IAuthorizationService authService
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
-
+@inject IStringLocalizer<Authorization> Localizer
 
 <div class="d-flex flex-column m-2 p-2 align-items-center text-center">
     @if (IsPasswordGetting)
     {
         <div>
-            <h3>Enter new password</h3>
+            <h3>@Localizer["EnterNewPassword"]</h3>
         </div>
 
             <div class="col-8 form-group py-2 text-center">
-                <h5>New password</h5>
+                <h5>@Localizer["NewPassword"]</h5>
                 <InputText typeof="password" class="form-control col-10" @bind-Value="passwordChange.NewPassword" DisplayName="Email" />
-                <h5>Confirm new Password</h5>
+            <h5>@Localizer["ConfirmNewPassword"]</h5>
                 <InputText typeof="password" class="form-control col-10" @bind-Value="passwordChange.NewPasswordSubmit" />
             </div>
-            <button type="submit" class="btn btn-primary col-4 mt-3" @onclick="ChangePassword">Submit</button>
+            <button type="submit" class="btn btn-primary col-4 mt-3" @onclick="ChangePassword">@Localizer["Submit"]</button>
     }
     else
     {
         <div>
-            <h3>Confirm Code</h3>
+            <h3>@Localizer["ConfirmCode"]</h3>
         </div>
         <div class="code-input-container">
             @for (int i = 0; i < CodeLength; i++)
@@ -36,7 +36,7 @@
             }
         </div>
 
-    <button class="btn btn-primary mt-3" @onclick="SubmitEmail">Submit</button>
+    <button class="btn btn-primary mt-3" @onclick="SubmitEmail">@Localizer["Submit"]</button>
     }
 </div>
 
@@ -97,7 +97,7 @@
                 var res = await authService.ConfirmEmail(email);
                 if (!res)
                 {
-                    showToastr("Eror during confirming");
+                    showToastr(Localizer["Error during confirming"]);
                 }
 
                 if (ToLoginPage.HasDelegate)
@@ -109,7 +109,7 @@
         }
         else
         {
-            showToastr("Code mismatch");
+            showToastr(Localizer["Code mismatch"]);
 
         }
     }
@@ -123,12 +123,12 @@
                 var res = await authService.ConfirmEmail(email, passwordChange.NewPassword);
                 if (res)
                 {
-                    showToastr("Password was succesfully changed");
+                    showToastr("", Localizer["SuccessPasswordChange"]);
                 }
             }
             else
             {
-                showToastr("Error during password change");
+                showToastr(Localizer["ErrorPasswordChange"]);
             }
         }
         catch (Exception ex)

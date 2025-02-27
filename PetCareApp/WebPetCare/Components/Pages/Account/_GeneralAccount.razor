@@ -1,5 +1,6 @@
 ﻿@inject IUserService userService
 @inject IJSRuntime _JSRuntime
+@inject IStringLocalizer<Account> Localizer
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
@@ -7,8 +8,8 @@
             @if (!IsEdit)
             {
                 <div class="row text-center ">
-                    <h3 class="col-8 offset-2"><b>About me</b></h3>
-                    <button class="btn col-2 btn-func btn-warning p-0" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                    <h3 class="col-8 offset-2"><b>@Localizer["About me"]</b></h3>
+                    <button class="btn col-2 btn-func btn-warning p-0" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   @Localizer["Edit"]</button>
                 </div>
             }
 
@@ -16,9 +17,9 @@
                 @if (IsEdit)
                 {
                     <div class="row text-center">
-                        <h3 class="col-6 offset-3"><b>About me</b></h3>
-                        <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">Cancel</button>
-                        <button type="submit" class="btn col-2 btn-func btn-success">Save</button>
+                        <h3 class="col-6 offset-3"><b>@Localizer["About me"]</b></h3>
+                        <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn col-2 btn-func btn-success">@Localizer["Save"]</button>
                     </div>
                 }
 
@@ -34,11 +35,11 @@
                         }
                         <div class="row col-lg-12 m-3">
                             <div class="col-3 text-center">
-                                <h4>Profile photo</h4>
+                                <h4>@Localizer["Profile photo"]</h4>
                                 <label class="image-upload pb-4">
                                     <InputFile accept="image/*" OnChange="@HandleFileSelected" disabled="@(!IsEdit)" />
                                     <div class="image-container">
-                                        <img id="profile image" src="@UploadedImage" alt="No image available">
+                                        <img id="profile image" src="@UploadedImage" alt="@Localizer["No image available"]">
                                         @if (IsEdit)
                                         {
                                             <div class="placeholder">
@@ -55,20 +56,20 @@
                                 <div>
                                     <div class="row ms-3 text-center justify-content-around">
                                         <div class="offset-1 col-5">
-                                            <h4>Last Name</h4>
-                                            <InputText @bind-Value="masterData.LastName" placeholder="LastName"
+                                            <h4>@Localizer["Last Name"]</h4>
+                                            <InputText @bind-Value="masterData.LastName" placeholder="@Localizer["Last Name"]"
                                                        class="input-text-style col-12" disabled="@(!IsEdit)" />
                                         </div>
 
                                         <div class="col-5">
-                                            <h4>First Name</h4>
-                                            <InputText @bind-Value="masterData.FirstName" placeholder="FirstName"
+                                            <h4>@Localizer["First Name"]</h4>
+                                            <InputText @bind-Value="masterData.FirstName" placeholder="@Localizer["First Name"]"
                                                        class="input-text-style col-12" disabled="@(!IsEdit)" />
                                         </div>
                                     </div>
 
                                     <div class="ms-5 text-center mt-3 mb-3">
-                                        <h4>Location</h4>
+                                        <h4>@Localizer["Location"]</h4>
                                         <div class="row">
                                             <h4 class="offset-1 col-@(IsEdit ? "9" : "10") text-center" 
                                             style="color: var(--bs-green-blue);">
@@ -88,7 +89,7 @@
                                                 
                                                 <Content>
                                                     <div class="text-center">
-                                                        <h2>Edit location</h2>
+                                                        <h2>@Localizer["Edit location"]</h2>
                                                         <_EditLocation Contacts="@masterData.Contacts"
                                                                        CloseAndSubmit="CloseModal">
                                                         </_EditLocation>
@@ -100,14 +101,14 @@
                                     }
                                     <div class="row ms-3 text-center justify-content-around">
                                         <div class="offset-1 col-5">
-                                            <h4>Phone</h4>
+                                            <h4>@Localizer["Phone"]</h4>
                                             <InputText @bind-Value="masterData.Contacts.Phone"
                                                        placeholder="@(String.IsNullOrEmpty(masterData.Contacts.Phone) && !IsEdit ? "–" : masterData.Contacts.Phone)"
                                                        class="input-text-style col-12" disabled="@(!IsEdit)" />
                                         </div>
 
                                         <div class="col-5">
-                                            <h4>Email</h4>
+                                            <h4>@Localizer["Email"]</h4>
                                             <InputText @bind-Value="masterData.Email"
                                                        placeholder="Email"
                                                        class="input-text-style" disabled />
@@ -121,7 +122,7 @@
                     }
                     else
                     {
-                    <h3>There is no data to display</h3>
+                        <h3>@Localizer["There is no data to display"]</h3>
                     }
         </div>
         </form>
@@ -179,7 +180,7 @@
         if (String.IsNullOrEmpty(res))
         {
             //await _JSRuntime.InvokeVoidAsync("showToastr", "success", "Data updated and saved successfully!");
-            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Data updated and saved successfully!", "Success");
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", Localizer["Data updated and saved successfully!"], "Success");
             OnButtonClick();
             StateHasChanged();
         }

@@ -1,5 +1,9 @@
 ﻿@inject IOrganizationService orgService
 @inject IJSRuntime _JSRuntime
+@inject IStringLocalizer<Account> Localizer
+
+
+
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
@@ -7,8 +11,8 @@
                 @if (!IsEdit)
                 {
                     <div class="row text-center">
-                        <h3 class="col-8 offset-2"><b>About organization</b></h3>
-                    <button class="btn col-2 btn-func btn-warning p-0" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                        <h3 class="col-8 offset-2"><b>@Localizer["About organization"]</b></h3>
+                    <button class="btn col-2 btn-func btn-warning p-0" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   @Localizer["Edit"]</button>
                     </div>
                 }
 
@@ -16,9 +20,9 @@
                 @if (IsEdit)
                 {
                     <div class="row text-center">
-                        <h3 class="col-6 offset-3"><b>About organization</b></h3>
-                        <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">Cancel</button>
-                        <button type="submit" class="btn col-2 btn-func btn-success">Save</button>
+                        <h3 class="col-6 offset-3"><b>@Localizer["About organization"]</b></h3>
+                        <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn col-2 btn-func btn-success">@Localizer["Save"]</button>
                     </div>
                 }
            
@@ -34,7 +38,7 @@
                         }
                         <div class="row justify-content-around">
                             <div class="col-3 mb-4">
-                                <h4>Organization logo</h4>
+                                <h4>@Localizer["Organization logo"]</h4>
                                 <label class="image-upload pb-4">
                                     <InputFile accept="image/*" OnChange="HandleFileSelected" disabled="@(!IsEdit)"/>
                                     <div class="image-logo-container">
@@ -51,13 +55,13 @@
                             </div >
                             <div class="col-6">
                                 <div class="ms-4 mb-4 me-5 ">
-                                        <h4>Name</h4>
+                                        <h4>@Localizer["OrgName"]</h4>
                                     <InputText @bind-Value="@orgInfo.Name" placeholder="@orgInfo.Name"
                                                class="input-text-style col-10 text-center" disabled="@(!IsEdit)" />
                                     </div>
 
                                 <div class="ms-4 mb-4 me-5 text-center">
-                                        <h4>Description</h4>
+                                        <h4>@Localizer["Description"]</h4>
                                     <InputTextArea @bind-Value="@orgInfo.Description" placeholder="@orgInfo.Description"
                                                    class="input-textarea-style col-10 text-center" disabled="@(!IsEdit)" />
                                 </div>
@@ -66,7 +70,7 @@
                     }
                     else
                     {
-                        <h2>No data was found</h2>
+                        <h2>@Localizer["No data was found"]</h2>
                     }
                 </div>
 

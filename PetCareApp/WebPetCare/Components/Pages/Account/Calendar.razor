@@ -12,7 +12,11 @@
 @inject IJSRuntime _JSRuntime
 @inject IUserService _userService
 @rendermode InteractiveAuto
+@inject IStringLocalizer<Account> Localizer
 
+<div class="row justify-content-center mb-4">
+    <h2 class="col-5 offset-4">@Localizer["Schedule"]</h2>
+</div>
 @if(isOrganization && employeesList != null)
 {
     <div class="mb-3 col-5 offset-4">
@@ -38,8 +42,8 @@
                         <tr >
                             <td colspan="2" class="text-center">
                                 <SfButtonGroup Mode="Syncfusion.Blazor.SplitButtons.SelectionMode.Single">
-                                    <ButtonGroupButton @bind-Selected="@isRecord" >Record</ButtonGroupButton>
-                                    <ButtonGroupButton @bind-Selected="@isBreak" >Break</ButtonGroupButton>
+                                    <ButtonGroupButton @bind-Selected="@isRecord" >@Localizer["Record"]</ButtonGroupButton>
+                                    <ButtonGroupButton @bind-Selected="@isBreak" >@Localizer["Break"]</ButtonGroupButton>
                                 </SfButtonGroup>
                               </td>
                         </tr>
@@ -48,9 +52,9 @@
                     @if (data.Type == "Record" || isRecord)
                     {
                         <tr>
-                            <td class="e-textlabel">Service Name</td>
+                            <td class="e-textlabel">@Localizer["Service Name"]</td>
                         <td colspan="4">
-                            <SfDropDownList TValue="int" TItem="ServiceName" @bind-Value="@(data.ServiceId)" Placeholder="Select a service name" DataSource="@serviceNames">
+                            <SfDropDownList TValue="int" TItem="ServiceName" @bind-Value="@(data.ServiceId)" Placeholder="@Localizer["Select a service name"]" DataSource="@serviceNames">
                                 <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
                                 <DropDownListEvents TValue="int" TItem="ServiceName"></DropDownListEvents>
                             </SfDropDownList>
@@ -59,26 +63,26 @@
                     }
                     
                     <tr>
-                        <td class="e-textlabel">From</td>
+                        <td class="e-textlabel">@Localizer["From"]</td>
                         <td colspan="4">
                             <SfDateTimePicker @bind-Value="@(data.StartTime)"></SfDateTimePicker>
                         </td>
                     </tr>
                     <tr>
-                        <td class="e-textlabel">To</td>
+                        <td class="e-textlabel">@Localizer["To"]</td>
                         <td colspan="4">
                             <SfDateTimePicker @bind-Value="@(data.EndTime)"></SfDateTimePicker>
                         </td>
                     </tr>
                     <tr>
-                        <td class="e-textlabel">Description</td>
+                        <td class="e-textlabel">@Localizer["Description"]</td>
                         <td colspan="4">
                             <SfTextBox Multiline="true" @bind-Value="@(data.Description)"></SfTextBox>
                         </td>
                     </tr>
                     @if (data.Type == "Break" || isBreak){
                         <tr>
-                            <td class="e-textlabel">Recurrence</td>
+                            <td class="e-textlabel">@Localizer["Recurrence"]</td>
                             <td colspan="4">
                                 <SfRecurrenceEditor @bind-Value="@(data.RecurrenceRule)" Frequencies="@Repeats" >
 
@@ -89,14 +93,14 @@
                     else
                     {
                         <tr>
-                            <td class="e-textlabel">Status</td>
+                            <td class="e-textlabel">@Localizer["Status"]</td>
                             <td colspan="4">
                                 <div>
                                     @if (data.Status.Id == 3)
                                     {
-                                        <h5 class="text-danger">Cancelled</h5>
+                                        <h5 class="text-danger">@Localizer["Cancelled"]</h5>
                                     }else{
-                                    <SfDropDownList TValue="int" TItem="Status" Placeholder="Change status" DataSource="@StatusData" @bind-Value="@data.Status.Id">
+                                    <SfDropDownList TValue="int" TItem="Status" Placeholder="@Localizer["Change status"]" DataSource="@StatusData" @bind-Value="@data.Status.Id">
                                         <DropDownListFieldSettings Value="Id" Text="Name" ></DropDownListFieldSettings>
                                     </SfDropDownList>
                                     }
@@ -210,13 +214,13 @@
             availableDates.Add(date);
             UpdateEvents(recordsResult.Data);
             //StateHasChanged();
-
-            showToastr("", "Records were succesfully gotten");
+            
+            await showToastr("", Localizer["Records were succesfully gotten"]);
 
         }
         else
         {
-            showToastr(recordsResult.ErrorMessage);
+            await showToastr(recordsResult.ErrorMessage);
         }
         StateHasChanged();
     }
@@ -346,7 +350,7 @@
                 }
                 UpdateEvents(changedEvents);
                 StateHasChanged();
-                showToastr("", "Records were succesfully updated");
+                showToastr("", Localizer["Records were succesfully updated"]);
             }
             else
             {
@@ -366,14 +370,14 @@
                 string reason = "";
                 if (args.DeletedRecords[0].Type == "Record")
                 {
-                    reason = await DialogService.PromptAsync("Enter reason to cancel appointment:", "Cancel Appointment");
+                    reason = await DialogService.PromptAsync(Localizer["Enter reason to cancel appointment:"], Localizer["Cancel Appointment"]);
                     if (!String.IsNullOrEmpty(reason))
                     {
                         await DeleteRecords(args.DeletedRecords, reason);
                     }
                     else
                     {
-                        showToastr("Reason cannot be empty");
+                        showToastr(Localizer["Reason cannot be empty"]);
                         events.Add(args.DeletedRecords[0]);
                     }
                 }
@@ -418,7 +422,7 @@
 
         if (String.IsNullOrEmpty(temp))
         {
-            showToastr("", "Data were succefully added");
+            showToastr("", Localizer["Data were succefully added"]);
         }
         else
         {
@@ -446,7 +450,7 @@
         }
         else
         {
-            showToastr("No services were found");
+            showToastr(Localizer["No services were found"]);
         }
     }
 
@@ -497,7 +501,7 @@
 
         if (String.IsNullOrEmpty(temp))
         {
-            showToastr("", "Record was succesfully cancelled");
+            showToastr("", Localizer["Record was succesfully cancelled"]);
             foreach(var item in records)
             {
                 if(item.Type == "Record")

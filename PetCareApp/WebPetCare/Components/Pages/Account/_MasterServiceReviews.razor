@@ -2,17 +2,18 @@
 @inject IServiceService serviceService
 @inject SfDialogService DialogService
 @inject IJSRuntime _JSRuntime
+@inject IStringLocalizer<Account> Localizer
 
 
 <div class="d-flex justify-content-center mt-2">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border p-3 align-content-center">
             <div class="row col-10 offset-1">
-                <h2><strong>Reviews</strong></h2>
+                <h2><strong>@Localizer["Reviews"]</strong></h2>
                 <hr />
                 <div class="row justify-content-end">
                     <div class="col-3">
-                        <h6>Sort</h6>
+                        <h6>@Localizer["Sort"]</h6>
                         <SfDropDownList TValue="SortOptions.SortTypesReview" TItem="SelectListItem<SortOptions.SortTypesReview>"
                                         DataSource="SortTypes" @bind-Value="sortType">
                             <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
@@ -47,13 +48,13 @@
                                 }
                                 @if ((item.Comments == null || item.Comments.Count == 0) && isOwner)
                                 {
-                                    <button class="btn btn-success p-2" style="font-size: 1rem;" @onclick="() => AddComment(item.Id)">Add comment</button>
+                                    <button class="btn btn-success p-2" style="font-size: 1rem;" @onclick="() => AddComment(item.Id)">@Localizer["Add comment"]</button>
                                 }
                              </div>
                         </div>
                         @if (!String.IsNullOrEmpty(item.ServiceName))
                         {
-                            <h6 class="ms-4 green-blue-text">For service: @item.ServiceName</h6>
+                            <h6 class="ms-4 green-blue-text">@Localizer["For service"]: @item.ServiceName</h6>
                         }
                         <p class="ms-4">@item.Date.ToString("g")</p>
 
@@ -102,24 +103,24 @@
                 }
                 <SfDialog Width="350px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@isCommenting">
                     <DialogTemplates>
-                        <Header> Add Comment </Header>
+                        <Header> @Localizer["Add Comment"] </Header>
                         <Content> 
                             <div>
-                                <h5>Please, write your comment:</h5>
+                                <h5>@Localizer["Please, write your comment"]:</h5>
                                 <InputTextArea class="input-textarea-style" style="min-width: 100%" @bind-Value="commentDto.Text"></InputTextArea>
                             </div>
 
                         </Content>
                     </DialogTemplates>
                     <DialogButtons>
-                        <DialogButton Content="OK" IsPrimary="true" OnClick="@SaveComment" />
-                        <DialogButton Content="Cancel" OnClick="@CancelComment" />
+                        <DialogButton Content="@Localizer["OK"]" IsPrimary="true" OnClick="@SaveComment" />
+                        <DialogButton Content="@Localizer["Cancel"]" OnClick="@CancelComment" />
                     </DialogButtons>
                    
                 </SfDialog>
                 @if(reviews == null || reviews.Count == 0)
                 {
-                    <h3>There is no reviews</h3>
+                    <h3>@Localizer["There is no reviews"]</h3>
                 }
             </div>
         </div>
@@ -199,7 +200,7 @@
         var res = await userService.AddReviewComment(commentDto);
         if (String.IsNullOrEmpty(res))
         {
-            showToastr("", "Comment was succesfully added");
+            showToastr("", Localizer["Comment was succesfully added"]);
             CancelComment();
             await OnAfterRenderAsync(true);
         }
@@ -210,7 +211,7 @@
         var res = await userService.DeleteReview(reviewId);
         if (String.IsNullOrEmpty(res))
         {
-            showToastr("", "Review was succesfully deleted");
+            showToastr("", Localizer["Review was succesfully deleted"]);
             await OnAfterRenderAsync(true);
 
         }
@@ -225,7 +226,7 @@
         var res = await userService.DeleteReviewComment(commentId);
         if (String.IsNullOrEmpty(res))
         {
-            showToastr("", "Comment was succesfully deleted");
+            showToastr("", Localizer["Comment was succesfully deleted"]);
             await OnAfterRenderAsync(true);
 
         }

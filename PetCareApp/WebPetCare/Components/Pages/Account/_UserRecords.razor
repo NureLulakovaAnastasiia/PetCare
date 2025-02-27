@@ -3,18 +3,20 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime _JSRuntime
 @inject SfDialogService DialogService
+@inject IStringLocalizer<Account> Localizer
+
 
 <div class="d-flex justify-content-center  mt-3">
     <div class="col-lg-10 align-items-center text-center">
         <div class="form-custom-border p-3 ">
-            <h3 class=""><b>My records</b></h3>
+            <h3 class=""><b>@Localizer["My records"]</b></h3>
             <hr />
            
             @if (records.Count > 0)
             {
                 <div class="row justify-content-end">
                     <div class="col-3">
-                        <h6>Sort by start time</h6>
+                        <h6>@Localizer["Sort by start time"]</h6>
                         <SfDropDownList TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
                                         DataSource="SortTypes" @bind-Value="sortType">
                             <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
@@ -23,7 +25,7 @@
                         </SfDropDownList>
                     </div>
                     <div class="col-3">
-                        <h6>Filter by status</h6>
+                        <h6>@Localizer["Filter by status"]</h6>
                         <SfDropDownList TValue="SortOptions.FilterByRecordStatus" TItem="SelectListItem<SortOptions.FilterByRecordStatus>"
                                         DataSource="FilterTypes" @bind-Value="filterType">
                             <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
@@ -34,7 +36,7 @@
 
                     @if(filteredRecords.Count == 0)
                     {
-                        <h3 class="mt-5">No records were found.</h3>
+                        <h3 class="mt-5">@Localizer["No records were found."]</h3>
                     }
                 </div>
                 <div class="container my-4 align-content-center">
@@ -61,13 +63,13 @@
                                 <div class="card-body row">
                                     <div class="col-6">
                                         <div class="ms-1 mb-2 align-items-center">
-                                            <h5 class="">Status : </h5>
-                                            <h4 class="@(record.Status == "Created" || record.Status == "Finished" ? "text-primary" : "text-danger") col-8">@record.Status</h4>
+                                            <h5 class="">@Localizer["Status"] : </h5>
+                                            <h4 class="@(record.Status == "Created" || record.Status == "Finished" ? "text-primary" : "text-danger") col-8">@Localizer[record.Status]</h4>
                                         </div>
                                         @if (!String.IsNullOrEmpty(record.RecordCancelReason))
                                         {
                                             <div class="m-2 mt-3">
-                                                <h5 class="">Cancel Reason: </h5>
+                                                <h5 class="">@Localizer["Cancel Reason"]: </h5>
                                                 <h4 class="text-danger col-8">@record.RecordCancelReason</h4>
                                             </div>
 
@@ -76,15 +78,15 @@
                                         <div class="ms-1 mt-3 align-items-center">
                                             @if (!String.IsNullOrEmpty(record.Comment))
                                             {
-                                                <h5 class="">Comment: </h5>
+                                                <h5 class="">@Localizer["Comment"]: </h5>
                                                 <h6 class=" col-9 green-blue-text"> @record.Comment </h6>
                                             }
                                         </div>
                                     </div>
                                     <div class="col-6 mb-3">
-                                        <h5 class="">Description:</h5>
+                                        <h5 class="">@Localizer["Description"]:</h5>
                                         <div class="ps-2 green-blue-text" style="white-space: pre-line;">
-                                                @(!String.IsNullOrEmpty(record.Description) ? record.Description : "No description available")
+                                            @(!String.IsNullOrEmpty(record.Description) ? record.Description : Localizer["No description available"])
                                             </div>
                                         @if (!String.IsNullOrEmpty(record.PetName))
                                         {
@@ -100,11 +102,11 @@
                                                 {
                                                     if (record.IsReviewed)
                                                     {
-                                                        <label class="ps-3">You've already wrote a review to this service</label>
+                                                        <label class="ps-3">@Localizer["AreadyWrittenReview"]</label>
                                                     }
                                                     else
                                                     {
-                                                        <button class="btn btn-success p-2" @onclick="WriteReview">Add Review</button>
+                                                        <button class="btn btn-success p-2" @onclick="WriteReview">@Localizer["Add Review"]</button>
                                                     }
                                                 }
                                                 else if (record.Status == "Created")
@@ -114,7 +116,7 @@
                                                         var interval = record.StartTime - DateTime.UtcNow;
                                                         if (interval.TotalHours > 5)
                                                         {
-                                                            <button class="btn btn-danger p-2" @onclick="() => CancelRecord(record.Id)">Cancel Record</button>
+                                                            <button class="btn btn-danger p-2" @onclick="() => CancelRecord(record.Id)">@Localizer["Cancel Record"]</button>
                                                         }
                                                     }
                                                 }
@@ -129,7 +131,7 @@
             }
             else
             {
-                <h3>No records were found.</h3>
+                <h3>@Localizer["No records were found."]</h3>
             }
 
         </div>
@@ -183,13 +185,13 @@
 
     public async Task CancelRecord(int recordId)
     {
-        bool isConfirm = await DialogService.ConfirmAsync("Are you sure you want to cancel this record?", "Cancel Record");
+        bool isConfirm = await DialogService.ConfirmAsync(Localizer["SureCancelRecord"], Localizer["Cancel Record"]);
         if (isConfirm)
         {
             var res = await userService.CancelRecord(recordId);
             if (String.IsNullOrEmpty(res))
             {
-                showToastr("", "Record was succesfully cancelled");
+                showToastr("", Localizer["Record was succesfully cancelled"]);
                 ReloadData();
             }
             else

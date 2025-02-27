@@ -2,6 +2,9 @@
 @inject IAuthorizationService _authService
 @inject IUserService _userService
 @inject NavigationManager Navigation
+@inject IStringLocalizer<Authorization> Localizer
+
+@using Microsoft.AspNetCore.Localization
 @using Syncfusion.Blazor.SplitButtons
 
 <nav class="navbar bg-body d-flex ">
@@ -26,24 +29,32 @@
                 <_EventsHistoryList IsShowed="isHistoryShowed" OnClose="ToggleHistory" />
             }
         }
+        <li class="nav-item">
+            <div>
+                <select @bind="Culture">
+                    <option value="en">English</option>
+                    <option value="uk">Українська</option>
 
+                </select>
+            </div>
+        </li>
         
         <li class="nav-item p-0 mx-4">
             <a class="nav-link nav-link-big" href="" Match="NavLinkMatch.All">
-                Home
+                @Localizer["Home"]
             </a>
         </li>
 
         <li class="nav-item  p-0  mx-4">
             <a class="nav-link nav-link-big" href="search">
-                Search
+                @Localizer["Search"]
             </a>
         </li>
         @if (!isLogged)
         {
             <li class="nav-item  p-0 mx-4">
                 <a class="nav-link nav-link-big" href="login">
-                Login
+                @Localizer["Login"]
             </a>
         </li>
         }else{
@@ -52,12 +63,12 @@
             @* <a class="nav-link" href="account">
                 Account
             </a> *@
-                <SfDropDownButton Content="Account">
+                <SfDropDownButton Content="@Localizer["Account"]">
                 <DropDownButtonEvents  ItemSelected="SelectItem" >
                 </DropDownButtonEvents>
                 <DropDownMenuItems>
-                    <DropDownMenuItem Text="Profile" Id="Profile"></DropDownMenuItem>
-                    <DropDownMenuItem Text="Log Out" Id="LogOut"></DropDownMenuItem>
+                    <DropDownMenuItem Text="@Localizer["Profile"]" Id="Profile"></DropDownMenuItem>
+                    <DropDownMenuItem Text="@Localizer["LogOut"]" Id="LogOut"></DropDownMenuItem>
                 </DropDownMenuItems>
             </SfDropDownButton>
         </li>
@@ -69,11 +80,56 @@
     [Parameter]
     public bool isLogged { get; set; } = false;
 
+
     public string? ErrorMessage { get; set; }
 
     public bool isHistoryShowed = false;
 
     public List<HistoryEvent> eventsHistory { get; set; } = new List<HistoryEvent>();
+
+    protected override void OnInitialized()
+    {
+        Culture = CultureInfo.CurrentCulture;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Culture = CultureInfo.CurrentCulture;
+    }
+
+    private CultureInfo Culture
+    {
+        get
+        {
+            return CultureInfo.CurrentCulture;
+        }
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                var uri = new Uri(Navigation.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value.Name);
+                var uriEscaped = Uri.EscapeDataString(uri);
+                SetCulture(cultureEscaped, uri);
+            }
+        }
+    }
+
+
+    private async void SetCulture(string culture, string redirectUri)
+    {
+        if (culture != null)
+        {
+
+            var requestCulture = new RequestCulture(culture, culture);
+            var cookieName = CookieRequestCultureProvider.DefaultCookieName;
+            var cookieValue = CookieRequestCultureProvider.MakeCookieValue(requestCulture);
+
+            await JSRuntime.InvokeVoidAsync("setCultureCookie", cookieValue, cookieName);
+        }
+
+        Navigation.NavigateTo(redirectUri, forceLoad:true);
+    }
 
     public Task UpdateNavMenuAsync(bool isAuthenticated)
     {
@@ -100,14 +156,15 @@
         }
     }
 
-   
-
     public void ToggleHistory()
     {
         isHistoryShowed = !isHistoryShowed;
         StateHasChanged();
 
     }
+
+
+
 }
 
 <style>
