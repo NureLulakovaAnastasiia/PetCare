@@ -109,19 +109,25 @@
     private string fullTemplateImage = "Images/star-fill.svg";
     private string emptyTemplateImage = "Images/star.svg";
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!String.IsNullOrEmpty(masterId))
+        {
+            var res = await userService.GetMasterData(masterId);
+            if (res.IsSuccess)
+            {
+                masterData = res.Data;
+            }
+        }
+
+    }
+
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            if (!String.IsNullOrEmpty(masterId))
-            {
-                var res = await userService.GetMasterData(masterId);
-                if (res.IsSuccess)
-                {
-                    masterData = res.Data;
-                }
-            }
             StateHasChanged();
         }
     }

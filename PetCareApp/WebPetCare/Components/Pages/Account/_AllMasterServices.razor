@@ -13,9 +13,36 @@
             }
             else
             {
+                <div class="row justify-content-end">
+                    <div class="col-3">
+                        <h6>Sort</h6>
+                        <SfDropDownList TValue="SortOptions.SortTypesService" TItem="SelectListItem<SortOptions.SortTypesService>"
+                                        DataSource="SortTypes" @bind-Value="sortType">
+                            <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+                            <DropDownListEvents TValue="SortOptions.SortTypesService" TItem="SelectListItem<SortOptions.SortTypesService>"
+                                                ValueChange="SortServices"></DropDownListEvents>
+                        </SfDropDownList>
+                    </div>
+                    @if (masterId == null && orgId == null)
+                    {
+                        <div class="col-3">
+                            <h6>Filter by visibility</h6>
+                            <SfDropDownList TValue="SortOptions.FilterByServiceVisibility" TItem="SelectListItem<SortOptions.FilterByServiceVisibility>"
+                            DataSource="FilterTypes" @bind-Value="filterType">
+                                <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+                                <DropDownListEvents TValue="SortOptions.FilterByServiceVisibility" TItem="SelectListItem<SortOptions.FilterByServiceVisibility>"
+                                ValueChange="FilterServices"></DropDownListEvents>
+                            </SfDropDownList>
+                        </div>
+                    }
+                    @if (filteredServices.Count == 0)
+                    {
+                        <h3 class="mt-5">No services were found.</h3>
+                    }
+                </div>
                 <div class="container my-4">
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-                        @foreach (var service in services)
+                        @foreach (var service in filteredServices)
                         {
                             <div class="col">
                                 <div class="card h-100">
@@ -32,6 +59,18 @@
                                     </div>
 
                                     <div class="card-body d-flex flex-column green-blue-text justify-content-between">
+                                        
+                                        <div class="row align-items-center justify-content-center">
+                                            <SfRating Value=@service.Rate Disabled="true" ShowLabel="true" LabelPosition="Syncfusion.Blazor.Inputs.LabelPosition.Left" CssClass=" text-start">
+                                                <FullTemplate>
+                                                    <img src=@fullTemplateImage widht="17" height="17" />
+                                                </FullTemplate>
+                                                <EmptyTemplate>
+                                                    <img src=@emptyTemplateImage widht="17" height="17" />
+                                                </EmptyTemplate>
+                                                <LabelTemplate>@context+</LabelTemplate>
+                                            </SfRating>
+                                        </div>
                                         <h5>Price: @service.MinimumPrice - @service.MaximumPrice</h5>
                                         <h5>Time: @service.MinimumTime - @service.MaximumTime min</h5>
                                         <div class="align-bottom">
@@ -64,7 +103,27 @@
     [Parameter]
     public int? orgId { get; set; }
     private List<GetServiceDto> services = new List<GetServiceDto>();
+    public List<GetServiceDto> filteredServices { get; set; } = new List<GetServiceDto>();
 
+    private SortOptions.SortTypesService sortType = SortOptions.SortTypesService.HighRate;
+    private SortOptions.FilterByServiceVisibility filterType = SortOptions.FilterByServiceVisibility.All;
+
+    private List<SelectListItem<SortOptions.SortTypesService>> SortTypes = new List<SelectListItem<SortOptions.SortTypesService>>();
+    private List<SelectListItem<SortOptions.FilterByServiceVisibility>> FilterTypes = new List<SelectListItem<SortOptions.FilterByServiceVisibility>>();
+    private string fullTemplateImage = "Images/star-fill.svg";
+    private string emptyTemplateImage = "Images/star.svg";
+
+    protected override async Task OnInitializedAsync()
+    {
+        SortTypes = Enum.GetValues(typeof(SortOptions.SortTypesService))
+            .Cast<SortOptions.SortTypesService>()
+            .Select(e => new SelectListItem<SortOptions.SortTypesService>(e))
+            .ToList();
+        FilterTypes = Enum.GetValues(typeof(SortOptions.FilterByServiceVisibility))
+       .Cast<SortOptions.FilterByServiceVisibility>()
+       .Select(e => new SelectListItem<SortOptions.FilterByServiceVisibility>(e))
+       .ToList();
+    }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -78,8 +137,10 @@
             {
                 await GetMasterServices();
             }
-
         }
+        FilterServices();
+        StateHasChanged();
+
     }
     private async Task GetMasterServices()
     {
@@ -87,11 +148,10 @@
         if (res.IsSuccess)
         {
             services = res.Data;
-            StateHasChanged();
         }
         else
         {
-
+            showToastr(res.ErrorMessage);
         }
 
     }
@@ -102,7 +162,6 @@
         if (res.IsSuccess)
         {
             services = res.Data;
-            StateHasChanged();
         }
         else
         {
@@ -117,6 +176,45 @@
         Navigation.NavigateTo($"/service-id={serviceId}");
     }
 
+    public void SortServices()
+    {
+        switch (sortType)
+        {
+            case SortOptions.SortTypesService.LowPrice:
+                filteredServices = filteredServices.OrderBy(e => e.MinimumPrice).ToList();
+                break;
+            case SortOptions.SortTypesService.HighPrice:
+                filteredServices = filteredServices.OrderByDescending(e => e.MinimumPrice).ToList();
+                break;
+            case SortOptions.SortTypesService.LowRate:
+                filteredServices = filteredServices.OrderBy(e => e.Rate).ToList();
+                break;
+            case SortOptions.SortTypesService.HighRate:
+                filteredServices = filteredServices.OrderByDescending(e => e.Rate).ToList();
+                break;
+
+        }
+    }
+
+    public void FilterServices()
+    {
+        switch (filterType)
+        {
+            case SortOptions.FilterByServiceVisibility.All:
+                filteredServices = services.ToList();
+                break;
+            case SortOptions.FilterByServiceVisibility.Visible:
+                filteredServices = services.Where(e => !e.IsHidden).ToList();
+                break;
+            case SortOptions.FilterByServiceVisibility.Hidden:
+                filteredServices = services.Where(e => e.IsHidden).ToList();
+                break;
+
+        }
+        SortServices();
+    }
+
+
     private async void showToastr(string res, string successMessage = "")
     {
         if (String.IsNullOrEmpty(res))
@@ -129,3 +227,36 @@
         }
     }
 }
+
+<style>
+    .e-rating-container .e-rating-label {
+        font-size: 15px;
+        color: var(--bs-primary);
+        font-weight: 500;
+        line-height: 15px;
+    }
+
+    container .e-rating-label.e-label-left {
+        width: 10px;
+     }
+
+    .e-rating-container .e-rating-item-container {
+        cursor: pointer;
+        font-size: 10px;
+        padding: 3px;
+        display: block;
+        min-width: 0; 
+        min-height: 0;
+        position: relative;
+    }
+
+    .e-rating-container .e-rating-label.e-label-left {
+        text-align: right;
+        margin: 0;
+    }
+
+
+    .e-rating-container .e-rating-label.e-label-left {
+        min-width: 10px;
+    }
+</style>

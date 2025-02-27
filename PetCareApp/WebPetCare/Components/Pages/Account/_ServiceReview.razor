@@ -32,14 +32,24 @@
                         <textarea id="description" @bind="Description" class="form-control"></textarea>
                     </div>
                     <div class="col-6 p-2 text-center">
-                        <label for="photo" class="d-block pb-2 pt-2">Photo</label>
+                        <label for="photo" class="d-block pb-2">Photo</label>
+                        <label class="image-upload pb-4 ">
+                            <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
+                            <div class="image-container">
+                                @if (!string.IsNullOrEmpty(UploadedImage))
+                                {
+                                    <img src="@UploadedImage" alt="Preview Image" style="display: block;">
 
-                        @if (UploadedImage != null)
-                        {
-                            <img src="@UploadedImage" class="pb-2" alt="Preview image" style="max-width: 200px;" />
-                        }
+                                }
+                                else
+                                {
+                                    <div class="placeholder">
+                                        <span class="plus"><i class="bi bi-plus-square-dotted"></i></span>
+                                    </div>
+                                }
+                            </div>
+                        </label>
 
-                        <InputFile class="p-2 ms-2" OnChange="HandleFileSelected" accept="image/*" />
                     </div>
                 </div>
             </Content>

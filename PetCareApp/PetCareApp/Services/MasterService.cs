@@ -1250,6 +1250,7 @@ namespace PetCareApp.Services
                 }
                 var services = _dbContext.Services
                     .Where(s => s.AppUserId == (masterId == null ? user.Id : masterId))
+                    .Include(s => s.Reviews)
                     .ToList();
                 if (services == null || services.Count == 0)
                 {
@@ -1258,6 +1259,14 @@ namespace PetCareApp.Services
                 else
                 {
                     res.Data = _mapper.Map<List<GetServiceDto>>(services);
+                    foreach (var service in res.Data)
+                    {
+                        if (service.Reviews.Count > 0)
+                        {
+                            service.Rate = service.Reviews.Average(r => r.Rate);
+                            service.Reviews.Clear();
+                        }
+                    }
                 }
             }
             catch (Exception ex)

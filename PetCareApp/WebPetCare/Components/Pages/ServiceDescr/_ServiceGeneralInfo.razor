@@ -69,7 +69,20 @@
 
                             </div>
                         </div>
+                        <div class="row m-2 p-2 ms-4 mb-4 align-items-center">
 
+                            <label class="col-1 me-0 ms-2">Rate</label>
+
+                            <SfRating Value=@serviceDto.Rate Disabled="true" ShowLabel="true" LabelPosition="Syncfusion.Blazor.Inputs.LabelPosition.Left" CssClass="col-lg-1 col-2 text-start">
+                                <FullTemplate>
+                                    <img src=@fullTemplateImage widht="25" height="25" />
+                                </FullTemplate>
+                                <EmptyTemplate>
+                                    <img src=@emptyTemplateImage widht="25" height="25" />
+                                </EmptyTemplate>
+                                <LabelTemplate>@context+</LabelTemplate>
+                            </SfRating>
+                        </div>
                         <div class="row col-12 justify-content-around">
                             <div class="col-3 m-1">
                                 <h4>Minimum Price, UAN</h4>
@@ -107,7 +120,9 @@
     public GetServiceDto serviceDto { get; set; } = new GetServiceDto();
     private GetServiceDto initialServiceDto = new GetServiceDto();
     public bool IsEdit = false;
-   
+    private string fullTemplateImage = "Images/star-fill.svg";
+    private string emptyTemplateImage = "Images/star.svg";
+
     private void OnButtonClick()
     {
         IsEdit = !IsEdit;
@@ -179,3 +194,11 @@
         Navigation.NavigateTo($"/questionary/edit/serviceId={serviceDto.Id}");
     }
 }
+<style>
+    .e-rating-container .e-rating-label {
+        font-size: 20px;
+        color: var(--bs-primary);
+        font-weight: 700;
+        line-height: 18px;
+    }
+</style>

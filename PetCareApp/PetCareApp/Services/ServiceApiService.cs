@@ -7,6 +7,7 @@ using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
 using PetCareApp.Mappings;
 using PetCareApp.Models;
+using System.ComponentModel;
 
 namespace PetCareApp.Services
 {
@@ -156,17 +157,18 @@ namespace PetCareApp.Services
                 var service = _dbContext.Services
                         .Where(x => x.Id == serviceId)
                         .Include(x => x.Tags)
+                        .Include (x => x.Reviews)
                         .FirstOrDefault();
                
                 if (service != null)
                 {
                     var serviceDto = _mapper.Map<GetServiceDto>(service);
-                    if (serviceDto.Tags != null)
+                    if (serviceDto.Reviews.Count > 0)
                     {
-                        serviceDto.Tags.ForEach(t => t.Services = null);
+                        serviceDto.Rate = service.Reviews.Average(r => r.Rate);
+                        serviceDto.Reviews.Clear();
                     }
-                    serviceDto.Reviews.ForEach(r => r.Service = null);
-
+                    
                     var user = await GetCurrentUserAsync();
                     if (user != null && user.Id == serviceDto.AppUserId)
                     {

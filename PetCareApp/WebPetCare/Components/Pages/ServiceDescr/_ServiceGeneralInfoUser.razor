@@ -40,22 +40,36 @@
                                     @serviceDto.Description
                                 </h5>
                             </div>
-
-                            <div class="m-2 p-2 ms-3">
-                                <div class="row mb-3">
-                                    <label class="col-1">Tags</label>
+                            @if(serviceDto.Tags.Count > 0){
+                                <div class="m-2 p-2 ms-3">
+                                    <div class="row mb-3">
+                                        <label class="col-1">Tags</label>
+                                    </div>
+                                    <div class="d-flex flex-wrap m-2">
+                                        @foreach (var tag in serviceDto.Tags)
+                                        {
+                                            <div class="badge text-white d-inline-flex align-items-center me-2 mt-1 p-2">
+                                                @tag.Name
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
-                                <div class="d-flex flex-wrap m-2">
-                                    @foreach (var tag in serviceDto.Tags)
-                                    {
-                                        <div class="badge text-white d-inline-flex align-items-center me-2 mt-1 p-2">
-                                            @tag.Name
-                                        </div>
-                                    }
-                                </div>
-
-                            </div>
+                            }
                         </div>
+                    </div>
+                    <div class="row m-2 p-2 ms-4 mb-4 align-items-center">
+                       
+                            <label class="col-1 me-0 ms-2">Rate</label>
+                       
+                    <SfRating Value=@serviceDto.Rate Disabled="true" ShowLabel="true" LabelPosition="Syncfusion.Blazor.Inputs.LabelPosition.Left" CssClass="col-lg-1 col-2 text-start">
+                        <FullTemplate>
+                            <img src=@fullTemplateImage widht="25" height="25" />
+                        </FullTemplate>
+                        <EmptyTemplate>
+                            <img src=@emptyTemplateImage widht="25" height="25" />
+                        </EmptyTemplate>
+                        <LabelTemplate>@context+</LabelTemplate>
+                    </SfRating>
                     </div>
 
                     <div class="row col-12 justify-content-around">
@@ -98,6 +112,8 @@
     [Parameter]
     public string? role { get; set; } = "";
     private string masterName = "";
+    private string fullTemplateImage = "Images/star-fill.svg";
+    private string emptyTemplateImage = "Images/star.svg";
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -124,3 +140,12 @@
         Navigation.NavigateTo($"/record/{serviceDto.Id}/{serviceDto.Name}");
     }
 }
+
+<style>
+    .e-rating-container .e-rating-label {
+    font-size: 20px;
+    color: var(--bs-primary);
+    font-weight: 700;
+    line-height: 18px;
+}
+</style>
