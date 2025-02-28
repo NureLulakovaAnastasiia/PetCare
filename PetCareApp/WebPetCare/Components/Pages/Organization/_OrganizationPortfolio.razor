@@ -2,6 +2,7 @@
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
 @inject SfDialogService DialogService
+@inject IStringLocalizer<Resources.Organization> Localizer
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
@@ -9,9 +10,9 @@
             @if (!IsEdit && isEditable)
             {
                 <div class="row text-center">
-                    <h3 class="col-7 offset-2"><b>My portfolio</b></h3>
-                    <button class="btn col-2 btn-func btn-warning" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
-                    <button class="btn col-2 btn-func btn-func-primary ms-2" @onclick="OpenModal"><i class="bi bi-plus-circle"></i>   Add</button>
+                    <h3 class="col-7 offset-2"><b>@Localizer["My portfolio"]</b></h3>
+                    <button class="btn col-2 btn-func btn-warning" @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   @Localizer["Edit"]</button>
+                    <button class="btn col-2 btn-func btn-func-primary ms-2" @onclick="OpenModal"><i class="bi bi-plus-circle"></i>   @Localizer["Add"]</button>
                 </div>
             }
 
@@ -19,8 +20,8 @@
             @if (IsEdit && isEditable)
             {
                 <div class="row text-center">
-                    <h3 class="col-8 offset-2"><b>My portfolio</b></h3>
-                    <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">Finish</button>
+                    <h3 class="col-8 offset-2"><b>@Localizer["My portfolio"]</b></h3>
+                    <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">@Localizer["Finish"]</button>
                 </div>
                 <hr />
             }
@@ -29,7 +30,7 @@
                 <div class="row">
                     @if (portfolio == null || portfolio.Count == 0)
                     {
-                        <h3>Portfolio is not available or empty</h3>
+                        <h3>@Localizer["Portfolio is not available or empty"]</h3>
                     }
                     else
                     {
@@ -46,7 +47,7 @@
                                         else
                                         {
                                             <div class="card-body text-center">
-                                                <p>No image available</p>
+                                                <p>@Localizer["No image available"]</p>
                                             </div>
                                         }
                                     </div>
@@ -70,7 +71,7 @@
                 <DialogTemplates>
                     <Header>
                         <div class="text-center">
-                            <h2>Add portfolio</h2>
+                            <h2>@Localizer["Add portfolio"]</h2>
                         </div>
                     </Header>
                     <Content>
@@ -80,7 +81,7 @@
                                 <div class=" col-5  mb-4">
                                     <div class="row">
                                         <div class="col-1 me-1">
-                                            <SfCheckBox @bind-Checked="@masterPortfolio.IsChecked" Label="Choose"></SfCheckBox>
+                                            <SfCheckBox @bind-Checked="@masterPortfolio.IsChecked" Label="@Localizer["Choose"]"></SfCheckBox>
 
                                         </div>
                                         <div class="card col-10">
@@ -88,12 +89,12 @@
                                                 @if (masterPortfolio.Photo != null && masterPortfolio.Photo.Length > 0)
                                                 {
                                                     var base64Image = $"data:image/jpeg;base64,{Convert.ToBase64String(masterPortfolio.Photo)}";
-                                                    <img src="@base64Image" class="card-img-top fixed-image" alt="Portfolio Image" />
+                                                    <img src="@base64Image" class="card-img-top fixed-image" alt="@Localizer["Portfolio Image"]" />
                                                 }
                                                 else
                                                 {
                                                     <div class="card-body text-center">
-                                                        <p>No image available</p>
+                                                        <p>@Localizer["No image available"]</p>
                                                     </div>
                                                 }
                                             </div>
@@ -110,8 +111,8 @@
                 </DialogTemplates>
 
                 <DialogButtons>
-                    <DialogButton Content="Add" IsPrimary="true" OnClick="@AddOrgPortfolios" />
-                    <DialogButton Content="Cancel" OnClick="@CloseModal" />
+                    <DialogButton Content="@Localizer["Add"]" IsPrimary="true" OnClick="@AddOrgPortfolios" />
+                    <DialogButton Content="@Localizer["Cancel"]" OnClick="@CloseModal" />
                 </DialogButtons>
             </SfDialog>
 
@@ -157,7 +158,7 @@
             var res = await orgService.RemoveOrgPortfolio(id);
             if (String.IsNullOrEmpty(res))
             {
-                showToastr("", "Item was succefully removed");
+                showToastr("", Localizer["Item was succefully removed"]);
                 portfolio.Remove(item);
                 mastersPortfolios.Add(item);
                 StateHasChanged();
@@ -192,7 +193,7 @@
         }
         else
         {
-            showToastr("You haven't chosen items to add");
+            showToastr(Localizer["You haven't chosen items to add"]);
         }
     }
 

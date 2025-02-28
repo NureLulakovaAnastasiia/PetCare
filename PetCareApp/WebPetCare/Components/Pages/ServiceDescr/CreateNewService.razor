@@ -2,6 +2,7 @@
 @inject NavigationManager Navigation
 @inject IServiceService service
 @inject IJSRuntime _JSRuntime
+@inject IStringLocalizer<ServiceDescr> Localizer
 
 
 <div class="d-flex justify-content-center">
@@ -9,20 +10,20 @@
         <div class="form-custom-border p-3 ">
             <div class="row text-center align-items-center">
                 <button type="button" class="btn col-2 p-1 ms-3 btn-func btn-danger" style="height: 3em" @onclick="Back">
-                    <i class="bi bi-arrow-left"></i>   Back
+                    <i class="bi bi-arrow-left"></i>   @Localizer["Back"]
                 </button>
 
                 @if (isServiceCreation){
                 <div class="col-4 offset-3 me-3 ps-0 pe-5">
-                    <h3 ><b>Service Creation</b></h3>
-                    <p class="green-blue-text">Fill form with info about service</p>
+                    <h3 ><b>@Localizer["Service Creation"]</b></h3>
+                    <p class="green-blue-text">@Localizer["Fill form with info about service"]</p>
                 </div>
                 }
                 else if (isQuestionaryCreation)
                 {
                     <div class="col-4 offset-3 me-3 ps-0 pe-5">
-                        <h3><b>Questionary Creation</b></h3>
-                        <p class="green-blue-text">Create questionary or skip this step</p>
+                        <h3><b>@Localizer["Questionary Creation"]</b></h3>
+                        <p class="green-blue-text">@Localizer["Create questionary or skip this step"]</p>
                     </div>
                 }
             </div>
@@ -60,7 +61,7 @@
         var res = await service.AddService(serviceDto, questions);
         if (String.IsNullOrEmpty(res))
         {
-            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Service was added successfully!", "Success");
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", Localizer["Service was added successfully!"], "Success");
             Navigation.NavigateTo("/account");
         }else if(res.Equals("Unauthorized"))
         {

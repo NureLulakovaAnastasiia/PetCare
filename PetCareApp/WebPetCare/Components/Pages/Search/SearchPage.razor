@@ -6,6 +6,7 @@
 @inject IJSRuntime _JSRuntime
 @using LabelPosition = Syncfusion.Blazor.Inputs.LabelPosition
 @inject NavigationManager Navigation
+@inject IStringLocalizer<Resources.Search> Localizer
 
 
 
@@ -14,20 +15,20 @@
         <div class="form-custom-border p-3 ">
             <div class="row">
                 <div class="col-3">
-                    <SfDropDownList TValue="int" TItem="CityDropdownItem" Placeholder="Select a city" AllowFiltering="true" DataSource="@CityList" CssClass="e-outline" FloatLabelType="FloatLabelType.Always">
+                    <SfDropDownList TValue="int" TItem="CityDropdownItem" Placeholder="@Localizer["Select a city"]" AllowFiltering="true" DataSource="@CityList" CssClass="e-outline" FloatLabelType="FloatLabelType.Always">
                         <DropDownListFieldSettings Text="NameFormatted" Value="GeonameId"></DropDownListFieldSettings>
                         <DropDownListEvents TValue="int" TItem="CityDropdownItem" ValueChange="OnValueChange"></DropDownListEvents>
                     </SfDropDownList>
                 </div>
 
-                <div class=" row col-5">
+                <div class=" row col-6">
                     <div class="row col-4 m-0 p-0 text-center justify-content-center">
                         <div class="m-0">
                             <SfTooltip CssClass="e-tooltip-css" OpensOn="Focus" Target="#btnFiter">
                                 <ContentTemplate>
                                     <div id='democontent'>
                                         <div class="ms-0 text-center">
-                                            <h4>Rate</h4>
+                                            <h4>@Localizer["Rate"]</h4>
                                             <SfRating @bind-Value=Rate ShowLabel=true LabelPosition="LabelPosition.Left">
                                                 <FullTemplate>
                                                     <img src=@fullTemplateImage widht="30" height="30" />
@@ -40,7 +41,7 @@
                                             <hr />
                                         </div>
                                         <div class="ps-4 pe-4 mt-1 text-center">
-                                            <h4>Price</h4>
+                                            <h4>@Localizer["Price"]</h4>
                                             <div class="row justify-content-around mt-2">
                                                 <InputNumber @bind-Value="RangeValue[0]" class="input-textarea-style col-5 p-1"></InputNumber>
                                                 <InputNumber @bind-Value="RangeValue[1]" class="input-textarea-style col-5 p-1"></InputNumber>
@@ -49,12 +50,12 @@
                                         </div>
                                         <hr />
                                         <div class="row justify-content-center">
-                                            <button class="btn col-6 btn-danger p-1">Clear filters</button>
+                                            <button class="btn col-6 btn-danger p-1">@Localizer["Clear filters"]</button>
                                         </div>
                                     </div>
                                 </ContentTemplate>
                                 <ChildContent>
-                                    <button class="btn btn-info m-0 p-3" ID="btnFiter"><i class="bi bi-funnel-fill"></i>   Filter </button>
+                                    <button class="btn btn-info m-0 p-3" ID="btnFiter"><i class="bi bi-funnel-fill"></i>   @Localizer["Filter"] </button>
                                 </ChildContent>
                             </SfTooltip>
                         </div>
@@ -67,35 +68,35 @@
                                         <div class="ms-0 text-center col-4 ">
                                             <div class="row m-2 align-items-center">
                                                 <SfCheckBox @bind-Checked="sorting.ByRate" @onchange="@(() => ChangeSortType("Rate"))" CssClass="col-1 offset-2"></SfCheckBox>
-                                                <h5 class="col-8 text-start ps-3 m-0 p-0 green-blue-text">By Rate</h5>
+                                                <h5 class="col-8 text-start ps-3 m-0 p-0 green-blue-text">@Localizer["By Rate"]</h5>
                                             </div>
                                             <div class="row">
-                                                <SfRadioButton CssClass="col-12" Label="From highest" Name="rates" Value="false" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
-                                                <SfRadioButton CssClass="col-12" Label="From lowest" Name="rates" Value="true" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
+                                                <SfRadioButton CssClass="col-12" Label="@Localizer["From highest"]" Name="rates" Value="false" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
+                                                <SfRadioButton CssClass="col-12" Label="@Localizer["From lowest"]" Name="rates" Value="true" @bind-Checked="sorting.AscendingRate" @onchange="@(() => ChangeSortType("Rate"))" Disabled="!sorting.ByRate"></SfRadioButton>
                                             </div>
                                         </div>
 
                                         <div class="ms-0 text-center col-4" style="border-color: var(--bs-border-color);border-left: 0.2em solid;">
                                             <div class="row m-2 align-items-center">
                                                 <SfCheckBox @bind-Checked="sorting.ByPrice" @onchange="@(() => ChangeSortType("Price"))" CssClass="col-1 offset-2"></SfCheckBox>
-                                                <h5 class="col-8 text-start ps-3 m-0 p-0 green-blue-text">By Price</h5>
+                                                <h5 class="col-8 text-start ps-3 m-0 p-0 green-blue-text">@Localizer["By Price"]</h5>
 
                                             </div>
                                             <div class="row">
-                                                <SfRadioButton CssClass="col-12" Label="From highest" Name="prices" Value="false" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
-                                                <SfRadioButton CssClass="col-12" Label="From lowest" Name="prices" Value="true" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
+                                                <SfRadioButton CssClass="col-12" Label="@Localizer["From highest"]" Name="prices" Value="false" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
+                                                <SfRadioButton CssClass="col-12" Label="@Localizer["From lowest"]" Name="prices" Value="true" @bind-Checked="sorting.AscendingPrice" @onchange="@(() => ChangeSortType("Price"))" Disabled="!sorting.ByPrice"></SfRadioButton>
                                             </div>
                                         </div>
 
                                         <div class="ms-0 text-center col-4">
                                             <div class="row m-2 align-items-center">
                                                 <SfCheckBox @bind-Checked="sorting.ByNumOfReviews" @onchange="@(() => ChangeSortType("Reviews"))" CssClass="col-1 offset-2"></SfCheckBox>
-                                                <h5 class="col-8 text-start ps-3 m-0 p-0 green-blue-text">By Reviews</h5>
+                                                <h5 class="col-8 text-start ps-3 m-0 p-0 green-blue-text">@Localizer["By Reviews"]</h5>
 
                                             </div>
                                             <div class="row">
-                                                <SfRadioButton CssClass="col-12" Label="From highest" Name="reviews" Value="false" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
-                                                <SfRadioButton CssClass="col-12" Label="From lowest" Name="reviews" Value="true" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
+                                                <SfRadioButton CssClass="col-12" Label="@Localizer["From highest"]" Name="reviews" Value="false" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
+                                                <SfRadioButton CssClass="col-12" Label="@Localizer["From lowest"]" Name="reviews" Value="true" @bind-Checked="sorting.AscendingReview" @onchange="@(() => ChangeSortType("Reviews"))" Disabled="!sorting.ByNumOfReviews"></SfRadioButton>
                                             </div>
 
                                         </div>
@@ -103,7 +104,7 @@
                                     </div>
                                 </ContentTemplate>
                                 <ChildContent>
-                                    <button class="btn m-0 btn-info" ID="btnSort"><i class="bi bi-arrow-down-up"></i>   Sort </button>
+                                    <button class="btn m-0 btn-info" s ID="btnSort"><i class="bi bi-arrow-down-up"></i>   @Localizer["Sort"] </button>
                                 </ChildContent>
                             </SfTooltip>
                         </div>
@@ -116,7 +117,7 @@
                                 </div>
                             </ContentTemplate>
                             <ChildContent>
-                                <button class="btn m-0 btn-secondary" ID="btnTags"><i class="bi bi-tags-fill"></i>   Tags </button>
+                                <button class="btn m-0 btn-secondary" ID="btnTags"><i class="bi bi-tags-fill"></i>   @Localizer["Tags"] </button>
                             </ChildContent>
                         </SfTooltip>
                     </div>
@@ -124,8 +125,8 @@
 
                 <div class=" row col-3">
                     <div class="col-10 align-content-center">
-                        <label>Search</label>
-                        <InputText @bind-Value="search" DisplayName="Search" class="input-textarea-style col-11"></InputText>
+                        <label>@Localizer["Search"]</label>
+                        <InputText @bind-Value="search" DisplayName="@Localizer["Search"]" class="input-textarea-style col-11"></InputText>
                     </div>
                     <div class="col-1 m-0">
                         <button class="btn btn-primary" @onclick="GetFilteredData"><i class="bi bi-search"></i></button>
@@ -152,9 +153,9 @@
                                     <div class="col-10 p-3">
                                         <h4 class="text-primary">@item.ServiceDto.Name</h4>
                                         <hr />
-                                        <p>Price: <span class="green-blue-text">@item.ServiceDto.MinimumPrice  -  @item.ServiceDto.MaximumPrice </span>  UAN</p>
+                                        <p>@Localizer["Price"]: <span class="green-blue-text">@item.ServiceDto.MinimumPrice  -  @item.ServiceDto.MaximumPrice </span>  UAN</p>
                                         <div class="row mt-0 pt-0 align-items-start" style="max-height:30px;">
-                                            <p class="col-1 pt-1">Rate:</p>
+                                            <p class="col-1 pt-1 me-4">@Localizer["Rate"]:</p>
                                             <div class="col-5 pt-0 mt-0 justify-content-start align-items-start" style="max-height:20px;">
                                                 <SfRating Value=@(item.ServiceDto.Rate * 1.0)  ShowTooltip="false" CssClass="custom-rate" Disabled>
                                                     <FullTemplate>
@@ -168,7 +169,7 @@
                                         </div>
                                     </div>
                                     <div class="col-2 m-0 p-0 align-content-end">
-                                        <button class="btn-fill" @onclick="() => GoToService(item.ServiceDto.Id)"><h5 class="text-white">Details<br /><i class="bi bi-arrow-right-circle"></i> </h5></button>
+                                        <button class="btn-fill" @onclick="() => GoToService(item.ServiceDto.Id)"><h5 class="text-white">@Localizer["Details"]<br /><i class="bi bi-arrow-right-circle"></i> </h5></button>
 
                                     </div>
 
@@ -180,7 +181,7 @@
                 else
                 {
                     <div>
-                        No data to display
+                        @Localizer["No data to display"]
                     </div>
                 }
 
@@ -606,6 +607,7 @@
         background-color: rgba(var(--bs-primary-rgb), 0.6);
         border-start-end-radius: 12px;
         border-end-end-radius: 12px;
+       border:none;
     }
 
 

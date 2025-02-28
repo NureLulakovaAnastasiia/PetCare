@@ -2,42 +2,45 @@
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
 @inject SfDialogService DialogService
+@inject IStringLocalizer<Resources.Organization> Localizer
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border p-3 justify-content-center">
             <div class="row text-center">
-                <h2 class="col-8 offset-2"><b>Employees</b></h2>
+                <h2 class="col-8 offset-2"><b>@Localizer["Employees"]</b></h2>
                 <hr />
             </div>
-            
+
+
+            <div class="row justify-content-end">
+                <div class="col-3">
+                    <h6>@Localizer["Sort by date"]</h6>
+                    <SfDropDownList TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
+                                    DataSource="SortTypes" @bind-Value="sortType">
+                        <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
+                                            ValueChange="SortEmployees"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+                <div class="col-3">
+                    <h6>@Localizer["Filter"]</h6>
+                    <SfDropDownList TValue="SortOptions.FilterEmployees" TItem="SelectListItem<SortOptions.FilterEmployees>"
+                                    DataSource="FilterTypes" @bind-Value="filterType">
+                        <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="SortOptions.FilterEmployees" TItem="SelectListItem<SortOptions.FilterEmployees>"
+                                            ValueChange="FilterEmployees"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+
+                @if (filteredEmployees.Count == 0)
+                {
+                    <h3 class="mt-5">@Localizer["No employees were found"].</h3>
+                }
+            </div>
             @if (filteredEmployees != null && filteredEmployees.Count > 0)
             {
-                <div class="row justify-content-end">
-                    <div class="col-3">
-                        <h6>Sort by acceptance date</h6>
-                        <SfDropDownList TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
-                                        DataSource="SortTypes" @bind-Value="sortType">
-                            <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
-                            <DropDownListEvents TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
-                                                ValueChange="SortEmployees"></DropDownListEvents>
-                        </SfDropDownList>
-                    </div>
-                    <div class="col-3">
-                        <h6>Filter</h6>
-                        <SfDropDownList TValue="SortOptions.FilterEmployees" TItem="SelectListItem<SortOptions.FilterEmployees>"
-                                        DataSource="FilterTypes" @bind-Value="filterType">
-                            <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
-                            <DropDownListEvents TValue="SortOptions.FilterEmployees" TItem="SelectListItem<SortOptions.FilterEmployees>"
-                                                ValueChange="FilterEmployees"></DropDownListEvents>
-                        </SfDropDownList>
-                    </div>
-
-                    @if (filteredEmployees.Count == 0)
-                    {
-                        <h3 class="mt-5">No employees were found.</h3>
-                    }
-                </div>
+               
                 <div class="d-flex flex-wrap justify-content-around w">
                     @foreach (var employee in filteredEmployees)
                     {
@@ -54,7 +57,7 @@
                                     else
                                     {
                                         <div class="">
-                                            <p>No image available</p>
+                                            <p>@Localizer["No image available"]</p>
                                         </div>
                                     }
                                 </div>
@@ -62,16 +65,16 @@
                             </div>
                             <hr class="mt-0 pt-0 text-center" />
                             <div class="card-body text-center">
-                                <p>Acceptance Date: @(employee.AcceptanceDate.ToString("g") ?? "")</p>
+                                <p>@Localizer["Acceptance Date"]: @(employee.AcceptanceDate.ToString("g") ?? "")</p>
                                 @if(employee.DismissalDate != null)
                                 {
-                                  <p>Dismissal Date: @(employee.DismissalDate?.ToString("g") ?? "")</p>
+                                  <p>@Localizer["Dismissal Date"]: @(employee.DismissalDate?.ToString("g") ?? "")</p>
                                 }
                                 else
                                 {
                                     <button class="btn btn-danger p-2" 
                                             @onclick="() => Dismiss(employee.Id)">
-                                        Dismiss
+                                        @Localizer["Dismiss"]
                                     </button>
                                 }
                                
@@ -83,7 +86,7 @@
             }
             else
             {
-                <h3>No data was found</h3>
+                <h3>@Localizer["No data was found"]</h3>
             }
         </div>
     </div>
@@ -96,7 +99,7 @@
     public List<GetEmployeeDto> employees { get; set; } = new List<GetEmployeeDto>();
     public List<GetEmployeeDto> filteredEmployees { get; set; } = new List<GetEmployeeDto>();
 
-    private SortOptions.SortDirection sortType = SortOptions.SortDirection.Oldest;
+    private SortOptions.SortDirection sortType = SortOptions.SortDirection.Newest;
     private SortOptions.FilterEmployees filterType = SortOptions.FilterEmployees.All;
 
     private List<SelectListItem<SortOptions.SortDirection>> SortTypes = new List<SelectListItem<SortOptions.SortDirection>>();
@@ -125,8 +128,6 @@
             {
                 employees = res.Data;
                 FilterEmployees();
-                SortEmployees();
-                StateHasChanged();
             }
             else
             {
@@ -138,13 +139,13 @@
 
     public async Task Dismiss(int employeeId)
     {
-        bool isConfirm = await DialogService.ConfirmAsync("Are you sure you want to fire this employee?", "Fire employee");
+        bool isConfirm = await DialogService.ConfirmAsync(Localizer["SureDismissEmployee"], Localizer["Fire employee"]);
         if (isConfirm)
         {
             var res = await orgService.DismissEmployee(employeeId);
             if (String.IsNullOrEmpty(res))
             {
-                showToastr("", "Employee was dismissed");
+                showToastr("", Localizer["Employee was dismissed"]);
                 StateHasChanged();
             }
             else
@@ -152,7 +153,7 @@
                 showToastr(res);
             }
         }
-
+        FilterEmployees();
     }
 
     public void SortEmployees()
@@ -160,10 +161,10 @@
         switch (sortType)
         {
             case SortOptions.SortDirection.Newest:
-                employees = filteredEmployees.OrderByDescending(e => e.AcceptanceDate).ToList();
+                filteredEmployees = filteredEmployees.OrderByDescending(e => e.AcceptanceDate).ToList();
                 break;
             case SortOptions.SortDirection.Oldest:
-                employees = filteredEmployees.OrderBy(e => e.AcceptanceDate).ToList();
+                filteredEmployees = filteredEmployees.OrderBy(e => e.AcceptanceDate).ToList();
 
                 break;
         }
@@ -186,7 +187,7 @@
         }
 
         SortEmployees();
-
+        StateHasChanged();
     }
 
     private async void showToastr(string res, string successMessage = "")

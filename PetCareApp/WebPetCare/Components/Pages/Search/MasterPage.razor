@@ -4,6 +4,7 @@
 @using LabelPosition = Syncfusion.Blazor.Inputs.LabelPosition
 @inject IUserService userService
 @inject NavigationManager Navigation
+@inject IStringLocalizer<Resources.Search> Localizer
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
@@ -21,7 +22,7 @@
                         else
                         {
                             <div class="card-body text-center">
-                                <p>No image available</p>
+                                <p>@Localizer["No image available"]</p>
                             </div>
                         }
                         </div>
@@ -34,7 +35,7 @@
                                     <EmptyTemplate>
                                         <img src=@emptyTemplateImage style="max-width:30px; max-height:30px;" />
                                     </EmptyTemplate>
-                                    <LabelTemplate ><strong>Rate:</strong> @context+</LabelTemplate>
+                                    <LabelTemplate ><strong>@Localizer["Rate"]:</strong> @context+</LabelTemplate>
                                 </SfRating>
                             </div>
                         </div>
@@ -49,17 +50,17 @@
                         @if (masterData.OrgId != null)
                         {
                             <div class="col-8 offset-2">
-                                <label class="">Organization </label>
+                                <label class="">@Localizer["Organization"] </label>
                                 <h4 class="green-blue-text"><NavLink @onclick="GoToOrgPage" class=" nav-link nav-link-underline ">@masterData.OrgName</NavLink></h4>
                             </div>
                         }
                         
                             <div class="col-8 offset-2">
-                                <label>Address</label>
+                                <label>@Localizer["Address"]</label>
                             <h4 class="green-blue-text">@masterData.Contacts.Address</h4>
                             </div>
                             <div class="">
-                                <label>Phone</label>
+                                <label>@Localizer["Phone"]</label>
                             <h4 class="green-blue-text">@masterData.Contacts.Phone</h4>
                             </div>
                         
@@ -72,11 +73,11 @@
 </div>
 
 <div class="row col-9 offset-2 mb-3 ">
-    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Schedule ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Schedule)">Schedule</button>
-    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Map ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Map)">Map</button>
-    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Services ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Services)">Services</button>
-    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Reviews ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Reviews)">Reviews</button>
-    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Portfolio ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Portfolio)">Portfolio</button>
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Schedule ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Schedule)">@Localizer["Schedule"]</button>
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Map ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Map)">@Localizer["Map"]</button>
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Services ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Services)">@Localizer["Services"]</button>
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Reviews ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Reviews)">@Localizer["Reviews"]</button>
+    <button class="btn col-lg-2 me-3 btn-nav@(options == MasterDataOptions.Portfolio ? "-active" : "")" @onclick="() => ChangePage(MasterDataOptions.Portfolio)">@Localizer["Portfolio"]</button>
 </div>
 
 @switch (options)

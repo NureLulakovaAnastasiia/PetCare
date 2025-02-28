@@ -230,10 +230,10 @@
         switch (sortType)
         {
             case SortOptions.SortDirection.Newest:
-                filteredRecords = filteredRecords.OrderBy(e => e.StartTime).ToList();
+                filteredRecords = filteredRecords.OrderByDescending(e => e.StartTime).ToList();
                 break;
             case SortOptions.SortDirection.Oldest:
-                filteredRecords = filteredRecords.OrderByDescending(e => e.StartTime).ToList();
+                filteredRecords = filteredRecords.OrderBy(e => e.StartTime).ToList();
 
                 break;
         }

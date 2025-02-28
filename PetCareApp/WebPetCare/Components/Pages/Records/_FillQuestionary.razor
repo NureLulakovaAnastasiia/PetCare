@@ -1,5 +1,8 @@
 ﻿@inject IJSRuntime _JSRuntime
 @inject IUserService _userService
+@inject IStringLocalizer<Resources.Record> Localizer
+
+
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border p-3">
@@ -26,7 +29,7 @@
                                             @if (image != null)
                                             {
                                                 <div class=" image-row-container">
-                                                    <img src="@image" class="pb-2 col-4 fixed-image ms-0" alt="Answer image" style="max-width: 200px;" />
+                                                    <img src="@image" class="pb-2 col-4 fixed-image ms-0" alt="@Localizer["Answer image"]" style="max-width: 200px;" />
                                                 </div>
                                             }
                                         </div>
@@ -35,13 +38,13 @@
                             </li>
                         }
                     </ol>
-                    <button type="submit" class="btn btn-func btn-success p-2">Next <i class="bi bi-arrow-right-circle"></i></button>
+                    <button type="submit" class="btn btn-func btn-success p-2">@Localizer["Next"] <i class="bi bi-arrow-right-circle"></i></button>
                 </form>
             }
             else
             {
-                <h4>No questionary for this service</h4>
-                <button type="submit" class="btn btn-success" @onclick="SubmitAnswers">Next</button>
+                <h4>@Localizer["No questionary for this service"]</h4>
+                <button type="submit" class="btn btn-success" @onclick="SubmitAnswers">@Localizer["Next"]</button>
             }
         </div>
     </div>

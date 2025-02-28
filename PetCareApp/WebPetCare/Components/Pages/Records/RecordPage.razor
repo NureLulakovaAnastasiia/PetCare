@@ -4,11 +4,14 @@
 @inject IJSRuntime _JSRuntime
 @inject IUserService _userService
 @inject NavigationManager Navigation
+@inject IStringLocalizer<Resources.Record> Localizer
+
+
 
 <div class="container justify-content-center">
     <div class="offset-3 col-6 text-center">
-        <h2><strong>Record</strong></h2>
-        <h4 class="green-blue-text">For service: @serviceName</h4>
+        <h2><strong>@Localizer["Record"]</strong></h2>
+        <h4 class="green-blue-text">@Localizer["For service"]: @serviceName</h4>
         @if (analisysDto != null && analisysDto.Description != null)
         {
             <div style="white-space: pre-line;">
@@ -27,7 +30,7 @@
     </div>
 
     <div>
-        <button class="btn btn-danger" @onclick="GoBack">Back</button>
+        <button class="btn btn-danger" @onclick="GoBack">@Localizer["Back"]</button>
         @switch (step)
         {
             case 1:
@@ -37,13 +40,13 @@
                 <div class="d-flex justify-content-center">
                     <div class="col-lg-10 align-items-center text-center ">
                         <div class="form-custom-border p-3">
-                            <h3>Submit record</h3>
-                            <h4 class="green-blue-text">Chosen time: @chosenSlot.Date.ToString("dddd, dd MMMM yyyy"), @chosenSlot.StartTime.ToString(@"hh\:mm") - @chosenSlot.EndTime.ToString(@"hh\:mm")</h4>
+                            <h3>@Localizer["Submit record"]</h3>
+                            <h4 class="green-blue-text">@Localizer["Chosen time"]: @chosenSlot.Date.ToString("dddd, dd MMMM yyyy"), @chosenSlot.StartTime.ToString(@"hh\:mm") - @chosenSlot.EndTime.ToString(@"hh\:mm")</h4>
                             <hr />
                             <div class=" d-flex flex-column align-items-center">
-                                <label>You can write comment to your record</label>
+                                <label>@Localizer["WriteCommentToRecord"]</label>
                                 <InputTextArea class="input-textarea-style col-8" @bind-Value="comment"></InputTextArea>
-                                <button class="btn btn-primary btn-submit mt-4" @onclick="SubmitRecord">Submit</button>
+                                <button class="btn btn-primary btn-submit mt-4" @onclick="SubmitRecord">@Localizer["Submit"]</button>
                             </div>
                         </div>
                     </div>
@@ -114,6 +117,7 @@
             var res = await _userService.AddRecord(record);
             if (String.IsNullOrEmpty(res))
             {
+                showToastr("", Localizer["SuccessRecord"]);
                 Navigation.NavigateTo($"/service-id={serviceId}");
             }
             else

@@ -1,6 +1,7 @@
 ﻿@using WebPetCare.Services
 @using Syncfusion.Blazor.Inputs
 @inject ISearchService _searchService
+@inject IStringLocalizer<Resources.Search> Localizer
 
 
 
@@ -21,11 +22,11 @@
         <div class="row text-start">
         @if (selectedTags.Count == 0)
         {
-            <h5 class="offset-2 p-0">No selected tags</h5>
+            <h5 class="offset-2 p-0">@Localizer["No selected tags"]</h5>
         }
         else
         {
-            <h6 class="offset-1 p-0"> Selected </h6>
+            <h6 class="offset-1 p-0"> @Localizer["Selected"] </h6>
             <div class="d-flex flex-wrap m-2">
                 @foreach (var item in selectedTags)
                 {

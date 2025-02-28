@@ -2,6 +2,9 @@
 @using WebPetCare.Components.Pages.Account
 @inject IServiceService _service
 @inject IJSRuntime _JSRuntime
+@inject IStringLocalizer<ServiceDescr> Localizer
+
+
 
 @if(isOwner){
     <_ServiceGeneralInfo serviceDto="@serviceDto"></_ServiceGeneralInfo>

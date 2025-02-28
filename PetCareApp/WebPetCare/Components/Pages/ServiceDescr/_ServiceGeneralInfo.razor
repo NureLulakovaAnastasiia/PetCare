@@ -2,6 +2,7 @@
 @inject IServiceService _service
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
+@inject IStringLocalizer<ServiceDescr> Localizer
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
@@ -11,9 +12,9 @@
                 @if (!IsEdit)
                 {
                     <div class="row text-center">
-                        <h3 class="col-6 offset-3" ><b>Service Details</b></h3>
-                        <button class="btn col-2 me-3 btn-func btn-danger" @onclick="DeleteService"><i class="bi bi-trash"></i>    Delete</button>
-                        <button class="btn col-2 btn-func btn-warning " @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   Edit</button>
+                        <h3 class="col-6 offset-3" ><b>@Localizer["Service Details"]</b></h3>
+                        <button class="btn col-2 me-3 btn-func btn-danger" @onclick="DeleteService"><i class="bi bi-trash"></i>    @Localizer["Delete"]</button>
+                        <button class="btn col-2 btn-func btn-warning " @onclick="OnButtonClick"><i class="bi bi-pencil-fill"></i>   @Localizer["Edit"]</button>
                     </div>
                 }
 
@@ -21,9 +22,9 @@
                 @if (IsEdit)
                 {
                     <div class="row text-center">
-                            <h3 class="col-6 offset-3"><b>Service Details</b></h3>
-                            <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">Cancel</button>
-                            <button type="submit" class="btn col-2 btn-func btn-success">Save</button>
+                            <h3 class="col-6 offset-3"><b>@Localizer["Service Details"]</b></h3>
+                            <button type="button" class="btn col-2 mx-1 btn-func btn-danger" @onclick="CancelEdit">@Localizer["Cancel"]</button>
+                            <button type="submit" class="btn col-2 btn-func btn-success">@Localizer["Save"]</button>
                     </div>
                 }
 
@@ -33,13 +34,13 @@
                         <div class="row col-12 mb-2 ms-3">
                             <div class="col-8">
                                     <div class="m-2 p-2">
-                                        <h4>Name</h4>
+                                        <h4>@Localizer["Name"]</h4>
                                         <InputText @bind-Value="serviceDto.Name"
-                                                       placeholder="@(serviceDto.Name != null ? serviceDto.Name : "No name")"
+                                               placeholder="@(serviceDto.Name != null ? serviceDto.Name : Localizer["No name"])"
                                                        disabled=" @(!IsEdit)" class="input-text-style col-12"></InputText>
                                     </div>
                                     <div class="m-2 p-2">
-                                        <h4>Description</h4>
+                                        <h4>@Localizer["Description"]</h4>
                                         <InputTextArea @bind-Value="serviceDto.Description"
                                                        placeholder="@(serviceDto.Description != null ? serviceDto.Description : " ")"
                                                        disabled=" @(!IsEdit)" class="input-textarea-style col-12"></InputTextArea>
@@ -47,7 +48,7 @@
                                     
                                 <div class="m-2 p-2">
                                     <div class="row mb-3">
-                                        <h4 class="col-1">Tags</h4>
+                                        <h4 class="col-1">@Localizer["Tags"]</h4>
                                      </div>
                                     @if(IsEdit){
                                         <_TagSearch selectedTags="serviceDto.Tags" updateSelectedTags="UpdateTags"></_TagSearch>
@@ -64,14 +65,14 @@
                                 </div>
                             </div>
                             <div class="col-4 text-center p-3 mb-2">
-                                <buttton class="btn btn-info col-5 offset-1 m-3" @onclick="ToQuestionaryUpdate">Questionary</buttton>
-                                <buttton class="btn btn-secondary col-5 offset-1 m-3" @onclick="ChangeServiceVisibility"><i class="bi bi-eye@(serviceDto.IsHidden ? "" : "-slash")"></i>@(serviceDto.IsHidden ? " Show" : " Hide")</buttton>
+                                <buttton class="btn btn-info col-5 offset-1 m-3" style="font-size:1rem;" @onclick="ToQuestionaryUpdate">@Localizer["Questionary"]</buttton>
+                                <buttton class="btn btn-secondary col-5 offset-1 m-3" style="font-size:1rem;" @onclick="ChangeServiceVisibility"><i class="bi bi-eye@(serviceDto.IsHidden ? "" : "-slash")"></i>   @(serviceDto.IsHidden ? Localizer["Show"] : Localizer["Hide"])</buttton>
 
                             </div>
                         </div>
                         <div class="row m-2 p-2 ms-4 mb-4 align-items-center">
 
-                            <label class="col-1 me-0 ms-2">Rate</label>
+                            <label class="col-1 me-0 ms-2">@Localizer["Rate"]</label>
 
                             <SfRating Value=@serviceDto.Rate Disabled="true" ShowLabel="true" LabelPosition="Syncfusion.Blazor.Inputs.LabelPosition.Left" CssClass="col-lg-1 col-2 text-start">
                                 <FullTemplate>
@@ -85,17 +86,17 @@
                         </div>
                         <div class="row col-12 justify-content-around">
                             <div class="col-3 m-1">
-                                <h4>Minimum Price, UAN</h4>
+                                <h4>@Localizer["Minimum Price"], UAN</h4>
                                 <InputNumber @bind-Value="@serviceDto.MinimumPrice" class="input-text-style col-7"
                                 disabled=" @(!IsEdit)"></InputNumber>
                             </div>
                             <div class="col-3 m-1">
-                                <h4>Maximum Price, UAN</h4>
+                                <h4>@Localizer["Maximum Price"], UAN</h4>
                                 <InputNumber @bind-Value="@serviceDto.MaximumPrice" class="input-text-style col-7" 
                                 disabled=" @(!IsEdit)"></InputNumber>
                             </div>
                             <div class="col-3 m-1">
-                                <h4>Time, min</h4>
+                                <h4>@Localizer["Time, min"]</h4>
                                 <InputNumber @bind-Value="@serviceDto.RealTime" class="input-text-style col-7"
                                 disabled=" @(!IsEdit)"></InputNumber>
                             </div>
@@ -106,7 +107,7 @@
             }
             else
             {
-                <h3>There is no data to display</h3>
+                <h3>@Localizer["There is no data to display"]</h3>
             }
         </div>
     </div>
@@ -144,7 +145,7 @@
         var res = await _service.UpdateService(serviceDto);
         if (String.IsNullOrEmpty(res))
         {
-            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Data updated and saved successfully!", "Success");
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", Localizer["Data updated and saved successfully!"], "Success");
             OnButtonClick();
             StateHasChanged();
         }
@@ -165,7 +166,7 @@
         var res = await _service.DeleteService(serviceDto.Id);
         if (String.IsNullOrEmpty(res))
         {
-            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", "Service was deleted successfully!", "Success");
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", Localizer["Service was deleted successfully!"], "Success");
             Navigation.NavigateTo("/account");
         }
         else
@@ -180,7 +181,7 @@
         if (String.IsNullOrEmpty(res))
         {
             serviceDto.IsHidden = !serviceDto.IsHidden;
-            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", serviceDto.IsHidden ? "Service become hidden!" : "Service is now shown!", "Success");
+            await _JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", serviceDto.IsHidden ? Localizer["Service become hidden!"] : Localizer["Service is now shown!"], "Success");
             StateHasChanged();
         }
         else

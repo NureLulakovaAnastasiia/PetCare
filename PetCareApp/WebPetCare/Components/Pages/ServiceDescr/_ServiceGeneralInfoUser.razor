@@ -1,5 +1,6 @@
 ﻿@inject IServiceService _service
 @inject NavigationManager Navigation
+@inject IStringLocalizer<ServiceDescr> Localizer
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
@@ -18,24 +19,24 @@
                                 <div class="col-8">
                                   
                                     <div class="m-2 p-2 row">
-                                        <label>Service provider </label>
+                                        <label>@Localizer["Service provider"] </label>
                                         <h4 class="green-blue-text"> <NavLink @onclick="GoToMasterPage" class="nav-link nav-link-underline ">@masterName</NavLink></h4>
                                     </div>
                                 </div>
                                 @if(!String.IsNullOrEmpty(role)){
                                     <div class="col-4 text-end">
-                                        <button class="btn btn-success p-3 ps-5 pe-5" @onclick="MakeRecord">Apply</button>
+                                        <button class="btn btn-success p-3 ps-5 pe-5" @onclick="MakeRecord">@Localizer["Apply"]</button>
                                     </div>
                                 }
                                 else
                                 {
                                     <div class="col-4 text-center">
-                                    <h5 class="text-danger"> ! For applying to the procedure you need to sign in</h5>
+                                        <h5 class="text-danger"> ! @Localizer["SignInToApply"]</h5>
                                         </div>
                                 }
                             </div>
                             <div class="m-2 p-2 ms-3">
-                                <label>Description</label>
+                                <label>@Localizer["Description"]</label>
                                 <h5 class="green-blue-text">
                                     @serviceDto.Description
                                 </h5>
@@ -43,7 +44,7 @@
                             @if(serviceDto.Tags.Count > 0){
                                 <div class="m-2 p-2 ms-3">
                                     <div class="row mb-3">
-                                        <label class="col-1">Tags</label>
+                                        <label class="col-1">@Localizer["Tags"]</label>
                                     </div>
                                     <div class="d-flex flex-wrap m-2">
                                         @foreach (var tag in serviceDto.Tags)
@@ -59,7 +60,7 @@
                     </div>
                     <div class="row m-2 p-2 ms-4 mb-4 align-items-center">
                        
-                            <label class="col-1 me-0 ms-2">Rate</label>
+                            <label class="col-1 me-0 ms-2">@Localizer["Rate"]</label>
                        
                     <SfRating Value=@serviceDto.Rate Disabled="true" ShowLabel="true" LabelPosition="Syncfusion.Blazor.Inputs.LabelPosition.Left" CssClass="col-lg-1 col-2 text-start">
                         <FullTemplate>
@@ -74,15 +75,15 @@
 
                     <div class="row col-12 justify-content-around">
                         <div class="col-3 m-1 text-center">
-                            <h4>Minimum Price, UAN</h4>
+                            <h4>@Localizer["Minimum Price"], UAN</h4>
                             <h5 class="green-blue-text">@serviceDto.MinimumPrice</h5>
                         </div>
                         <div class="col-3 m-1  text-center">
-                            <h4>Maximum Price, UAN</h4>
+                            <h4>@Localizer["Maximum Price"], UAN</h4>
                             <h5 class="green-blue-text">@serviceDto.MaximumPrice</h5>
                         </div>
                         <div class="col-3 m-1  text-center">
-                            <h4>Time, min</h4>
+                            <h4>@Localizer["Time, min"]</h4>
                             <h5 class="green-blue-text">@serviceDto.RealTime</h5>
                         </div>
                     </div>
@@ -92,7 +93,7 @@
             }
             else
             {
-                <h3>There is no such service</h3>
+                <h3>@Localizer["There is no such service"]</h3>
             }
         </div>
     </div>

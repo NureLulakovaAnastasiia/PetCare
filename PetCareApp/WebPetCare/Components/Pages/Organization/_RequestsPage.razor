@@ -2,19 +2,21 @@
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
 @inject SfDialogService DialogService
+@inject IStringLocalizer<Resources.Organization> Localizer
+
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border p-3 justify-content-center">
             <div class="row text-center">
-                <h3 class="col-8 offset-2"><b>Requests</b></h3>
+                <h3 class="col-8 offset-2"><b>@Localizer["Requests"]</b></h3>
                 <hr />
             </div>
             @if (requests != null && requests.Count > 0)
             {
                 <div class="row justify-content-end">
                     <div class="col-3">
-                        <h6>Sort by date</h6>
+                        <h6>@Localizer["Sort by date"]</h6>
                         <SfDropDownList TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
                                         DataSource="SortTypes" @bind-Value="sortType">
                             <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
@@ -23,7 +25,7 @@
                         </SfDropDownList>
                     </div>
                     <div class="col-3">
-                        <h6>Filter by status</h6>
+                        <h6>@Localizer["Filter by status"]</h6>
                         <SfDropDownList TValue="SortOptions.FilterByRequestStatus" TItem="SelectListItem<SortOptions.FilterByRequestStatus>"
                                         DataSource="FilterTypes" @bind-Value="filterType">
                             <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
@@ -34,7 +36,7 @@
 
                     @if (filteredRequests.Count == 0)
                     {
-                        <h3 class="mt-5">No requests were found.</h3>
+                        <h3 class="mt-5">@Localizer["No requests were found"].</h3>
                     }
                 </div>
 
@@ -44,26 +46,26 @@
                     {
                         <div class="row col-10 form-custom-border p-3 m-3 main-review">
                             <div class="col-8 text-start offset-1 green-blue-text">
-                                <h4>Request №@request.Id</h4>
+                                <h4>@Localizer["Request"] №@request.Id</h4>
                                 @if (role == "Organization")
                                 {
-                                    <NavLink @onclick="() => GoToMasterPage(request.AppUserId)" class="nav-link nav-link-underline">From: <strong>@request.UserName</strong></NavLink>
+                                    <NavLink @onclick="() => GoToMasterPage(request.AppUserId)" class="nav-link nav-link-underline">@Localizer["From"]: <strong>@request.UserName</strong></NavLink>
                                 }
                                 else{
-                                    <NavLink @onclick="() => GoToOrgPage(request.OrganizationId)" class="nav-link nav-link-underline">Organization: <strong>@request.OrganizationName</strong></NavLink>
+                                    <NavLink @onclick="() => GoToOrgPage(request.OrganizationId)" class="nav-link nav-link-underline">@Localizer["Organization"]: <strong>@request.OrganizationName</strong></NavLink>
                                 }
-                                <p>Date: @request.Date.ToString("F")</p>
+                                <p>@Localizer["Date"]: @request.Date.ToString("F")</p>
 
                             </div>
                             <div class="col-3 align-items-center">
                                 @if (request.Status == "New" && role == "Organization")
                                 {
-                                    <button class="btn  btn-success col-9 mb-1 p-2" @onclick="() => AcceptRequest(request.Id)">Accept</button>
-                                    <button class="btn  btn-danger col-9 p-2" @onclick="() => RejectRequest(request.Id)">Reject</button>
+                                    <button class="btn  btn-success col-9 mb-1 p-2" @onclick="() => AcceptRequest(request.Id)">@Localizer["Accept"]</button>
+                                    <button class="btn  btn-danger col-9 p-2" @onclick="() => RejectRequest(request.Id)">@Localizer["Reject"]</button>
                                 }
                                 else
                                 {
-                                    <h5 style="color: @(ChooseColor(request.Status))">Status: @request.Status</h5>
+                                    <h5 style="color: @(ChooseColor(request.Status))">@Localizer["Status"]: @Localizer[request.Status]</h5>
                                 }
                             </div>
 
@@ -118,7 +120,7 @@
             }
             else
             {
-                showToastr("Error during getting data");
+                showToastr(Localizer["Error during getting data"]);
             }
             StateHasChanged();
         }
@@ -137,14 +139,14 @@
 
     private async Task AcceptRequest(int requestId)
     {
-        bool isConfirm = await DialogService.ConfirmAsync("Are you sure you want to accept this request?", "Accept request");
+        bool isConfirm = await DialogService.ConfirmAsync(Localizer["SureAcceptRequest"], Localizer["Accept request"]);
         if (isConfirm)
         {
 
             var res = await orgService.AcceptRequest(requestId);
             if (String.IsNullOrEmpty(res))
             {
-                showToastr("", "Request was succefully accepted");
+                showToastr("", Localizer["Request was succefully accepted"]);
                 var ind = requests.FindIndex(r => r.Id == requestId);
                 if (ind != -1)
                 {
@@ -161,13 +163,13 @@
 
     private async Task RejectRequest(int requestId)
     {
-        bool isConfirm = await DialogService.ConfirmAsync("Are you sure you want to reject this request?", "Reject request");
+        bool isConfirm = await DialogService.ConfirmAsync(Localizer["SureRejectRequest"], Localizer["Reject request"]);
         if (isConfirm)
         {
             var res = await orgService.RejectRequest(requestId);
             if (String.IsNullOrEmpty(res))
             {
-                showToastr("", "Request was succefully rejected");
+                showToastr("", Localizer["Request was succefully rejected"]);
                 var ind = requests.FindIndex(r => r.Id == requestId);
                 if (ind != -1)
                 {

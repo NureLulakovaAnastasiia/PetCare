@@ -2,17 +2,18 @@
 @inject IServiceService _service
 @inject IJSRuntime _JSRuntime
 @inject NavigationManager Navigation
+@inject IStringLocalizer<ServiceDescr> Localizer
 
 <div class="d-flex justify-content-center">
 <div class="col-lg-10 align-items-center">
     <div class="form-custom-border p-3 ">
             <div class="row text-center align-items-center">
                 <button type="button" class="btn col-2 p-1 ms-3 btn-func btn-danger" style="height: 3em" @onclick="Back">
-                    <i class="bi bi-arrow-left"></i>   Back
+                    <i class="bi bi-arrow-left"></i>   @Localizer["Back"]
                 </button>
                 <div class="col-4 offset-3 me-3 ps-0 pe-5">
-                <h3><b>Questionary Modification</b></h3>
-                <p  class="green-blue-text">Update or remove questionary</p>
+                <h3><b> @Localizer["Questionary Modification"]</b></h3>
+                <p  class="green-blue-text"> @Localizer["Update or remove questionary"]</p>
             </div>
         </div>
         <hr />
@@ -21,7 +22,7 @@
                 <div class="m-2 p-2">
                         <div class="form-check align-items-center col-4 text-start">
                         <InputCheckbox @bind-Value="isNotNeeded" class="form-check-input" />
-                            <label class="form-check-label  ms-2"><h5 class=" text-info">Remove questionary</h5></label>
+                            <label class="form-check-label  ms-2"><h5 class=" text-info"> @Localizer["Remove questionary"]</h5></label>
                     </div>
                 </div>
             </div>
@@ -29,16 +30,16 @@
                 {
                     <div class="modal-overlay">
                         <div class="modal-content">
-                            <h4>Are you sure you want to submit?</h4>
-                            <button class="btn btn-success" @onclick="ConfirmSubmission">Yes</button>
-                            <button class="btn btn-secondary" @onclick="Cancel">No</button>
+                            <h4> @Localizer["Are you sure you want to submit?"]</h4>
+                            <button class="btn btn-success" @onclick="ConfirmSubmission"> @Localizer["Yes"]</button>
+                            <button class="btn btn-secondary" @onclick="Cancel"> @Localizer["No"]</button>
                         </div>
                     </div>
                 }
             @if (!isNotNeeded)
             {
                     <div class="row justify-content-end">
-                        <button class="btn btn-func btn-success col-10" type="button" @onclick="AddQuestion"><i class="bi bi-plus-circle"></i> Add Question</button>
+                        <button class="btn btn-func btn-success col-10" type="button" @onclick="AddQuestion"><i class="bi bi-plus-circle"></i>  @Localizer["Add Question"]</button>
                     </div>
                     <hr />
                     <form method="post" @onsubmit="SubmitAdding">
@@ -49,16 +50,16 @@
                                 {
                                     <li>
                                         <div class="mb-3" @key="question">
-                                            <label class="form-check-label">Question Text</label>
+                                            <label class="form-check-label"> @Localizer["Question Text"]</label>
                                             <InputText @bind-Value="question.Name" class="form-control" />
                                             @{
                                                 var questionInd = questions.IndexOf(question);
                                             }
                                             <div class="row align-items-center justify-content-center offset-1">
-                                                <button class="btn btn-func btn-danger p-1 m-3 col-2 " @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash"></i>  Delete Question</button>
-                                                <button class="btn btn-func btn-success m-3 col-3" type="button" @onclick="() => AddAnswer(questionInd)"><i class="bi bi-plus-circle"></i> Add Answer</button>
+                                                <button class="btn btn-func btn-danger p-1 m-3 col-2 " @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash"></i>   @Localizer["Delete Question"]</button>
+                                                <button class="btn btn-func btn-success m-3 col-3" type="button" @onclick="() => AddAnswer(questionInd)"><i class="bi bi-plus-circle"></i>  @Localizer["Add Answer"]</button>
                                                 <InputCheckbox class="col-1 ms-4 p-3 form-check-input" style="font-size: 20px;" @bind-Value="question.HasAnswerWithFixedTime" @onclick="() => ChooseFixedQuestion(questionInd)"></InputCheckbox>
-                                                <label class="form-check-label  col-3 text-start ms-2 ps-1">Is Time Fixed</label>
+                                                <label class="form-check-label  col-3 text-start ms-2 ps-1"> @Localizer["Is Time Fixed"]</label>
                                             </div>
                                             <ul>
                                                 @foreach (var answer in question.Answers)
@@ -69,11 +70,11 @@
                                                     <li>
                                                         <div class="row mt-2 align-items-top" @key="answer">
                                                             <div class="col-5">
-                                                                <label class="form-check-label">Answer</label>
+                                                                <label class="form-check-label"> @Localizer["Answer"]</label>
                                                                 <InputText @bind-Value="answer.Text" class="form-control" />
                                                                 @if (image != null)
                                                                 {
-                                                                    <img src="@image" class="pb-2" alt="Answer image" style="max-width: 200px;" />
+                                                                    <img src="@image" class="pb-2" alt=" @Localizer["Answer image"]" style="max-width: 200px;" />
                                                                 }
                                                                 <InputFile class="p-2 ms-2" OnChange="@(e => AddImage(e, answerInd, question.Id))" accept="image/*" />
                                                             </div>
@@ -85,7 +86,7 @@
                                                                             @* Maximum is default if nothing else  *@
                                                                             <div class="form-check mt-3">
                                                                                 <InputCheckbox @bind-Value="answer.IsTimeMinimum" class="form-check-input" />
-                                                                                <label class="form-check-label">Minimum Time</label>
+                                                                                <label class="form-check-label"> @Localizer["Minimum Time"]</label>
 
                                                                             </div> @* make radiobutton *@
 
@@ -93,7 +94,7 @@
                                                                     </div>
                                                                 }
                                                                 <div class="col-4 text-center">
-                                                                    <label class="form-check-label">Time @((fixedQuestionNum == questionInd || fixedQuestionNum == -1) ? "(fixed)" : "(+/- format)")</label>
+                                                                    <label class="form-check-label"> @Localizer["Time"] @((fixedQuestionNum == questionInd || fixedQuestionNum == -1) ? Localizer["(fixed)"] : Localizer["(+/- format)"])</label>
                                                                     <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
                                                                 </div>
                                                                 <div class="col-1 mt-3 text-center">
@@ -109,7 +110,7 @@
                                     </li>
                                 }
                             }
-                            <button type="submit" class="btn col-2 btn-func-primary mt-3" style="font-size: 1.5em">Save</button>
+                            <button type="submit" class="btn col-2 btn-func-primary mt-3" style="font-size: 1.5em"> @Localizer["Save"]</button>
 
                     </ol>
                 </form>
@@ -213,7 +214,7 @@
     private async void ConfirmSubmission()
     {
         var res = await _service.DeleteQuestionary(serviceId);
-        showToastr(res, "Questionary was deleted successfully!");
+        showToastr(res, Localizer["Questionary was deleted successfully!"]);
         showConfirmation = false;
         Back();
     }
@@ -233,7 +234,7 @@
         else
         {
             res = await _service.UpdateQuestionary(questions);
-            showToastr(res, "Data updated and saved successfully!");
+            showToastr(res, Localizer["Data updated and saved successfully!"]);
         }
     }
 
