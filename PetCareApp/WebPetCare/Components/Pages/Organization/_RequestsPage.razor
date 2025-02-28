@@ -3,6 +3,7 @@
 @inject NavigationManager Navigation
 @inject SfDialogService DialogService
 @inject IStringLocalizer<Resources.Organization> Localizer
+@inject IStringLocalizer<Resources.EnumResources> EnumLocalizer
 
 
 <div class="d-flex justify-content-center">
@@ -96,13 +97,18 @@
 
     protected override async Task OnInitializedAsync()
     {
+        SetSortAndFilters();
+    }
+
+    private void SetSortAndFilters()
+    {
         SortTypes = Enum.GetValues(typeof(SortOptions.SortDirection))
-            .Cast<SortOptions.SortDirection>()
-            .Select(e => new SelectListItem<SortOptions.SortDirection>(e))
-            .ToList();
+           .Cast<SortOptions.SortDirection>()
+           .Select(e => new SelectListItem<SortOptions.SortDirection>(e, e.GetLocalizedEnum(EnumLocalizer)))
+           .ToList();
         FilterTypes = Enum.GetValues(typeof(SortOptions.FilterByRequestStatus))
        .Cast<SortOptions.FilterByRequestStatus>()
-       .Select(e => new SelectListItem<SortOptions.FilterByRequestStatus>(e))
+       .Select(e => new SelectListItem<SortOptions.FilterByRequestStatus>(e, e.GetLocalizedEnum(EnumLocalizer)))
        .ToList();
     }
 
@@ -124,6 +130,7 @@
             }
             StateHasChanged();
         }
+        SetSortAndFilters();
     }
 
     private void GoToMasterPage(string masterId)

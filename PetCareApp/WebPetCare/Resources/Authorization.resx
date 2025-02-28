@@ -201,6 +201,9 @@
   <data name="NoAccount" xml:space="preserve">
     <value>Don't have an account?</value>
   </data>
+  <data name="Organization" xml:space="preserve">
+    <value>Organization</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
   </data>
@@ -233,6 +236,9 @@
   </data>
   <data name="SuccessPasswordChange" xml:space="preserve">
     <value>Password was succesfully changed</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>User</value>
   </data>
   <data name="Verified Experts" xml:space="preserve">
     <value>Verified Experts – Check reviews and portfolios before booking.</value>

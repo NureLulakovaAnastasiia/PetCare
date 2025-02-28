@@ -8,6 +8,7 @@ using Syncfusion.Blazor;
 using Syncfusion.Blazor.Popups;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
+using WebPetCare.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1feHRRQmlfUE1wWUY=");
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddSingleton(typeof(ISyncfusionStringLocalizer), typeof(SyncfusionLocalizer));
 
 builder.Services.AddHttpClient();
 builder.Services.AddLocalization();

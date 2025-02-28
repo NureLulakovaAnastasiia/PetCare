@@ -35,7 +35,7 @@
                     <tbody>
                         @foreach (var time in schedule)
                         {
-                            var dayOrDate = time.DayOfWeek != null ? Enum.GetName(typeof(DayOfWeek), time.DayOfWeek) : time.Date?.ToString("d");
+                            var dayOrDate = time.DayOfWeek != null ? culture.DateTimeFormat.GetDayName((DayOfWeek)time.DayOfWeek) : time.Date?.ToString("d");
                             <tr >
                                 <td class="align-content-center"><h4>@dayOrDate</h4></td>
                                 <td class="align-content-center"><h4 class="green-blue-text">@time.StartTime</h4></td>
@@ -127,8 +127,14 @@
     private DayOfWeekItem selectedDayOfWeek { get; set; } = new DayOfWeekItem();
     public ScheduleDto? editedSchedule { get; set; } = new ScheduleDto();
     private bool isAdding = false;
-    
-    
+    private CultureInfo culture
+    {
+        get
+        {
+            return CultureInfo.CurrentCulture;
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -140,7 +146,7 @@
             .Select(day => new DayOfWeekItem
                 {
                     ID = (int)day,
-                    Text = day.ToString()
+                    Text = culture.DateTimeFormat.GetDayName(day)
                 }).ToList();
     }
    

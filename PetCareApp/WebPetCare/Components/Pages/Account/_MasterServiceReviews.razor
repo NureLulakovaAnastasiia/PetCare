@@ -3,6 +3,7 @@
 @inject SfDialogService DialogService
 @inject IJSRuntime _JSRuntime
 @inject IStringLocalizer<Account> Localizer
+@inject IStringLocalizer<Resources.EnumResources> EnumLocalizer
 
 
 <div class="d-flex justify-content-center mt-2">
@@ -143,11 +144,15 @@
 
     protected override async Task OnInitializedAsync()
     {
+        SetSort();
+    }
+
+    private void SetSort()
+    {
         SortTypes = Enum.GetValues(typeof(SortOptions.SortTypesReview))
             .Cast<SortOptions.SortTypesReview>()
-            .Select(e => new SelectListItem<SortOptions.SortTypesReview>(e))
+            .Select(e => new SelectListItem<SortOptions.SortTypesReview>(e, e.GetLocalizedEnum(EnumLocalizer)))
             .ToList();
-
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -179,6 +184,7 @@
             SortReviews();
             StateHasChanged();
         }
+        SetSort();
     }
 
     private void AddComment(int reviewId)

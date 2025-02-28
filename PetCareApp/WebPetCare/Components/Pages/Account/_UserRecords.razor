@@ -4,6 +4,7 @@
 @inject IJSRuntime _JSRuntime
 @inject SfDialogService DialogService
 @inject IStringLocalizer<Account> Localizer
+@inject IStringLocalizer<Resources.EnumResources> EnumLocalizer
 
 
 <div class="d-flex justify-content-center  mt-3">
@@ -152,16 +153,21 @@
 
     protected override async Task OnInitializedAsync()
     {
+        SetSortAndFilters();
+    }
+
+
+    private void SetSortAndFilters()
+    {
         SortTypes = Enum.GetValues(typeof(SortOptions.SortDirection))
             .Cast<SortOptions.SortDirection>()
-            .Select(e => new SelectListItem<SortOptions.SortDirection>(e))
+            .Select(e => new SelectListItem<SortOptions.SortDirection>(e, e.GetLocalizedEnum(EnumLocalizer)))
             .ToList();
         FilterTypes = Enum.GetValues(typeof(SortOptions.FilterByRecordStatus))
        .Cast<SortOptions.FilterByRecordStatus>()
-       .Select(e => new SelectListItem<SortOptions.FilterByRecordStatus>(e))
+       .Select(e => new SelectListItem<SortOptions.FilterByRecordStatus>(e, e.GetLocalizedEnum(EnumLocalizer)))
        .ToList();
     }
-
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -181,6 +187,7 @@
             }
 
         }
+        SetSortAndFilters();
     }
 
     public async Task CancelRecord(int recordId)

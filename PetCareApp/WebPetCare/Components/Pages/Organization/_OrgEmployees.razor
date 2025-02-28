@@ -3,6 +3,7 @@
 @inject NavigationManager Navigation
 @inject SfDialogService DialogService
 @inject IStringLocalizer<Resources.Organization> Localizer
+@inject IStringLocalizer<Resources.EnumResources> EnumLocalizer
 
 <div class="d-flex justify-content-center">
     <div class="col-lg-10 align-items-center text-center ">
@@ -109,13 +110,21 @@
 
     protected override async Task OnInitializedAsync()
     {
+        SetSortAndFilters();
+    }
+
+
+    private void SetSortAndFilters()
+    {
         SortTypes = Enum.GetValues(typeof(SortOptions.SortDirection))
             .Cast<SortOptions.SortDirection>()
-            .Select(e => new SelectListItem<SortOptions.SortDirection>(e))
+            .Select(e => new SelectListItem
+        <SortOptions.SortDirection>
+                (e, e.GetLocalizedEnum(EnumLocalizer)))
             .ToList();
         FilterTypes = Enum.GetValues(typeof(SortOptions.FilterEmployees))
        .Cast<SortOptions.FilterEmployees>()
-       .Select(e => new SelectListItem<SortOptions.FilterEmployees>(e))
+       .Select(e => new SelectListItem<SortOptions.FilterEmployees>(e, e.GetLocalizedEnum(EnumLocalizer)))
        .ToList();
     }
 
@@ -134,7 +143,7 @@
                 showToastr(res.ErrorMessage);
             }
         }
-
+        SetSortAndFilters();
     }
 
     public async Task Dismiss(int employeeId)

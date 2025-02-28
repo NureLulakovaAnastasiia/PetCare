@@ -3,6 +3,7 @@
 @inject NavigationManager Navigation
 @inject IOrganizationService orgService
 @inject IStringLocalizer<Account> Localizer
+@inject IStringLocalizer<Resources.EnumResources> EnumLocalizer
 
 
 <div class="d-flex justify-content-center">
@@ -116,13 +117,18 @@
 
     protected override async Task OnInitializedAsync()
     {
+        SetSortAndFilters();
+    }
+
+    private void SetSortAndFilters()
+    {
         SortTypes = Enum.GetValues(typeof(SortOptions.SortTypesService))
             .Cast<SortOptions.SortTypesService>()
-            .Select(e => new SelectListItem<SortOptions.SortTypesService>(e))
+            .Select(e => new SelectListItem<SortOptions.SortTypesService>(e, e.GetLocalizedEnum(EnumLocalizer)))
             .ToList();
         FilterTypes = Enum.GetValues(typeof(SortOptions.FilterByServiceVisibility))
        .Cast<SortOptions.FilterByServiceVisibility>()
-       .Select(e => new SelectListItem<SortOptions.FilterByServiceVisibility>(e))
+       .Select(e => new SelectListItem<SortOptions.FilterByServiceVisibility>(e, e.GetLocalizedEnum(EnumLocalizer)))
        .ToList();
     }
 
@@ -141,6 +147,7 @@
         }
         FilterServices();
         StateHasChanged();
+        SetSortAndFilters();
 
     }
     private async Task GetMasterServices()

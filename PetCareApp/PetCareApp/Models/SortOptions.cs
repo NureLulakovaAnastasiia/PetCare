@@ -49,6 +49,12 @@ namespace PetCareApp.Models
             Value = value;
             Text = value.ToString(); 
         }
+
+        public SelectListItem(TEnum value, string text = null)
+        {
+            Value = value;
+            Text = text ?? value.ToString();
+        }
     }
 }
 

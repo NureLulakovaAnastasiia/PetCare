@@ -84,7 +84,7 @@
                         <tr>
                             <td class="e-textlabel">@Localizer["Recurrence"]</td>
                             <td colspan="4">
-                                <SfRecurrenceEditor @bind-Value="@(data.RecurrenceRule)" Frequencies="@Repeats" >
+                                <SfRecurrenceEditor @bind-Value="@(data.RecurrenceRule)" Frequencies="@Repeats"  >
 
                                 </SfRecurrenceEditor>
                             </td>
@@ -177,6 +177,10 @@
             }
             await ChangeMaster();
         }
+        var culture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+        if (localizeStatus.ContainsKey(culture)) {
+            StatusData = localizeStatus[culture];
+        }
     }
 
     private async Task ChangeMaster()
@@ -214,7 +218,7 @@
             availableDates.Add(date);
             UpdateEvents(recordsResult.Data);
             //StateHasChanged();
-            
+
             await showToastr("", Localizer["Records were succesfully gotten"]);
 
         }
@@ -234,7 +238,7 @@
             {
                 events.Remove(same);
             }
-            var status = StatusData.FirstOrDefault(s => s.Name == record.Status);
+            var status = localizeStatus["en"].FirstOrDefault(s => s.Name == record.Status);
             var appointment = new AppointmentData
                 {
                     Id = record.Id,
@@ -519,10 +523,9 @@
         }
     }
 
-
     private GetRecordDto mapAppointment(AppointmentData data)
     {
-        var status = StatusData.FirstOrDefault(s => s.Id == data.Status.Id);
+        var status = localizeStatus["en"].FirstOrDefault(s => s.Id == data.Status.Id);
         var serviceName = serviceNames.Where(x => x.Id == data.ServiceId).Select(x => x.Name).FirstOrDefault();
         return new GetRecordDto
             {
@@ -588,7 +591,7 @@
                     EndDate = endDate
                 });
         }
-        
+
         return res;
     }
 
@@ -761,6 +764,14 @@
         new Status(){ Id= 2, Name= "Finished" }
     };
 
+    private Dictionary<string, List<Status>> localizeStatus = new Dictionary<string, List<Status>>
+    {
+        {"en" , new List<Status> {new Status(){ Id= 1, Name= "Created" },
+        new Status(){ Id= 2, Name= "Finished" } } },
+        {"uk" , new List<Status> {new Status(){ Id= 1, Name= "Створено" },
+        new Status(){ Id= 2, Name= "Завершено" } } }
+    };
+
     public class AppointmentData
     {
         public int Id { get; set; }
@@ -925,7 +936,28 @@
 
     .e-calendar .e-content td.e-today span.e-day, .e-calendar .e-content td.e-focused-date.e-today span.e-day {
         box-shadow: inset 2px 0 var(--bs-primary), inset 0 2px var(--bs-primary), inset -2px 0 var(--bs-primary), inset 0 -2px var(--bs-primary);
-        color: var(--bs-primary);
+        color: #fff;
+    }
+
+    .e-calendar .e-content td.e-today span.e-day, .e-calendar .e-content td.e-focused-date.e-today span.e-day:hover {
+            box-shadow: inset 2px 0 #038c69, inset 0 2px #038c69, inset -2px 0 #038c69, inset 0 -2px #038c69;
+        color: #fff;
+    }
+
+    .e-calendar .e-btn.e-today.e-flat.e-primary, .e-calendar .e-css.e-btn.e-today.e-flat.e-primary:hover {
+        background: #038c69;
+        border: 1px solid #038c69;
+    }
+
+    .e-calendar .e-content td.e-today.e-selected span.e-day {
+        background-color: var(--bs-primary);
+        border: none;
+        box-shadow: inset 1px 0 var(--bs-primary), inset 0 1px var(--bs-primary), inset -1px 0 var(--bs-primary), inset 0 -1px var(--bs-primary);
+        color: #fff;
+    }
+    .e-calendar .e-content td.e-today.e-selected:hover span.e-day, .e-calendar .e-content td.e-selected:hover span.e-day, .e-calendar .e-content td.e-selected.e-focused-date span.e-day:hover {
+        background: #038c69;
+        border: 1px solid #038c69;
     }
     
     .e-toolbar .e-toolbar-item .e-tbar-btn:hover{
@@ -959,6 +991,21 @@
         border-color: var(--bs-secondary);
         box-shadow: inset 1px 1px var(--bs-secondary), inset -1px 0 var(--bs-secondary), inset 0 -1px var(--bs-secondary);
     }
+
+    .e-recurrenceeditor .e-recurrence-table{
+        display: none;
+    }
+
+    .e-recurrenceeditor .e-editor {
+        display: inline-block;
+    }
+
+    .e-recurrenceeditor .e-input-wrapper {
+        float: left;
+        width: 100%;
+    }
+
+
 </style>
 
     <script>
