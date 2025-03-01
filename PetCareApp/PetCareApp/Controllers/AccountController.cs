@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Rewrite;
 using PetCareApp.Dtos;
 using PetCareApp.Interfaces;
 using PetCareApp.Models;
+using System.Data;
 
 namespace PetCareApp.Controllers
 {
@@ -16,7 +17,7 @@ namespace PetCareApp.Controllers
         private readonly ITokenService _tokenService;
         private readonly IAccountService _userService;
         private readonly SignInManager<AppUser> _signInManager;
-        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, 
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService,
             IAccountService userService, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
@@ -53,7 +54,8 @@ namespace PetCareApp.Controllers
                 appUser.Contacts = null;
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
 
-                if (createdUser.Succeeded) {
+                if (createdUser.Succeeded)
+                {
                     var roleResult = await _userManager.AddToRoleAsync(appUser, role);
                     if (roleResult.Succeeded)
                     {
@@ -92,7 +94,7 @@ namespace PetCareApp.Controllers
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody]LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
             {
@@ -129,8 +131,85 @@ namespace PetCareApp.Controllers
             );
         }
 
+        [HttpGet("googleCheckEmail")]
+        public async Task<IActionResult> GoogleCheckEmail([FromQuery] string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) //register, choose role
+            {
+                return NotFound("Role");
+            }
+            else //login
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (!roles.Any())
+                {
+                    return StatusCode(400, "Something went wrong with your access");
+                }
+
+                var newUser = new NewUserDto
+                {
+                    Email = email,
+                    Role = roles.First(),
+                    Token = _tokenService.CreateToken(user, roles[0])
+                };
+                return Ok(
+                   newUser
+                );
+
+            }
+        }
+
+        [HttpPost("addGoogleUser")]
+        public async Task<IActionResult> RegisterGoogleUser([FromBody] AppUser userToAdd, [FromQuery] string role)
+        {
+            try
+            {
+                userToAdd.Contacts = null;
+                userToAdd.UserName = userToAdd.Email;
+                userToAdd.EmailConfirmed = true;
+                var createdUser = await _userManager.CreateAsync(userToAdd, "User$123");
+                if (createdUser.Succeeded)
+                {
+                    var roleResult = await _userManager.AddToRoleAsync(userToAdd, role);
+                    if (roleResult.Succeeded)
+                    {
+                        if (role == "Organization")
+                        {
+                            var res = _userService.CreateOrganization(userToAdd.Id);
+                            if (!int.TryParse(res, out var num))
+                            {
+                                return StatusCode(500, "Error during organization creation");
+                            }
+                        }
+                        return Ok(new NewUserDto
+                        {
+                            Role = role,
+                            Email = userToAdd.Email,
+                            Token = _tokenService.CreateToken(userToAdd, ""),
+                        });
+                    }
+                    else
+                    {
+                        await _userManager.DeleteAsync(userToAdd);
+                        return StatusCode(500, roleResult.Errors);
+                    }
+                }
+                else
+                {
+                    return StatusCode(500, createdUser.Errors);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+
         [HttpPost("sendEmail")]
-        public async Task<IActionResult> SendEmail([FromBody]  EmailConfirmationDto emailConfirm)
+        public async Task<IActionResult> SendEmail([FromBody] EmailConfirmationDto emailConfirm)
         {
             try
             {
@@ -138,7 +217,8 @@ namespace PetCareApp.Controllers
                 if (checkUser != null && (!checkUser.EmailConfirmed || emailConfirm.IsPasswordChange))
                 {
                     var res = _userService.SendEmail(emailConfirm);
-                    if(!String.Equals(res, "Success")) { 
+                    if (!String.Equals(res, "Success"))
+                    {
                         return StatusCode(500, res);
                     }
                 }
@@ -155,21 +235,23 @@ namespace PetCareApp.Controllers
         }
 
         [HttpPatch("confirmEmail")]
-        public async Task<IActionResult> ConfirmEmail([FromQuery] string email,  string? newPassword)
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string email, string? newPassword)
         {
             try
             {
                 var checkUser = await _userManager.FindByEmailAsync(email);
-                if (checkUser != null) 
+                if (checkUser != null)
                 {
-                    if (!checkUser.EmailConfirmed) {
+                    if (!checkUser.EmailConfirmed)
+                    {
                         var res = _userService.SubmitEmail(email);
                         if (int.TryParse(res, out int num))
                         {
                             return Ok("Email was confirmed");
                         }
                         return StatusCode(500, res);
-                    }else if (!String.IsNullOrEmpty(newPassword))
+                    }
+                    else if (!String.IsNullOrEmpty(newPassword))
                     {
                         var token = await _userManager.GeneratePasswordResetTokenAsync(checkUser);
                         var res = await _userManager.ResetPasswordAsync(checkUser, token, newPassword);
@@ -187,7 +269,7 @@ namespace PetCareApp.Controllers
                 {
                     return Unauthorized("User is not found");
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -244,15 +326,16 @@ namespace PetCareApp.Controllers
         public async Task<IActionResult> GetUserRole()
         {
             var res = await _userService.GetCurrentRole();
-            if (String.IsNullOrEmpty(res)){
+            if (String.IsNullOrEmpty(res))
+            {
                 return NotFound();
             }
             {
-                
+
             }
             return Ok(res);
         }
 
-        
+
     }
 }

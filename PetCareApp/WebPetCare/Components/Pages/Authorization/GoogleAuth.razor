@@ -1,0 +1,142 @@
+﻿@page "/signin"
+@using Microsoft.AspNetCore.Components.Authorization
+@using static WebPetCare.Components.Pages.Authorization.Login
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthorizationService _authService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<Authorization> Localizer
+
+
+@if (IsRole)
+{
+    <div class="container ">
+        <div class="row col-7 offset-3 form-custom-border text-center justify-content-center mt-5">
+            <div class="col-8 m-5">
+                <h5>@Localizer["ChoseRole"]</h5>
+                <div class="row justify-content-center mt-4">
+                    <InputRadioGroup @bind-Value="role">
+                        @foreach (var Erole in Enum.GetValues<Roles>())
+                        {
+                            <div class="col-5">
+                                <label>
+                                    <InputRadio Value="@Erole.ToString()" />
+                                    @Localizer[Erole.ToString()]
+                                </label>
+                            </div>
+                        }
+                    </InputRadioGroup>
+                </div>
+                <button class="btn btn-primary mt-4" @onclick="RegisterUser">@Localizer["Submit"]</button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    //spinner
+}
+
+@code {
+    private string email { get; set; } = string.Empty;
+    [CascadingParameter]
+    public Func<bool, Task> UpdateAuthenticationStatus { get; set; }
+    private bool IsRole { get; set; } = false;
+    public string role = "User";
+    private AppUser userDto { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated ?? false)
+        {
+            email = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+            var firstName = user.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? "";
+            var lastName = user.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
+            var profilePictureUrl = user.FindFirst("urn:google:picture")?.Value;
+
+            if (String.IsNullOrEmpty(email))
+            {
+                showToastr(Localizer["ErrorEmail"]);
+                Navigation.NavigateTo("/login");
+                return;
+            }
+            var res = await CheckEmail();
+            if (res)
+            {
+                showToastr("", Localizer["SuccesfulLogin"]);
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                userDto = new AppUser
+                    {
+                        Id = "",
+                        Email = email,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        Photo = await DownloadImageAsByteArray(profilePictureUrl ?? ""),
+                        Contacts = new Contacts(){AppUserId = ""}
+                    };
+
+                IsRole = true;
+            }
+        }
+    }
+
+    private async Task<byte[]> DownloadImageAsByteArray(string imageUrl)
+    {
+        using HttpClient client = new HttpClient();
+        return await client.GetByteArrayAsync(imageUrl);
+    }
+
+    private async Task<bool> CheckEmail()
+    {
+        var res = await _authService.CheckGoogleLogin(email);
+        if (res.Data)
+        {
+            await UpdateAuthenticationStatus(true);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private async Task RegisterUser()
+    {
+        var res = await _authService.RegisterGoogleUser(userDto, role);
+        if (res.IsSuccess)
+        {
+            await UpdateAuthenticationStatus(true);
+            showToastr("", Localizer["SuccessRegister"]);
+            Navigation.NavigateTo("/");
+
+        }
+        else
+        {
+            showToastr(res.ErrorMessage);
+            Navigation.NavigateTo("/login");
+
+        }
+    }
+
+
+    private async void showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+
+}

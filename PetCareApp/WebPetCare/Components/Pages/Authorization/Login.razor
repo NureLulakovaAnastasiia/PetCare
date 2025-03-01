@@ -30,6 +30,11 @@
                 <div class="mt-3">
                     <h6>@Localizer["NoAccount"] <a @onclick="() => SelectTab(false)">@Localizer["Register"]</a></h6>
                 </div>
+                <div class="row justify-content-center mt-4">
+                    <button class="btn btn-outline-primary col-7" @onclick="GoogleLogin"><i class="bi bi-google"></i>    @Localizer["GoogleLogin"]</button>
+
+                </div>
+
             </div>
         }
         else if (EmailEnter)
@@ -100,6 +105,7 @@
             <_EmailSubmit realCode="@realCode" ToLoginPage="GoToLoginPage" email="@Email" IsPasswordRestore="@IsPasswordRestore" />
         }
     </div>
+
 </div>
 
 
@@ -263,6 +269,12 @@
         {
             await JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
         }
+    }
+    
+    
+    private void GoogleLogin()
+    {
+        Navigation.NavigateTo("/login-google", forceLoad: true);
     }
 }
 

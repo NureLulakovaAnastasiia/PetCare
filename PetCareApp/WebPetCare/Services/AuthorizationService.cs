@@ -6,6 +6,8 @@ using System.Net.Http;
 using Microsoft.JSInterop;
 using System.Net;
 using WebPetCare.IServices;
+using PetCareApp.Models;
+using Microsoft.Extensions.Options;
 
 namespace WebPetCare.Services
 {
@@ -206,6 +208,91 @@ namespace WebPetCare.Services
                 return data;
             }
 
+            return res;
+        }
+
+
+        public  async Task<Result<bool>> CheckGoogleLogin(string email)
+        {
+            var res= new Result<bool>();
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/account/googleCheckEmail?email={email}";
+
+                HttpResponseMessage response = await _httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    NewUserDto user = JsonSerializer.Deserialize<NewUserDto>(result, options);
+                    if (user != null)
+                    {
+                        await SetStoreItemAsync(user.Token, "token");
+                        await SetStoreItemAsync(user.Role, "role");
+                        res.Data = true;
+                    }
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        res.Data = false;
+
+                    }
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<bool>> RegisterGoogleUser(AppUser userDto, string role)
+        {
+
+            var res = new Result<bool>();
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            string json = JsonSerializer.Serialize(userDto, options);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                string fullUrl = $"{_apiUrl}/api/account/addGoogleUser?role={role}";
+
+                HttpResponseMessage response = await _httpClient.PostAsync(fullUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseResult = await response.Content.ReadAsStringAsync();
+
+                    NewUserDto user = JsonSerializer.Deserialize<NewUserDto>(responseResult, options);
+                    if (user != null)
+                    {
+                        await SetStoreItemAsync(user.Token, "token");
+                        await SetStoreItemAsync(user.Role, "role");
+
+                        res.Data = true;
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
             return res;
         }
     }

@@ -153,6 +153,9 @@
   <data name="Error during getting data" xml:space="preserve">
     <value>Error during getting data</value>
   </data>
+  <data name="ErrorEmail" xml:space="preserve">
+    <value>Email was not found</value>
+  </data>
   <data name="ErrorPasswordChange" xml:space="preserve">
     <value>Error during password change</value>
   </data>
@@ -167,6 +170,9 @@
   </data>
   <data name="GiveBest" xml:space="preserve">
     <value>Give your pet the best care – start today!</value>
+  </data>
+  <data name="GoogleLogin" xml:space="preserve">
+    <value>Login with Google</value>
   </data>
   <data name="HaveAnAccount" xml:space="preserve">
     <value>Already have an account?</value>
@@ -234,8 +240,14 @@
   <data name="Submit" xml:space="preserve">
     <value>Submit</value>
   </data>
+  <data name="SuccesfulLogin" xml:space="preserve">
+    <value>You have succesfully logged in</value>
+  </data>
   <data name="SuccessPasswordChange" xml:space="preserve">
     <value>Password was succesfully changed</value>
+  </data>
+  <data name="SuccessRegister" xml:space="preserve">
+    <value>You have succesfully registered</value>
   </data>
   <data name="User" xml:space="preserve">
     <value>User</value>
