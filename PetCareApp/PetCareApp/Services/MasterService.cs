@@ -493,9 +493,17 @@ namespace PetCareApp.Services
         //check if there no other appointments at the same time
         private bool CheckIfFreeTimeSlot(string masterId, DateTime startTime, DateTime endTime)
         {
-            var intersections = _dbContext.Records.Where(x => x.AppUserId == masterId
-                                && x.StartTime > startTime && x.EndTime < endTime
-                                && x.Status != "Canceled").ToList();
+            var services = _dbContext.Services
+                .Where(s => s.AppUserId == masterId)
+                .Select(s => s.Id).Distinct().ToList();
+            var intersections = _dbContext.Records.Where(x => services.Contains(x.ServiceId ?? 0)
+                                && x.StartTime.Date == startTime.Date
+                                && x.Status != "Cancelled").ToList();
+            intersections = intersections
+                .Where(x => (endTime > x.StartTime && startTime > x.EndTime)
+                || (startTime >= x.StartTime && (endTime >= x.EndTime && endTime != x.StartTime)))
+                .ToList();
+
             if (intersections.Any())
             {
                 return false;
@@ -840,12 +848,8 @@ namespace PetCareApp.Services
                             var masterServices = _dbContext.Services.Where(s => s.AppUserId == user.Id)
                                 .Select(s => s.Id).ToList();
 
-                            var sameTime = _dbContext.Records
-                                .Where(r => masterServices.Contains(r.ServiceId.Value) && r.Status != "Canceled" &&
-                                (r.StartTime < rec.StartTime && rec.StartTime < r.EndTime) ||
-                                (r.StartTime < rec.EndTime && r.StartTime > rec.StartTime))
-                                .ToList();
-                            if (sameTime != null && sameTime.Count > 1)
+                            var hasOverlap = CheckIfFreeTimeSlot(service.AppUserId, rec.StartTime, rec.EndTime);
+                            if (hasOverlap)
                             {
                                 return $"Records is already set to this time ({rec.StartTime})";
                             }

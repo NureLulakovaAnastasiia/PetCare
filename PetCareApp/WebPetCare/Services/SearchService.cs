@@ -26,10 +26,9 @@ namespace WebPetCare.Services
         }
 
 
-        public async Task<Result<List<CityDto>>> GetCityNames(int countryId = 690791)
+        public async Task<Result<List<CityDto>>> GetCityNames(int countryId = 690791, string localization = "en")
         {
             var res = new Result<List<CityDto>>();
-            var localization = "en";
             //add getting localization
 
             try

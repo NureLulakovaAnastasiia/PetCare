@@ -35,9 +35,9 @@ namespace PetCareApp.Services
                 {
                     return "No data to add";
                 }
-                var country = _dbContext.Countries.FirstOrDefault(c => c.Id == cities[0].CountryId);
+                var country = _dbContext.Countries.AsNoTracking().FirstOrDefault(c => c.Id == cities[0].CountryId);
                 var countryExists = country != null;
-                var existing = _dbContext.Cities.ToList();
+                var existing = _dbContext.Cities.AsNoTracking().ToList();
                 if (existing != null)
                 {
                     var newCities = cities.ExceptBy(existing.Select(e => e.Id), c => c.Id).ToList();
@@ -62,25 +62,26 @@ namespace PetCareApp.Services
                         }
                     }
 
-
                     _dbContext.AddRange(newCities);
                     //_dbContext.SaveChanges();
-                    //foreach (var c in citiesToUpdate)
-                    //{
-                    //    var exists = existing.FirstOrDefault(e => e.Id == c.Id);
-                    //    if (exists != null)
-                    //    {
-                    //        var localized = JsonSerializer.Deserialize<Dictionary<string, string>>(exists.LocalizedName);
-                    //        if (localized != null)
-                    //        {
-                    //            localized[localization] = c.LocalizedName;
-                    //        }
-                    //        c.LocalizedName = JsonSerializer.Serialize(localized);
-                    //    }
-                    //}
+                    foreach (var c in citiesToUpdate)
+                    {
+                        var exists = existing.FirstOrDefault(e => e.Id == c.Id);
+                        if (exists != null)
+                        {
+                            var localized = JsonSerializer.Deserialize<Dictionary<string, string>>(exists.LocalizedName);
+                            if (localized != null)
+                            {
+                                localized[localization] = c.LocalizedName;
+                            }
+                            c.LocalizedName = JsonSerializer.Serialize(localized);
+                        }
+                        c.Country = null;
+                    }
 
-                    //_dbContext.UpdateRange(citiesToUpdate);
-                    return _dbContext.SaveChanges().ToString();
+                    _dbContext.UpdateRange(citiesToUpdate);
+                    var res = _dbContext.SaveChanges();
+                    return res.ToString();
                 }
             }
             catch (Exception ex)
@@ -93,8 +94,8 @@ namespace PetCareApp.Services
 
         private async Task<List<City>?> GetAllCities(string countryCode, string localization)
         {
-            var max = 0;
-            var startRow = 5000;
+            var max = 7000;
+            var startRow = 4000;
             List<City> cities = new List<City>();
             do
             {
@@ -215,7 +216,7 @@ namespace PetCareApp.Services
                 var localized = JsonSerializer.Deserialize<Dictionary<string, string>>(c.LocalizedName);
                 if (localized != null)
                 {
-                    dto.Name = localized[localization] ?? string.Empty;
+                    dto.Name = localized.ContainsKey(localization) ? localized[localization] : localized["en"];
                 }
                 if (!String.IsNullOrEmpty(dto.Name))
                 {

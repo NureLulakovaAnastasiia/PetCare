@@ -231,6 +231,12 @@
   <data name="Schedule_Month" xml:space="preserve">
     <value>Місяць</value>
   </data>
+  <data name="Schedule_Alert" xml:space="preserve">
+    <value>Помилка</value>
+  </data>
+  <data name="Schedule_Overlap" xml:space="preserve">
+    <value>Запис не може бути створений так як він за часом співпадає з іншим записом.</value>
+  </data>
   <data name="Dialog_OK" xml:space="preserve">
     <value>Добре</value>
   </data>

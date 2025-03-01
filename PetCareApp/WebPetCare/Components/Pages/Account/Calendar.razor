@@ -20,13 +20,13 @@
 @if(isOrganization && employeesList != null)
 {
     <div class="mb-3 col-5 offset-4">
-        <SfDropDownList ID="dropdown" TValue="string" TItem="ShortEmployeeDto" Placeholder="Select a master" DataSource="@employeesList" @bind-Value="@selectedMaster.Id" >
+        <SfDropDownList ID="dropdown" TValue="string"  TItem="ShortEmployeeDto" Placeholder="Select a master" DataSource="@employeesList" @bind-Value="@selectedMaster.Id"  >
         <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
             <DropDownListEvents TValue="string" TItem="ShortEmployeeDto" ValueChange="ChangeMaster"></DropDownListEvents>
     </SfDropDownList>
     </div>
 }
-<SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" EnableAdaptiveUI="true" StartHour="6:00" ShowQuickInfo="false" EnableAllDayScroll="true" Height="700"
+<SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" AllowOverlap="false" EnableAdaptiveUI="true" StartHour="6:00" ShowQuickInfo="false" EnableAllDayScroll="true" Height="700"
             SelectedDateChanged="DateRangeChanged" >
     <ScheduleTemplates>
         <EditorTemplate>
@@ -126,7 +126,7 @@
 
     </ScheduleEventSettings>
 
-    <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen" ActionCompleted="UpdateDataInDb"></ScheduleEvents>
+    <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen"  ActionCompleted="UpdateDataInDb"></ScheduleEvents>
     <ScheduleViews>
         <ScheduleView Option="View.Day"></ScheduleView>
         <ScheduleView Option="View.Week"></ScheduleView>
@@ -217,8 +217,6 @@
             records.AddRange(recordsResult.Data);
             availableDates.Add(date);
             UpdateEvents(recordsResult.Data);
-            //StateHasChanged();
-
             await showToastr("", Localizer["Records were succesfully gotten"]);
 
         }
@@ -359,6 +357,8 @@
             else
             {
                 showToastr(res);
+                availableDates.Clear();
+                DateRangeChanged(changedEvents[0].StartTime);
             }
         }else if(args.ActionType == ActionType.EventCreate)
         {
@@ -383,6 +383,7 @@
                     {
                         showToastr(Localizer["Reason cannot be empty"]);
                         events.Add(args.DeletedRecords[0]);
+                        StateHasChanged();
                     }
                 }
                 else
@@ -431,6 +432,11 @@
         else
         {
             showToastr(temp);
+            foreach(var rec in records)
+            {
+                events.Remove(rec);
+            }
+            StateHasChanged();
         }
     }
 

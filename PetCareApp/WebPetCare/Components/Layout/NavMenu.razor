@@ -29,15 +29,7 @@
                 <_EventsHistoryList IsShowed="isHistoryShowed" OnClose="ToggleHistory" />
             }
         }
-        <li class="nav-item">
-            <div>
-                <select @bind="Culture">
-                    <option value="en">English</option>
-                    <option value="uk">Українська</option>
-
-                </select>
-            </div>
-        </li>
+      
         
         <li class="nav-item p-0 mx-4">
             <a class="nav-link nav-link-big" href="" Match="NavLinkMatch.All">
@@ -73,6 +65,15 @@
             </SfDropDownButton>
         </li>
         }
+        <li class="nav-item p-0 mx-4 mt-3">
+            <div>
+                <select @bind="Culture" class="custom-option">
+                    <option value="en">Eng</option>
+                    <option value="uk">Укр</option>
+
+                </select>
+            </div>
+        </li>
     </ul>
 </nav>
 
@@ -221,7 +222,18 @@
         }
 
 
+    .custom-option{
+        color: var(--bs-secondary);
+        border-color: rgba(var(--bs-secondary-rgb), 0.4);
+        font-size: 1.5rem;
+        border-width: 1px;
+        border-radius: 10px;
+    }
 
+    .custom-option:focus-visible {
+        color: var(--bs-secondary);
+            outline: none;
+    }
 
 
     .history-overlay {

@@ -8,7 +8,7 @@ namespace WebPetCare.IServices
 {
     public interface ISearchService
     {
-        public Task<Result<List<CityDto>>> GetCityNames(int countryId);
+        public Task<Result<List<CityDto>>> GetCityNames(int countryId, string localization = "en");
         
         public Task<List<GetServiceDto>> GetFilteredData(FiltersModel filters);
 

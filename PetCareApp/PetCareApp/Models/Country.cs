@@ -29,7 +29,7 @@ namespace PetCareApp.Models
         [JsonPropertyName("countryId")]
         [JsonConverter(typeof(StringToIntConverter))]
         public int CountryId { get; set; }
-        [JsonPropertyName("toponymName")]
+        [JsonPropertyName("name")]
         public string LocalizedName { get; set; }
         [JsonPropertyName("adminName1")]
         public string AdminRegion { get; set; }

@@ -334,7 +334,8 @@
 
     public async Task<List<CityDto>?> GetCities(int countryId = 690791)
     {
-        var data = await _searchService.GetCityNames(countryId);
+        var culture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+        var data = await _searchService.GetCityNames(countryId, culture);
         if (data.IsSuccess)
         {
             return data.Data;
