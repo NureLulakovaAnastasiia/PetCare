@@ -7,6 +7,7 @@
         <NavMenu @ref="navMenu" isLogged="@isAuthenticated" />
     </div>
       <Syncfusion.Blazor.Popups.SfDialogProvider />
+    <CascadingValue Value="@isAuthenticated">
         <CascadingValue Value="(Func<bool, Task>)UpdateAuthenticationStatus">
             <main>
                 <article>
@@ -14,6 +15,8 @@
                 </article>
             </main>
         </CascadingValue>
+    </CascadingValue>
+
         <footer>
             <div style="height: 200px;"></div>
         </footer>
@@ -22,13 +25,14 @@
 
 
 @code {
-    private bool isAuthenticated;
+    public bool isAuthenticated { get; set; } = false;
     private NavMenu navMenu;
     private string CurrentCulture { get; set; } = "uk";
 
     private async Task UpdateAuthenticationStatus(bool status)
     {
         isAuthenticated = status;
+        StateHasChanged();
         if (navMenu != null) 
         {
             await navMenu.UpdateNavMenuAsync(isAuthenticated);

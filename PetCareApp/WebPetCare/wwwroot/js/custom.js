@@ -16,6 +16,10 @@ window.focusNextInput = function (elementId) {
         element.focus();
     }
 };
+
+window.checkTokenInSessionStorage = () => {
+    return sessionStorage.getItem("token") !== null;
+};
 window.showToastr = function (type, message) {
     if (type === "success") {
         toastr.success(message);

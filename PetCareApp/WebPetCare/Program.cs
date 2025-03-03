@@ -14,6 +14,10 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1feHRRQmlfUE1wWUY=");
@@ -43,7 +47,7 @@ builder.Services.AddAuthentication(options =>
     options.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
     options.ClaimActions.MapJsonKey("urn:google:given_name", "given_name", "string");
     options.ClaimActions.MapJsonKey("urn:google:family_name", "family_name", "string");
-
+    options.Scope.Add("https://www.googleapis.com/auth/calendar.events");
     options.SaveTokens = true;
 });
 builder.Services.AddAuthorization();
@@ -56,11 +60,15 @@ builder.Services.AddLocalization();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddScoped<SfDialogService>();
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSingleton<GoogleCalendarService>();
+
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+
 });
 
 
@@ -95,10 +103,24 @@ app.UseRouting();
 app.UseAntiforgery();
 app.MapGet("/login-google", async (HttpContext context) =>
 {
+   
     await context.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties
     {
-        RedirectUri = "/signin"
+        RedirectUri = $"/signin"
     });
+});
+app.MapGet("/logout", async (HttpContext context) =>
+{
+    await context.SignOutAsync("Cookies");
+
+    var baseUrl = $"{context.Request.Scheme}://{context.Request.Host}";
+
+    string googleLogoutUrl = $"https://accounts.google.com/Logout?continue=https://appengine.google.com/_ah/logout?continue={baseUrl}/";
+
+    // Redirect user to Google logout URL
+    context.Response.Redirect(googleLogoutUrl);
+
+
 });
 
 app.UseSession();

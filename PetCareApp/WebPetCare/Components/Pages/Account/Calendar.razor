@@ -26,6 +26,9 @@
     </SfDropDownList>
     </div>
 }
+<div class="row">
+    <_GoogleCalendar></_GoogleCalendar>
+</div>
 <SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" AllowOverlap="false" EnableAdaptiveUI="true" StartHour="6:00" ShowQuickInfo="false" EnableAllDayScroll="true" Height="700"
             SelectedDateChanged="DateRangeChanged" >
     <ScheduleTemplates>
@@ -156,7 +159,7 @@
     private List<ShortEmployeeDto> employeesList = new List<ShortEmployeeDto>();
     private ShortEmployeeDto selectedMaster = new ShortEmployeeDto();
     private bool isDisposed = false;
-
+    private bool isCalendar = false;
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -194,10 +197,11 @@
         {
             breaks = res.Data;
             UpdateBreaks();
-            GetMasterServicesNames();
-            DateRangeChanged(DateTime.Now);
-            StateHasChanged();
         }
+        GetMasterServicesNames();
+        DateRangeChanged(DateTime.Now);
+        StateHasChanged();
+
     }
 
 

@@ -41,19 +41,30 @@ else
     private string email { get; set; } = string.Empty;
     [CascadingParameter]
     public Func<bool, Task> UpdateAuthenticationStatus { get; set; }
+    public bool isAuthenticated { get; set; } = false;
     private bool IsRole { get; set; } = false;
     public string role = "User";
     private AppUser userDto { get; set; }
 
+    // protected override async Task OnInitializedAsync()
+    // {
 
-    protected override async Task OnInitializedAsync()
+    // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await CheckAuthorization();
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
         var user = authState.User;
 
         if (user.Identity?.IsAuthenticated ?? false)
         {
+            if (isAuthenticated)
+            {
+                Navigation.NavigateTo("/account");
+                return;
+            }
             email = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
             var firstName = user.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? "";
             var lastName = user.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
@@ -65,6 +76,7 @@ else
                 Navigation.NavigateTo("/login");
                 return;
             }
+
             var res = await CheckEmail();
             if (res)
             {
@@ -74,18 +86,18 @@ else
             else
             {
                 userDto = new AppUser
-                    {
-                        Id = "",
-                        Email = email,
-                        FirstName = firstName,
-                        LastName = lastName,
-                        Photo = await DownloadImageAsByteArray(profilePictureUrl ?? ""),
-                        Contacts = new Contacts(){AppUserId = ""}
-                    };
+                        {
+                            Email = email,
+                            FirstName = firstName,
+                            LastName = lastName,
+                            Photo = await DownloadImageAsByteArray(profilePictureUrl ?? ""),
+                            Contacts = new Contacts() { AppUserId = "" }
+                        };
 
                 IsRole = true;
             }
         }
+        Navigation.NavigateTo("/login");
     }
 
     private async Task<byte[]> DownloadImageAsByteArray(string imageUrl)
@@ -138,5 +150,16 @@ else
             await JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
         }
     }
+    
+    private async Task CheckAuthorization()
+    {
+        isAuthenticated = await JSRuntime.InvokeAsync<bool>("checkTokenInSessionStorage");
 
+    }
 }
+<script>
+    window.checkTokenInSessionStorage = () => {
+        // Check if the token exists in sessionStorage
+        return sessionStorage.getItem("token") != null;
+    };
+</script>

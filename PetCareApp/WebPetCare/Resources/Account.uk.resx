@@ -147,6 +147,12 @@
   <data name="Add schedule" xml:space="preserve">
     <value>Додати розклад</value>
   </data>
+  <data name="AddEvents" xml:space="preserve">
+    <value>Додати події в Google Calendar</value>
+  </data>
+  <data name="AddToGoogleCalendar" xml:space="preserve">
+    <value>Додати події у Google Календар</value>
+  </data>
   <data name="AreadyWrittenReview" xml:space="preserve">
     <value>Ви вже написали відгук до цього сервісу</value>
   </data>
@@ -234,6 +240,9 @@
   <data name="Enter your address" xml:space="preserve">
     <value>Введіть вашу адресу</value>
   </data>
+  <data name="EventsSuccesfullyAdded" xml:space="preserve">
+    <value>Події успішно додані!</value>
+  </data>
   <data name="Filter by status" xml:space="preserve">
     <value>Фільтр за статусом</value>
   </data>
@@ -255,6 +264,9 @@
   <data name="General" xml:space="preserve">
     <value>Загальне</value>
   </data>
+  <data name="GoogleCalendarAlert" xml:space="preserve">
+    <value>Записи та перерви поточного місяця (місяця обраної дати) будуть додані в ваш основний календар. Ви впевнені, що хочете цього?</value>
+  </data>
   <data name="Is date" xml:space="preserve">
     <value>Чи дата</value>
   </data>
@@ -266,6 +278,9 @@
   </data>
   <data name="Location" xml:space="preserve">
     <value>Локація</value>
+  </data>
+  <data name="LoginGoogle" xml:space="preserve">
+    <value>Увійти через Google</value>
   </data>
   <data name="Master" xml:space="preserve">
     <value>Майстер</value>

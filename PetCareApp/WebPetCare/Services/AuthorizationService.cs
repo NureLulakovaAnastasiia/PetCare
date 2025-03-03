@@ -8,6 +8,7 @@ using System.Net;
 using WebPetCare.IServices;
 using PetCareApp.Models;
 using Microsoft.Extensions.Options;
+using static System.Net.WebRequestMethods;
 
 namespace WebPetCare.Services
 {

@@ -147,6 +147,12 @@
   <data name="Add schedule" xml:space="preserve">
     <value>Add schedule</value>
   </data>
+  <data name="AddEvents" xml:space="preserve">
+    <value>Add events to Google Calendar</value>
+  </data>
+  <data name="AddToGoogleCalendar" xml:space="preserve">
+    <value>Add events to Google Calendar</value>
+  </data>
   <data name="AreadyWrittenReview" xml:space="preserve">
     <value>You've already wrote a review to this service</value>
   </data>
@@ -234,6 +240,9 @@
   <data name="Enter your address" xml:space="preserve">
     <value>Enter your address</value>
   </data>
+  <data name="EventsSuccesfullyAdded" xml:space="preserve">
+    <value>Events were successfully added</value>
+  </data>
   <data name="Filter by status" xml:space="preserve">
     <value>Filter by status</value>
   </data>
@@ -255,6 +264,9 @@
   <data name="General" xml:space="preserve">
     <value>General</value>
   </data>
+  <data name="GoogleCalendarAlert" xml:space="preserve">
+    <value>The records and breaks of this month (month of selected day) will be added to ypur main calendar. Are you sure you want it?</value>
+  </data>
   <data name="Is date" xml:space="preserve">
     <value>Is date</value>
   </data>
@@ -266,6 +278,9 @@
   </data>
   <data name="Location" xml:space="preserve">
     <value>Location</value>
+  </data>
+  <data name="LoginGoogle" xml:space="preserve">
+    <value>Login using Google</value>
   </data>
   <data name="Master" xml:space="preserve">
     <value>Master</value>

@@ -1,0 +1,238 @@
+﻿@using Google.Apis.Calendar.v3.Data
+@using WebPetCare.Services
+@using System.Net.Http;
+@using System.Net.Http.Json;
+@using System.Threading.Tasks;
+@using Microsoft.AspNetCore.Components;
+@using static WebPetCare.Components.Pages.Account.Calendar
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<Account> Localizer
+@inject HttpClient Http
+@inject SfDialogService DialogService
+@inject GoogleCalendarService calendarService
+@inject IServiceService service
+@inject IUserService _userService
+
+<div class="row justify-content-end m-3">
+@if (!isGoogleAuthorized)
+{
+    <button class="btn col-3 btn-outline-primary" @onclick="GoToGoogleAuth">
+        @Localizer["LoginGoogle"]
+    </button>
+}
+else
+{
+    <button class="btn col-3 btn-primary p-1" @onclick="AddGoogleEvents">@Localizer["AddToGoogleCalendar"]</button>
+}
+</div>
+
+@code {
+    [Parameter]
+    public DateTime date { get; set; } = DateTime.Now;
+    private bool isGoogleAuthorized = false;
+    private List<GetRecordDto> records = new();
+    private List<BreakDto> breaks = new();
+    private List<Event> events = new List<Event>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckGoogleAuth();
+    }
+
+
+    private async Task GetData()
+    {
+        var recordsRes = await service.getMasterRecordForMonth(date);
+        if (recordsRes.IsSuccess)
+        {
+            records = recordsRes.Data;
+        }
+        var breaksRes = await _userService.getMasterBreaks(null);
+        if (breaksRes.IsSuccess)
+        {
+            breaks = breaksRes.Data;
+        }
+    }
+
+    private async Task CheckGoogleAuth()
+    {
+        var response = await calendarService.GetAccessTokenAsync();
+        if (!String.IsNullOrEmpty(response))
+        {
+            isGoogleAuthorized = true;
+        }
+    }
+
+
+
+    private async Task AddGoogleEvents()
+    {
+        if (!isGoogleAuthorized)
+        {
+            Navigation.NavigateTo("/login-google");
+            Navigation.NavigateTo("/account", forceLoad: true);
+            return;
+        }
+        bool isConfirm = await DialogService.ConfirmAsync(Localizer["GoogleCalendarAlert"], Localizer["AddEvents"]);
+        if (isConfirm)
+        {
+            await GetData();
+            events.Clear();
+            mapRecords();
+            mapBreaks();
+            if (events.Count > 0)
+            {
+                var res = await calendarService.AddEventsAsync(events);
+                if (res)
+                {
+                    showToastr("", Localizer["EventsSuccesfullyAdded"]);
+                }
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
+
+
+    private void mapRecords()
+    {
+        foreach(var rec in records)
+        {
+
+            Event evnt = new Event()
+                {
+                    Summary = rec.ServiceName,
+                    Description = rec.Description + "\n" + rec.Comment,
+                    ColorId = ChooseColor(rec.Status),
+                    Start = new EventDateTime()
+                    {
+                        DateTime = rec.StartTime.ToUniversalTime(),
+                        TimeZone = "Europe/Kyiv"
+                    },
+                    End = new EventDateTime()
+                    {
+                        DateTime = rec.EndTime.ToUniversalTime(),
+                        TimeZone = "Europe/Kyiv"
+                    }
+                };
+
+            events.Add(evnt);
+        }
+    }
+
+    private string ChooseColor(string status)
+    {
+        switch (status)
+        {
+            case "Created":
+                return "2";
+            case "Cancelled":
+                return "4";
+            default:
+                return "7";
+        }
+    }
+
+    private void GoToGoogleAuth()
+    {
+        Navigation.NavigateTo("/login-google", forceLoad: true);
+    }
+
+
+    private void mapBreaks()
+    {
+        foreach (var brk in breaks)
+        {
+            var reccurence = makeReccurenceRule(brk);
+            var start = brk.DayOfWeek == null ? brk.StartDate : AdjustStartDateToDayOfWeek(brk.StartDate, brk.DayOfWeek.Value);
+            Event evnt = new Event()
+                {
+                    Summary = Localizer["Break"],
+                    ColorId = "6", //orange
+                    Start = new EventDateTime()
+                    {
+                        DateTime = start.Date + brk.StartTime,
+                        TimeZone = "Europe/Kyiv"
+                    },
+                    End = new EventDateTime()
+                    {
+                        DateTime = start.Date + brk.EndTime,
+                        TimeZone = "Europe/Kyiv"
+                    },
+                    Recurrence = new List<string> { reccurence }
+                };
+            
+            events.Add(evnt);
+        }
+    }
+
+    private DateTime AdjustStartDateToDayOfWeek(DateTime startDate, int targetDayOfWeek)
+    {
+        int currentDay = (int)startDate.DayOfWeek; 
+
+        int daysToAdd = (targetDayOfWeek - currentDay + 7) % 7;
+
+        if (daysToAdd == 0)
+            return startDate;
+
+        return startDate.AddDays(daysToAdd);
+    }
+
+
+    private string makeReccurenceRule(BreakDto breakDto)
+    {
+
+        var rule = "";
+        var byDay = breakDto.DayOfWeek.HasValue ? days[breakDto.DayOfWeek.Value] : null;
+        if(byDay != null)
+        {
+            rule += $"RRULE:FREQ=WEEKLY;BYDAY={byDay}";
+        }
+
+        if (breakDto.EndDate.HasValue)
+        {
+            string until = breakDto.EndDate.Value.ToString("yyyyMMddT235959Z", CultureInfo.InvariantCulture);
+            rule += $";UNTIL={until}";
+        }
+        return rule;
+    }
+
+
+    private string[] days = { "SU", "MO", "TU", "WE", "TH", "FR", "SA" };
+
+    private async Task showToastr(string res, string successMessage = "")
+    {
+        if (String.IsNullOrEmpty(res))
+        {
+            await JSRuntime.InvokeVoidAsync("toastrInterop.showSuccess", successMessage, "Success");
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("toastrInterop.showError", res, "Error");
+        }
+    }
+
+}
+
+@*  public class AppointmentData
+    {
+        public int Id { get; set; }
+        public string Subject { get; set; }
+        public string Location { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public string Description { get; set; }
+        public string Comment { get; set; }
+        public Status Status { get; set; } = new Status();
+        public bool IsAllDay { get; set; }
+        public string Type { get; set; }
+        public int ServiceId { get; set; }
+        public string CssClass { get; set; } = "";
+        public string RecurrenceRule { get; set; }
+        public string RecurrenceException { get; set; }
+        public Nullable<int> RecurrenceID { get; set; }
+        public List<int>? breakIds { get; set; } = null;
+    } *@
