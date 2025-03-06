@@ -510,5 +510,36 @@ namespace PetCareApp.Services
 
             return res;
         }
+
+        public async Task<List<GetPetDto>> GetPets()
+        {
+            var res = new List<GetPetDto>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var pets = _dbContext.Pets.Where(p => p.AppUserId == user.Id).ToList();
+                    if (pets != null)
+                    {
+                        res = _mapper.Map<List<GetPetDto>>(pets);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            return res;
+        }
+
+        public PetDto? GetPetById(int petId)
+        {
+            var pet = _dbContext.Pets.FirstOrDefault(p => p.Id == petId);
+            if (pet != null)
+            {
+                return _mapper.Map<PetDto>(pet);
+            }
+            return null;
+        }
     }
 }

@@ -126,6 +126,9 @@
   <data name="Choose needed slot" xml:space="preserve">
     <value>Оберіть підходящий слот</value>
   </data>
+  <data name="Chosen pet" xml:space="preserve">
+    <value>Обрана тварина</value>
+  </data>
   <data name="Chosen time" xml:space="preserve">
     <value>Обраний час</value>
   </data>
@@ -152,6 +155,9 @@
   </data>
   <data name="Record" xml:space="preserve">
     <value>Запис</value>
+  </data>
+  <data name="Select pet" xml:space="preserve">
+    <value>Оберіть тварину</value>
   </data>
   <data name="Show all slots" xml:space="preserve">
     <value>Показати всі слоти</value>

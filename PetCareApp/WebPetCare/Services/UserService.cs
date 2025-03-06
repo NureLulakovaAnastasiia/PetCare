@@ -1039,6 +1039,64 @@ namespace WebPetCare.Services
 
             return res;
         }
+
+        public async Task<List<GetPetDto>?> GetUserPets()
+        {
+            var res = new List<GetPetDto>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/User/getUserPets";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<List<GetPetDto>>(result, options);
+                    return data;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                
+            }
+
+            return null;
+        }
+
+        public async Task<PetDto?> GetPetById(int petId)
+        {
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/User/getPetById?petId={petId}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<PetDto>(result, options);
+                    return data;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
     }
     
 }

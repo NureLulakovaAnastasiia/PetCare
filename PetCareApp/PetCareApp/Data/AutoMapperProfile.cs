@@ -38,6 +38,8 @@ namespace PetCareApp.Data
             CreateMap<GetContactsDto, Contacts>();
             CreateMap<Pet,  PetDto>();
             CreateMap<PetDto, Pet>();
+            CreateMap<Pet, GetPetDto>();
+            CreateMap<GetPetDto, Pet>();
             CreateMap<Schedule, ScheduleDto>();
             CreateMap<ScheduleDto, Schedule>();
             CreateMap<ReviewDto, Review>();

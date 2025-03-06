@@ -54,6 +54,28 @@
 
                     @if (data.Type == "Record" || isRecord)
                     {
+                        <tr class="text-end justify-content-end">
+                        @if(data.PetId != null)
+                        {
+                          <td colspan="2">
+                            <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnPet">
+                                <ContentTemplate>
+                                    <div id='democontent'>
+                                        <div class="ms-0 text-center green-blue-text">
+                                            <h6>@Localizer["Chosen pet"]</h6>
+                                            <p>@Localizer["Name"]: @Pet.Name</p>
+                                            <p>@Localizer["Breed"]: @Pet.Breed </p>
+                                        </div>
+                                       
+                                    </div>
+                                </ContentTemplate>
+                                <ChildContent>
+                                    <button class="btn btn-info m-0 p-1" style="font-size: 0.7rem" ID="btnPet" @onclick="() => GetPet(data.PetId.Value)">   @Localizer["Show pet"] </button>
+                                </ChildContent>
+                            </SfTooltip>
+                            </td>
+                        }
+                        </tr>
                         <tr>
                             <td class="e-textlabel">@Localizer["Service Name"]</td>
                         <td colspan="4">
@@ -160,7 +182,7 @@
     private ShortEmployeeDto selectedMaster = new ShortEmployeeDto();
     private bool isDisposed = false;
     private bool isCalendar = false;
-
+    private PetDto Pet = new PetDto();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -203,7 +225,6 @@
         StateHasChanged();
 
     }
-
 
     private async void DateRangeChanged(DateTime date)
     {
@@ -251,6 +272,7 @@
                     Description = record.Description,
                     Comment = record.Comment != null ? record.Comment : "",
                     ServiceId = record.ServiceId,
+                    PetId = record.PetId,
                     Type = "Record"
                 };
             switch (record.Status)
@@ -308,7 +330,7 @@
                 events.Add(new AppointmentData
                     {
                         Id = breaks[i].Id * -1,
-                        Subject = "Break",
+                        Subject = Localizer["Break"],
                         StartTime = breaks[i].StartDate + breaks[i].StartTime,
                         EndTime = breaks[i].StartDate + breaks[i].EndTime,
                         Description = "Break",
@@ -546,7 +568,8 @@
                 Comment = data.Comment,
                 ServiceName = serviceName == null ? data.Subject : serviceName,
                 Status = status != null ? status.Name : data.Status.Name,
-                ServiceId = data.ServiceId
+                ServiceId = data.ServiceId,
+                PetId = data.PetId
             };
     }
 
@@ -687,7 +710,7 @@
         var res = new AppointmentData
             {
                 Id = breakDto.Id * -1,
-                Subject = "Break",
+                Subject = Localizer["Break"],
                 StartTime = breakDto.StartDate + breakDto.StartTime,
                 EndTime = breakDto.StartDate + breakDto.EndTime,
                 Description = "Recurring weekly break",
@@ -704,6 +727,17 @@
         }
         return res;
     }
+
+    private async Task GetPet(int petId)
+    {
+        var res = await _userService.GetPetById(petId);
+        if(res != null)
+        {
+            Pet = res;
+            StateHasChanged();
+        }
+    }
+
 
     private string GetDayOfWeek(int? dayOfWeek)
     {
@@ -793,6 +827,7 @@
         public string Comment { get; set; }
         public Status Status { get; set; } = new Status();
         public bool IsAllDay { get; set; }
+        public int? PetId { get; set; } = null;
         public string Type { get; set; }
         public int ServiceId { get; set; }
         public string CssClass { get; set; } = "";
@@ -1015,6 +1050,26 @@
         width: 100%;
     }
 
+    .e-tooltip-wrap.e-popup {
+        background-color: var(--bs-tertiary);
+        border: 3px solid var(--bs-tertiary);
+        box-shadow: 0 0 10px rgba(var(--bs-secondary-rgb), 0.3);
+    }
+
+    .e-tooltip-wrap .e-arrow-tip-inner.e-tip-right, .e-tooltip-wrap .e-arrow-tip-inner.e-tip-left, .e-tooltip-wrap .e-arrow-tip-inner.e-tip-bottom, .e-tooltip-wrap .e-arrow-tip-inner.e-tip-top {
+        color: var(--bs-tertiary);
+        box-shadow: 0 0 10px rgba(var(--bs-secondary-rgb), 0.3);
+    }
+
+    .e-tooltip-wrap .e-arrow-tip-outer.e-tip-top {
+        border-bottom: 8px solid var(--bs-tertiary);
+        border-left: 8px solid rgba(0, 0, 0, 0);
+        border-right: 8px solid rgba(0, 0, 0, 0);
+    }
+
+    .e-tooltip-wrap {
+        background-color: #e3dccc;
+    }
 
 </style>
 

@@ -42,6 +42,10 @@
                         <div class="form-custom-border p-3">
                             <h3>@Localizer["Submit record"]</h3>
                             <h4 class="green-blue-text">@Localizer["Chosen time"]: @chosenSlot.Date.ToString("dddd, dd MMMM yyyy"), @chosenSlot.StartTime.ToString(@"hh\:mm") - @chosenSlot.EndTime.ToString(@"hh\:mm")</h4>
+                            @if(chosenPet.Id != 0)
+                            {
+                                <h4>@Localizer["Chosen pet"]: @chosenPet.Name</h4>
+                            }
                             <hr />
                             <div class=" d-flex flex-column align-items-center">
                                 <label>@Localizer["WriteCommentToRecord"]</label>
@@ -53,6 +57,14 @@
                 </div>
                 break;
             default:
+                @if (userPets != null && userPets.Count > 0)
+                {
+                    <div class="mb-3 col-5 offset-4">
+                        <SfDropDownList ID="dropdown" TValue="GetPetDto" TItem="GetPetDto" Placeholder="@Localizer["Select pet"]" DataSource="@userPets" @bind-Value="@chosenPet">
+                            <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                        </SfDropDownList>
+                    </div>
+                }
                 <_FillQuestionary serviceId="@serviceId" OnAnalisysChanged="UpdateAnalisys" ToNextStep="GoNext"></_FillQuestionary>
                 break;
         }
@@ -65,11 +77,24 @@
     [Parameter]
     public string serviceName { get; set; } = string.Empty;
     public int step { get; set; } = 0;
-
+    public List<GetPetDto> userPets = new List<GetPetDto>();
     public QuestionaryAnalisysDto analisysDto { get; set; } = new QuestionaryAnalisysDto();
-
+    public GetPetDto chosenPet = new GetPetDto() { Name = "-----", Id = 0 };
     public TimeSlot chosenSlot { get; set; } = new TimeSlot();
     public string comment { get; set; } = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        userPets.Clear();
+        var res = await _userService.GetUserPets();
+        if(res != null)
+        {
+            userPets.AddRange(res);
+        }
+        userPets.Add(chosenPet);
+        StateHasChanged();
+    }
+
     public void GoBack()
     {
         if (step > 0)
@@ -84,7 +109,10 @@
     }
     private void UpdateAnalisys(QuestionaryAnalisysDto updatedAnalisys)
     {
-        analisysDto = updatedAnalisys;
+        if (updatedAnalisys != null || analisysDto != null)
+        {
+            analisysDto = updatedAnalisys;
+        }
     }
 
     public void GoNext()
@@ -114,6 +142,11 @@
                     Description = analisysDto.Description,
                     Comment = comment
                 };
+            if(chosenPet.Id != 0)
+            {
+                record.PetId = chosenPet.Id;
+            }
+
             var res = await _userService.AddRecord(record);
             if (String.IsNullOrEmpty(res))
             {

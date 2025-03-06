@@ -19,6 +19,9 @@ namespace PetCareApp.Interfaces
         public Task<Result<bool>> RemoveReviewComment(int commentId);
         public Task<Result<bool>> AddReviewComment(ReviewCommentDto reviewComment);
 
+        public Task<List<GetPetDto>> GetPets();
+
+        public PetDto? GetPetById(int petId);
         public Task<Result<List<HistoryEvent>>> GetEventsHistory();
     }
 }

@@ -189,6 +189,9 @@
   <data name="Change status" xml:space="preserve">
     <value>Змінити статус</value>
   </data>
+  <data name="Chosen pet" xml:space="preserve">
+    <value>Записана тварина</value>
+  </data>
   <data name="Comment" xml:space="preserve">
     <value>Коментар</value>
   </data>
@@ -428,6 +431,9 @@
   </data>
   <data name="Services" xml:space="preserve">
     <value>Сервіси</value>
+  </data>
+  <data name="Show pet" xml:space="preserve">
+    <value>Записана тварина</value>
   </data>
   <data name="Sort" xml:space="preserve">
     <value>Сортувати</value>

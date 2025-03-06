@@ -126,6 +126,9 @@
   <data name="Choose needed slot" xml:space="preserve">
     <value>Choose needed slot</value>
   </data>
+  <data name="Chosen pet" xml:space="preserve">
+    <value>Chosen pet</value>
+  </data>
   <data name="Chosen time" xml:space="preserve">
     <value>Chosen time</value>
   </data>
@@ -152,6 +155,9 @@
   </data>
   <data name="Record" xml:space="preserve">
     <value>Record</value>
+  </data>
+  <data name="Select pet" xml:space="preserve">
+    <value>Select pet</value>
   </data>
   <data name="Show all slots" xml:space="preserve">
     <value>Show all slots</value>

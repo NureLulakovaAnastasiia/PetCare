@@ -88,6 +88,38 @@ namespace PetCareApp.Controllers
             return Ok(res);
         }
 
+        [HttpGet("getUserPets")]
+        public async Task<IActionResult> GetUserPets()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var res = await _userService.GetPets();
+            if (res == null || res.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(res);
+        }
+
+        [HttpGet("getPetById")]
+        public IActionResult GetPetById([FromQuery]int petId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var res =  _userService.GetPetById(petId);
+            if (res == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(res);
+        }
+
         [HttpGet("getMasterReviews")]
         [AllowAnonymous]
         public  async Task<IActionResult> GetMasterReviews([FromQuery] string masterId = "")

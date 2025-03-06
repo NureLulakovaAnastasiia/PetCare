@@ -13,6 +13,7 @@ namespace PetCareApp.Dtos
         [StringLength(20)]
         public string Status { get; set; } = "Created";
         public int ServiceId { get; set; }
+        public int? PetId { get; set; }
         public string ServiceName { get; set; } = "";
     }
 }
