@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Newtonsoft.Json;
 using Syncfusion.Blazor.Calendars;
 using PetCareApp.Models;
+using Microsoft.Extensions.Logging;
 
 namespace WebPetCare.Services
 {
@@ -76,6 +77,34 @@ namespace WebPetCare.Services
             }
             return false;
         }
+
+        public async Task<bool> DeleteEventsAsync(DateTime date)
+        {
+            _accessToken = await GetAccessTokenAsync();
+            if (_accessToken != null)
+            {
+                try
+                {
+                    var credential = GoogleCredential.FromAccessToken(_accessToken);
+                    var service = new CalendarService(new BaseClientService.Initializer()
+                    {
+                        HttpClientInitializer = credential,
+                        ApplicationName = AppName
+                    });
+                    
+
+                    await ClearMonthEvents(service, date.Month, date.Year);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+            return false;
+
+        }
+
 
         private async Task<bool> ClearMonthEvents(CalendarService service, int month, int year)
         {

@@ -23,7 +23,30 @@
 }
 else
 {
-    <button class="btn col-3 btn-primary p-1" @onclick="AddGoogleEvents">@Localizer["AddToGoogleCalendar"]</button>
+    <button class="btn col-3 btn-primary p-1" @onclick="OpenOptions">@Localizer["AddToGoogleCalendar"]</button>
+        <SfDialog Width="450px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@isOptionsShown">
+            <DialogTemplates>
+                <Header> @Localizer["Choose options"] </Header>
+                <Content> 
+                    <div class="container text-center justify-content-center">
+                        <div class="col">
+                            <h4>@Localizer["Data load options"]</h4>
+                            <p>@Localizer["Choose which data to upload"]</p>
+                            <div class="row">
+                                <SfCheckBox Label="@Localizer["Breaks"]" @bind-Checked="@isBreaks" CssClass="col-11 m-2"></SfCheckBox>
+                                <SfCheckBox Label="@Localizer["Records"]" @bind-Checked="@isRecords" CssClass="col-11 m-2"></SfCheckBox>
+                                <button class="btn btn-primary p-2 mt-3" @onclick="AddGoogleEvents" CssClass="col-2">@Localizer["Load"]</button>
+                            </div>
+                        </div>
+                        <hr />
+                        <div>
+                            <p>@Localizer["Clear data"]</p>
+                            <button class="btn btn-danger  p-2 mt-2" @onclick="DeleteEvents">@Localizer["Clear"]</button>
+                        </div>
+                    </div>
+                </Content>
+            </DialogTemplates>
+        </SfDialog>
 }
 </div>
 
@@ -34,6 +57,11 @@ else
     private List<GetRecordDto> records = new();
     private List<BreakDto> breaks = new();
     private List<Event> events = new List<Event>();
+    private bool isOptionsShown { get; set; } = false;
+    private bool isBreaks { get; set; } = false;
+    private bool isRecords { get; set; } = false;
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +81,7 @@ else
         {
             breaks = breaksRes.Data;
         }
+
     }
 
     private async Task CheckGoogleAuth()
@@ -61,9 +90,37 @@ else
         if (!String.IsNullOrEmpty(response))
         {
             isGoogleAuthorized = true;
+            isOptionsShown = false;
         }
     }
 
+    private void OpenOptions()
+    {
+        isOptionsShown = true;
+    }
+
+    private async Task DeleteEvents()
+    {
+        if (!isGoogleAuthorized)
+        {
+            Navigation.NavigateTo("/login-google");
+            Navigation.NavigateTo("/account", forceLoad: true);
+            return;
+        }
+        bool isConfirm = await DialogService.ConfirmAsync(Localizer["GoogleCalendarDeleteAlert"], Localizer["DeleteEvents"]);
+        if (isConfirm)
+        {
+            var res = await calendarService.DeleteEventsAsync(date);
+            if (res)
+            {
+                showToastr("", Localizer["EventsSuccesfullyDeleted"]);
+            }
+            else
+            {
+                showToastr(Localizer["EventsErrorDeletion"]);
+            }
+        }
+    }
 
 
     private async Task AddGoogleEvents()
@@ -79,8 +136,14 @@ else
         {
             await GetData();
             events.Clear();
-            mapRecords();
-            mapBreaks();
+            if (isBreaks)
+            {
+                mapBreaks();
+            }
+            if (isRecords)
+            {
+                mapRecords();
+            }
             if (events.Count > 0)
             {
                 var res = await calendarService.AddEventsAsync(events);
@@ -88,12 +151,18 @@ else
                 {
                     showToastr("", Localizer["EventsSuccesfullyAdded"]);
                 }
+                else
+                {
+                    showToastr(Localizer["EventsErrorAdding"]);
+                }
             }
         }
         else
         {
             return;
         }
+        isBreaks = false;
+        isRecords = false;
     }
 
 
@@ -146,7 +215,11 @@ else
     {
         foreach (var brk in breaks)
         {
-            var reccurence = makeReccurenceRule(brk);
+            var reccurence = string.Empty;
+            if(brk.DayOfWeek != null)
+            {
+                reccurence = makeReccurenceRule(brk);
+            }
             var start = brk.DayOfWeek == null ? brk.StartDate : AdjustStartDateToDayOfWeek(brk.StartDate, brk.DayOfWeek.Value);
             Event evnt = new Event()
                 {
@@ -162,7 +235,7 @@ else
                         DateTime = start.Date + brk.EndTime,
                         TimeZone = "Europe/Kyiv"
                     },
-                    Recurrence = new List<string> { reccurence }
+                    Recurrence = String.IsNullOrEmpty(reccurence) ? null : new List<string> { reccurence }
                 };
             
             events.Add(evnt);

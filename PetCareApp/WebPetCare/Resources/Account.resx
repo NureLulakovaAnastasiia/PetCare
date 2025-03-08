@@ -162,6 +162,9 @@
   <data name="Break" xml:space="preserve">
     <value>Break</value>
   </data>
+  <data name="Breaks" xml:space="preserve">
+    <value>Breaks</value>
+  </data>
   <data name="Breed" xml:space="preserve">
     <value>Breed</value>
   </data>
@@ -189,8 +192,20 @@
   <data name="Change status" xml:space="preserve">
     <value>Change status</value>
   </data>
+  <data name="Choose options" xml:space="preserve">
+    <value>Choose options with Google Calendar</value>
+  </data>
+  <data name="Choose which data to upload" xml:space="preserve">
+    <value>Choose which data to upload</value>
+  </data>
   <data name="Chosen pet" xml:space="preserve">
     <value>Chosen pet</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Clear data" xml:space="preserve">
+    <value>If you want to clear data in Google Claentar for current month</value>
   </data>
   <data name="Comment" xml:space="preserve">
     <value>Comment</value>
@@ -203,6 +218,9 @@
   </data>
   <data name="Created" xml:space="preserve">
     <value>Created</value>
+  </data>
+  <data name="Data load options" xml:space="preserve">
+    <value>Data load options</value>
   </data>
   <data name="Data updated and saved successfully!" xml:space="preserve">
     <value>Data updated and saved successfully!</value>
@@ -218,6 +236,9 @@
   </data>
   <data name="Delete schedule" xml:space="preserve">
     <value>Delete schedule</value>
+  </data>
+  <data name="DeleteEvents" xml:space="preserve">
+    <value>Delete events fron Google Calendar</value>
   </data>
   <data name="Description" xml:space="preserve">
     <value>Description</value>
@@ -243,8 +264,17 @@
   <data name="Enter your address" xml:space="preserve">
     <value>Enter your address</value>
   </data>
+  <data name="EventsErrorAdding" xml:space="preserve">
+    <value>Error during adding events</value>
+  </data>
+  <data name="EventsErrorDeletion" xml:space="preserve">
+    <value>Error during deleting events</value>
+  </data>
   <data name="EventsSuccesfullyAdded" xml:space="preserve">
     <value>Events were successfully added</value>
+  </data>
+  <data name="EventsSuccesfullyDeleted" xml:space="preserve">
+    <value>Events were succesfully deleted</value>
   </data>
   <data name="Filter by status" xml:space="preserve">
     <value>Filter by status</value>
@@ -270,6 +300,9 @@
   <data name="GoogleCalendarAlert" xml:space="preserve">
     <value>The records and breaks of this month (month of selected day) will be added to ypur main calendar. Are you sure you want it?</value>
   </data>
+  <data name="GoogleCalendarDeleteAlert" xml:space="preserve">
+    <value>Are you sure you want to delete all events for current month in Google Calendar?</value>
+  </data>
   <data name="Is date" xml:space="preserve">
     <value>Is date</value>
   </data>
@@ -278,6 +311,9 @@
   </data>
   <data name="Last Name" xml:space="preserve">
     <value>Last Name</value>
+  </data>
+  <data name="Load" xml:space="preserve">
+    <value>Load</value>
   </data>
   <data name="Location" xml:space="preserve">
     <value>Location</value>
@@ -386,6 +422,9 @@
   </data>
   <data name="Record was succesfully cancelled" xml:space="preserve">
     <value>Record was succesfully cancelled</value>
+  </data>
+  <data name="Records" xml:space="preserve">
+    <value>Records</value>
   </data>
   <data name="Records were succesfully gotten" xml:space="preserve">
     <value>Records were succesfully gotten</value>

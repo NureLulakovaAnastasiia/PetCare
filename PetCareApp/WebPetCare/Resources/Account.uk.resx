@@ -162,6 +162,9 @@
   <data name="Break" xml:space="preserve">
     <value>Перерва</value>
   </data>
+  <data name="Breaks" xml:space="preserve">
+    <value>Перерви</value>
+  </data>
   <data name="Breed" xml:space="preserve">
     <value>Порода</value>
   </data>
@@ -189,8 +192,20 @@
   <data name="Change status" xml:space="preserve">
     <value>Змінити статус</value>
   </data>
+  <data name="Choose options" xml:space="preserve">
+    <value>Оберіть дії з Google календарем</value>
+  </data>
+  <data name="Choose which data to upload" xml:space="preserve">
+    <value>Оберіть які саме події завантажити</value>
+  </data>
   <data name="Chosen pet" xml:space="preserve">
     <value>Записана тварина</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="Clear data" xml:space="preserve">
+    <value>Якщо ви хочете видалити дані у Google калентарі за поточний (обраний) місяць</value>
   </data>
   <data name="Comment" xml:space="preserve">
     <value>Коментар</value>
@@ -203,6 +218,9 @@
   </data>
   <data name="Created" xml:space="preserve">
     <value>Створено</value>
+  </data>
+  <data name="Data load options" xml:space="preserve">
+    <value>Дані для завантаження</value>
   </data>
   <data name="Data updated and saved successfully!" xml:space="preserve">
     <value>Даніі успішно оновлено та збережено</value>
@@ -218,6 +236,9 @@
   </data>
   <data name="Delete schedule" xml:space="preserve">
     <value>Видалити розлад</value>
+  </data>
+  <data name="DeleteEvents" xml:space="preserve">
+    <value>Видалення подій у Google календарі</value>
   </data>
   <data name="Description" xml:space="preserve">
     <value>Опис</value>
@@ -243,8 +264,17 @@
   <data name="Enter your address" xml:space="preserve">
     <value>Введіть вашу адресу</value>
   </data>
+  <data name="EventsErrorAdding" xml:space="preserve">
+    <value>Помилка при додаванні подій</value>
+  </data>
+  <data name="EventsErrorDeletion" xml:space="preserve">
+    <value>Помилка при видаленні подій</value>
+  </data>
   <data name="EventsSuccesfullyAdded" xml:space="preserve">
     <value>Події успішно додані!</value>
+  </data>
+  <data name="EventsSuccesfullyDeleted" xml:space="preserve">
+    <value>Події було успішно видалено</value>
   </data>
   <data name="Filter by status" xml:space="preserve">
     <value>Фільтр за статусом</value>
@@ -270,6 +300,9 @@
   <data name="GoogleCalendarAlert" xml:space="preserve">
     <value>Записи та перерви поточного місяця (місяця обраної дати) будуть додані в ваш основний календар. Ви впевнені, що хочете цього?</value>
   </data>
+  <data name="GoogleCalendarDeleteAlert" xml:space="preserve">
+    <value>Ви впевнені, що хочете видалити всі події за поточний місяць у Google календарі?</value>
+  </data>
   <data name="Is date" xml:space="preserve">
     <value>Чи дата</value>
   </data>
@@ -278,6 +311,9 @@
   </data>
   <data name="Last Name" xml:space="preserve">
     <value>Прізвище</value>
+  </data>
+  <data name="Load" xml:space="preserve">
+    <value>Завантажити</value>
   </data>
   <data name="Location" xml:space="preserve">
     <value>Локація</value>
@@ -386,6 +422,9 @@
   </data>
   <data name="Record was succesfully cancelled" xml:space="preserve">
     <value>Запис успішно скасований</value>
+  </data>
+  <data name="Records" xml:space="preserve">
+    <value>Записи</value>
   </data>
   <data name="Records were succesfully gotten" xml:space="preserve">
     <value>Записи успішно отримано</value>
