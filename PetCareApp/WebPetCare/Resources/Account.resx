@@ -513,6 +513,9 @@
   <data name="To" xml:space="preserve">
     <value>To</value>
   </data>
+  <data name="TooBigImage" xml:space="preserve">
+    <value>File is too large! Maximum allowed size is 2MB.</value>
+  </data>
   <data name="Type" xml:space="preserve">
     <value>Type</value>
   </data>

@@ -22,7 +22,7 @@
                         <h5>@Localizer["Email"]</h5>
                         <InputText class="form-control" @bind-Value="LoginModel.Email" DisplayName="Email" />
                         <h5>@Localizer["Password"]</h5>
-                        <InputText typeof="password" class="form-control" @bind-Value="LoginModel.Password" />
+                        <InputText type="password" class="form-control" @bind-Value="LoginModel.Password" />
                         <a @onclick="ShowEmailEnter">@Localizer["ForgotPassword"]</a>
                     </div>
                     <button type="submit" class="btn btn-primary col-10 mt-3">@Localizer["Login"]</button>
@@ -225,7 +225,7 @@
             EmailEnter = false;
             IsCode = true;
 
-            showToastr(Localizer["Email was succesfuly sent"]);
+            showToastr("", Localizer["Email was succesfuly sent"]);
         }
         else
         {

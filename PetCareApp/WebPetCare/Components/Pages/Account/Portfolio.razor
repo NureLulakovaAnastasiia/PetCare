@@ -129,11 +129,17 @@
     private string Description { get; set; }
     private IBrowserFile SelectedFile;
     private string? UploadedImage;
+    private const long MaxFileSize = 2 * 1024 * 1024;
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
         SelectedFile = e.File;
-
+        if (SelectedFile.Size > MaxFileSize)
+        {
+            UploadedImage = null;
+            showToastr(Localizer["TooBigImage"]);
+            return;
+        }
         using var stream = new MemoryStream();
         await SelectedFile.OpenReadStream(long.MaxValue).CopyToAsync(stream);
         UploadedImage = $"data:{SelectedFile.ContentType};base64,{Convert.ToBase64String(stream.ToArray())}";

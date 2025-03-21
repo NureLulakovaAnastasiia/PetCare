@@ -513,6 +513,9 @@
   <data name="To" xml:space="preserve">
     <value>До</value>
   </data>
+  <data name="TooBigImage" xml:space="preserve">
+    <value>Розмір фото завеликий! Максимальний розмір - 2МБ.</value>
+  </data>
   <data name="Type" xml:space="preserve">
     <value>Вид</value>
   </data>

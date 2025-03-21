@@ -85,14 +85,17 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        userPets.Clear();
-        var res = await _userService.GetUserPets();
-        if(res != null)
+        if (firstRender)
         {
-            userPets.AddRange(res);
+            userPets.Clear();
+            var res = await _userService.GetUserPets();
+            if (res != null)
+            {
+                userPets.AddRange(res);
+            }
+            userPets.Add(chosenPet);
+            StateHasChanged();
         }
-        userPets.Add(chosenPet);
-        StateHasChanged();
     }
 
     public void GoBack()
