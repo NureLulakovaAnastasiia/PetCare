@@ -16,6 +16,7 @@ namespace PetCareApp.Models
         public string? Phone {  get; set; } = string.Empty;
         public byte[]? Photo {  get; set; } 
 
+        public string? GoogleId { get; set; }
         public List<Pet> Pets { get; set; } = new List<Pet>();
         public Contacts Contacts { get; set; } = new Contacts();
         public Organization? Organization { get; set; }

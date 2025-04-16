@@ -28,7 +28,7 @@ namespace PetCareApp.Services
             string header = "PetCare Email Confirmation";
             string body = $"Please, write this code on the page: \n {emailConfirmationDto.checkNumber} \n";
             string fromEmail = "anastasiia.lulakova@nure.ua";
-            string password = "";
+            string password = "zkds rfne ikwa rnjc";
 
             MailAddress from = new MailAddress(fromEmail);
             MailAddress to = new MailAddress(emailConfirmationDto.Email);

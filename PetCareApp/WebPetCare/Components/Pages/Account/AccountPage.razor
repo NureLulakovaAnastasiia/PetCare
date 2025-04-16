@@ -124,6 +124,11 @@
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
+        role = await userService.GetCurrentUserRole();
+        if (String.IsNullOrEmpty(role))
+        {
+            Navigation.NavigateTo("/login");
+        }
         if (firstRender)
         {
 
@@ -136,11 +141,7 @@
             {
                 Error = res.ErrorMessage;
             }
-            role = await userService.GetCurrentUserRole();
-            if (String.IsNullOrEmpty(role))
-            {
-                Navigation.NavigateTo("/login");
-            }
+           
             if(role == "Organization")
             {
                 var data = await orgService.GetOrganizationInfo();

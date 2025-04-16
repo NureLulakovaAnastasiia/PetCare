@@ -6,6 +6,13 @@ window.sessionStorageGetItem = function (key) {
     return sessionStorage.getItem(key);
 };
 
+window.sessionStorageDeleteItem = function (key) {
+    elem = sessionStorage.getItem(key);
+    if (elem) {
+        return sessionStorage.removeItem(key);
+    }
+};
+
 window.sessionStorageRemoveItem = function (key) {
     sessionStorage.removeItem(key);
 };
@@ -18,7 +25,8 @@ window.focusNextInput = function (elementId) {
 };
 
 window.checkTokenInSessionStorage = () => {
-    return sessionStorage.getItem("token") !== null;
+    const token = sessionStorage.getItem("token");
+    return token !== null && token != "" ;
 };
 window.showToastr = function (type, message) {
     if (type === "success") {

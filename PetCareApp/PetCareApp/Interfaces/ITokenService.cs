@@ -9,7 +9,8 @@ namespace PetCareApp.Interfaces
 
         ClaimsPrincipal? CheckToken(string token);
 
+        bool CheckGoogleIds(string idToCheck, string realId);
 
-
+        string CreateHash(string value);
     }
 }

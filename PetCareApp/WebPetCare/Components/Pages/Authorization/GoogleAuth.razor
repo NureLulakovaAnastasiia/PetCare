@@ -53,6 +53,7 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        
         await CheckAuthorization();
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
@@ -65,39 +66,55 @@ else
                 Navigation.NavigateTo("/account");
                 return;
             }
-            email = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
-            var firstName = user.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? "";
-            var lastName = user.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
-            var profilePictureUrl = user.FindFirst("urn:google:picture")?.Value;
-
-            if (String.IsNullOrEmpty(email))
-            {
-                showToastr(Localizer["ErrorEmail"]);
-                Navigation.NavigateTo("/login");
-                return;
-            }
-
-            var res = await CheckEmail();
-            if (res)
-            {
-                showToastr("", Localizer["SuccesfulLogin"]);
-                Navigation.NavigateTo("/");
-            }
             else
             {
-                userDto = new AppUser
-                        {
-                            Email = email,
-                            FirstName = firstName,
-                            LastName = lastName,
-                            Photo = await DownloadImageAsByteArray(profilePictureUrl ?? ""),
-                            Contacts = new Contacts() { AppUserId = "" }
-                        };
+                email = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+                var firstName = user.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? "";
+                var lastName = user.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
+                var profilePictureUrl = user.FindFirst("urn:google:picture")?.Value;
+                var id = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
 
-                IsRole = true;
+                if (String.IsNullOrEmpty(email))
+                {
+                    showToastr(Localizer["ErrorEmail"]);
+                    Navigation.NavigateTo("/login");
+                    return;
+                }
+
+                userDto = new AppUser
+                    {
+                        Email = email,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        GoogleId = id,
+                        Photo = await DownloadImageAsByteArray(profilePictureUrl ?? ""),
+                        Contacts = new Contacts() { AppUserId = "" }
+                    };
+
+                var res = await CheckEmail(id);
+
+                if (res)
+                {
+                    showToastr("", Localizer["SuccesfulLogin"]);
+                    Navigation.NavigateTo("/account");
+                    IsRole = true;
+                    return;
+                }
+                else
+                {
+                    await RegisterUser();
+                    return;
+                }
             }
         }
+        else
+        {
+            showToastr(Localizer["ErrorEmail"]);
+            Navigation.NavigateTo("/login");
+            return;
+        }
         Navigation.NavigateTo("/login");
+
     }
 
     private async Task<byte[]> DownloadImageAsByteArray(string imageUrl)
@@ -106,9 +123,9 @@ else
         return await client.GetByteArrayAsync(imageUrl);
     }
 
-    private async Task<bool> CheckEmail()
+    private async Task<bool> CheckEmail(string id)
     {
-        var res = await _authService.CheckGoogleLogin(email);
+        var res = await _authService.CheckGoogleLogin(email, id);
         if (res.Data)
         {
             await UpdateAuthenticationStatus(true);

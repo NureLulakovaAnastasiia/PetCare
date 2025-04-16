@@ -182,12 +182,17 @@ namespace WebPetCare.Services
             await _jsRuntime.InvokeVoidAsync("sessionStorageSetItem", name, token);
         }
 
+        public async Task DeleteStoreItemAsync(string name)
+        {
+            await _jsRuntime.InvokeVoidAsync("sessionStorageRemoveItem", name);
+        }
+
         public async Task<string> Logout()
         {
             try
             {
-                await SetStoreItemAsync("", "token");
-                await SetStoreItemAsync("", "role");
+                await DeleteStoreItemAsync("token");
+                await DeleteStoreItemAsync("role");
                 return string.Empty;
             }
             catch (Exception ex)
@@ -213,12 +218,12 @@ namespace WebPetCare.Services
         }
 
 
-        public  async Task<Result<bool>> CheckGoogleLogin(string email)
+        public  async Task<Result<bool>> CheckGoogleLogin(string email, string id)
         {
             var res= new Result<bool>();
             try
             {
-                string fullUrl = $"{_apiUrl}/api/account/googleCheckEmail?email={email}";
+                string fullUrl = $"{_apiUrl}/api/account/googleCheckEmail?email={email}&id={id}";
 
                 HttpResponseMessage response = await _httpClient.GetAsync(fullUrl);
 

@@ -3,6 +3,7 @@ using PetCareApp.Interfaces;
 using PetCareApp.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace PetCareApp.Service
@@ -86,6 +87,27 @@ namespace PetCareApp.Service
             }
 
             return roles[0];
+        }
+
+        public bool CheckGoogleIds(string idToCheck, string realId)
+        {
+            var res = CreateHash(idToCheck);
+            return res == realId;
+        }
+
+        public string CreateHash(string value)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(value));
+
+                StringBuilder builder = new StringBuilder();
+                foreach (byte b in bytes)
+                {
+                    builder.Append(b.ToString("x2")); 
+                }
+                return builder.ToString();
+            }
         }
     }
 }

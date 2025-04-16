@@ -8,7 +8,7 @@ namespace WebPetCare.Services
 {
     public class BaseService
     {
-        protected readonly HttpClient _httpClient;
+        protected  HttpClient _httpClient;
         protected readonly string _apiUrl = "";
         private readonly IJSRuntime _jsRuntime;
 
@@ -29,6 +29,7 @@ namespace WebPetCare.Services
         {
             try
             {
+                _httpClient = await HttpService.GetHttpClient(_httpClient, _jsRuntime);
                 string fullUrl = $"{_apiUrl}/api/Account/getUserRole";
 
                 HttpResponseMessage response = await _httpClient.GetAsync(fullUrl);

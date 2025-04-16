@@ -132,7 +132,7 @@ namespace PetCareApp.Controllers
         }
 
         [HttpGet("googleCheckEmail")]
-        public async Task<IActionResult> GoogleCheckEmail([FromQuery] string email)
+        public async Task<IActionResult> GoogleCheckEmail([FromQuery] string email, [FromQuery] string id)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null) //register, choose role
@@ -141,6 +141,13 @@ namespace PetCareApp.Controllers
             }
             else //login
             {
+                //compare hashed id with user.googleid
+                var res = _tokenService.CheckGoogleIds(id, user.GoogleId);
+                if (!res)
+                {
+                    return NotFound("Something went wrong with your google account");
+                }
+
                 var roles = await _userManager.GetRolesAsync(user);
                 if (!roles.Any())
                 {
@@ -168,6 +175,9 @@ namespace PetCareApp.Controllers
                 userToAdd.Contacts = null;
                 userToAdd.UserName = userToAdd.Email;
                 userToAdd.EmailConfirmed = true;
+                if (userToAdd.GoogleId != null){
+                    userToAdd.GoogleId = _tokenService.CreateHash(userToAdd.GoogleId);
+                }
                 var createdUser = await _userManager.CreateAsync(userToAdd, "User$123");
                 if (createdUser.Succeeded)
                 {

@@ -14,7 +14,7 @@ namespace PetCareApp.Mappings
                 Photo = review.Photo,
                 Rate = review.Rate,
                 AppUserId = review.AppUserId,
-                AppUserName = review.AppUser != null ? review.AppUser.FirstName + review.AppUser.LastName : "",
+                AppUserName = review.AppUser != null ? review.AppUser.FirstName + " " + review.AppUser.LastName : "",
                 ServiceId = review.ServiceId,
                 ServiceName  = review.Service != null ? review.Service.Name : ""
             };
@@ -33,7 +33,7 @@ namespace PetCareApp.Mappings
                     Id = comment.Id,
                     Text = comment.Text,
                     AppUserId = comment.AppUserId,
-                    AppUserName = comment.AppUser != null ? comment.AppUser.FirstName + comment.AppUser.LastName : "",
+                    AppUserName = comment.AppUser != null ? comment.AppUser.FirstName + " " + comment.AppUser.LastName : "",
                     ReviewId = comment.ReviewId
                 });
             }
