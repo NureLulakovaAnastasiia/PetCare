@@ -500,8 +500,10 @@ namespace PetCareApp.Services
                                 && x.StartTime.Date == startTime.Date
                                 && x.Status != "Cancelled").ToList();
             intersections = intersections
-                .Where(x => (endTime > x.StartTime && startTime > x.EndTime)
-                || (startTime >= x.StartTime && (endTime >= x.EndTime && endTime != x.StartTime)))
+                .Where(x => (startTime <= x.StartTime && endTime > x.StartTime) 
+                || (startTime > x.StartTime && startTime < x.EndTime)
+                || (startTime == x.StartTime && endTime == x.EndTime)
+                )
                 .ToList();
 
             if (intersections.Any())

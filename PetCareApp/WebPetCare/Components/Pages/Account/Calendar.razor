@@ -658,18 +658,24 @@
     private DateTime? GetUntilDate(string rule)
     {
         DateTime? endDate = null;
-        if (rule != null)
+        try
         {
-            var index = rule.IndexOf("UNTIL=");
-            if (index != -1)
+            if (rule != null)
             {
-                string format = "yyyyMMdd'T'HHmmss'Z'";
-                string dateString = rule.Substring(index + 6);
-                if (String.IsNullOrEmpty(dateString))
+                var index = rule.IndexOf("UNTIL=");
+                if (index != -1)
                 {
-                    endDate = DateTime.ParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                    string format = "yyyyMMdd'T'HHmmss'Z';";
+                    string dateString = rule.Substring(index + 6);
+                    if (!String.IsNullOrEmpty(dateString))
+                    {
+                        endDate = DateTime.ParseExact(dateString, format, CultureInfo.InvariantCulture);
+                    }
                 }
             }
+        }catch(Exception ex)
+        {
+            
         }
         return endDate;
     }

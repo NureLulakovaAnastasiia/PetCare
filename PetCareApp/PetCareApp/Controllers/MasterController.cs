@@ -260,7 +260,9 @@ namespace PetCareApp.Controllers
             }
             var slots = _masterService.GetFreeTimeSlots(time, serviceId, masterId);
             var optimizedSlots  = _masterService.GetBetterFreeTimeSlots(time, serviceId, masterId);
-
+            optimizedSlots = slots
+                .Where(s => !optimizedSlots.Any(os => os.StartTime == s.StartTime && os.Date == s.Date))
+                .ToList();
             if (!slots.Any())
             {
                 return StatusCode(500, "Error during getting timeslots");

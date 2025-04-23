@@ -23,14 +23,14 @@
             if (users != null && users.Count > 0)
             {
                 var data = await _searchService.GetServicesContacts(users);
-                if(data != null)
+                if (data != null)
                 {
                     contacts = data;
                     generateMarkers();
                     _objectReference = DotNetObjectReference.Create(this);
                     await _JSRuntime.InvokeVoidAsync("registerMapInterop", _objectReference);
                     await _JSRuntime.InvokeVoidAsync("initMap", MapId, markers);
-                    
+
                 }
             }
         }

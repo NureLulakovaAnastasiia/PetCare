@@ -56,7 +56,7 @@
                                                 var questionInd = questions.IndexOf(question);
                                             }
                                             <div class="row align-items-center justify-content-center offset-1">
-                                                <button class="btn btn-func btn-danger p-1 m-3 col-2 " @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash"></i>   @Localizer["Delete Question"]</button>
+                                                <button type="button" class="btn btn-func btn-danger p-1 m-3 col-2 " @onclick="() => deleteQuestion(questionInd)"><i class="bi bi-trash"></i>   @Localizer["Delete Question"]</button>
                                                 <button class="btn btn-func btn-success m-3 col-3" type="button" @onclick="() => AddAnswer(questionInd)"><i class="bi bi-plus-circle"></i>  @Localizer["Add Answer"]</button>
                                                 <InputCheckbox class="col-1 ms-4 p-3 form-check-input" style="font-size: 20px;" @bind-Value="question.HasAnswerWithFixedTime" @onclick="() => ChooseFixedQuestion(questionInd)"></InputCheckbox>
                                                 <label class="form-check-label  col-3 text-start ms-2 ps-1"> @Localizer["Is Time Fixed"]</label>
