@@ -9,7 +9,7 @@ namespace PetCareApp.Interfaces
         public Task<string> AcceptMasterRequest(int requestId);
         public Task<string> RejectMasterRequest(int requestId);
         public Task<List<GetRequestDto>> GetRequests();
-
+        public Task<Result<OrganizationInfo>> GetCurrentMasterOrg();
         public Task<string> UpsertMasterSchedule(List<ScheduleDto> scheduleDto, string masterId);
         public Task<string> UpsertMasterBreaks(List<BreakDto> breakDto, string masterId);
         public Task<Result<OrganizationInfo>> GetOrganizationInfo(); 

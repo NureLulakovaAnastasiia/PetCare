@@ -144,6 +144,9 @@
   <data name="Choose" xml:space="preserve">
     <value>Обрати</value>
   </data>
+  <data name="Current Organization" xml:space="preserve">
+    <value>Поточна організація</value>
+  </data>
   <data name="Date" xml:space="preserve">
     <value>Дата</value>
   </data>
@@ -177,6 +180,9 @@
   <data name="Finish" xml:space="preserve">
     <value>Завершити</value>
   </data>
+  <data name="Fire" xml:space="preserve">
+    <value>Звільнитись</value>
+  </data>
   <data name="Fire employee" xml:space="preserve">
     <value>Звільнити робітника</value>
   </data>
@@ -191,6 +197,9 @@
   </data>
   <data name="My portfolio" xml:space="preserve">
     <value>Моє портфоліо</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Назва</value>
   </data>
   <data name="New" xml:space="preserve">
     <value>Новий</value>

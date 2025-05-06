@@ -215,5 +215,18 @@ namespace PetCareApp.Controllers
             }
             return StatusCode(500, res.ErrorMessage);
         }
+
+        [HttpGet("getCurrentMasterOrg")]
+        [Authorize(Roles = "Master")]
+
+        public async Task<IActionResult> GetCurrentMasterOrg()
+        {
+            var res = await _organizationService.GetCurrentMasterOrg();
+            if (res != null && res.IsSuccess)
+            {
+                return Ok(res.Data);
+            }
+            return StatusCode(500, res.ErrorMessage);
+        }
     }
 }

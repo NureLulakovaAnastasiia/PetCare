@@ -488,5 +488,15 @@ namespace PetCareApp.Controllers
             }
             return StatusCode(500, res.ErrorMessage);
         }
+
+        [HttpGet("getRecordOwner")]
+        [Authorize]
+        public async Task<IActionResult> GetRecordOwner([FromQuery] int recordId)
+        {
+            var res = await _masterService.GetRecordOwner(recordId);
+            
+                return Ok(res);
+            
+        }
     }
 }

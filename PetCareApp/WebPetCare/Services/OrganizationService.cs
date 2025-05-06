@@ -488,5 +488,38 @@ namespace WebPetCare.Services
 
             return res;
         }
+
+        public async Task<Result<OrganizationInfo>> GetCurrentMasterOrganization()
+        {
+            var res = new Result<OrganizationInfo>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Organization/getCurrentMasterOrg";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    var data = JsonSerializer.Deserialize<OrganizationInfo>(result, options);
+                    if (data != null)
+                    {
+                        res.Data = data;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
     }
 }

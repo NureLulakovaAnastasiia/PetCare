@@ -6,6 +6,7 @@
 @using Syncfusion.Blazor.Popups
 @using System.Collections.ObjectModel
 @using Syncfusion.Blazor.SplitButtons
+@using System.ComponentModel.DataAnnotations
 @inject SfDialogService DialogService
 @inject IServiceService service
 @inject IOrganizationService orgService
@@ -17,23 +18,24 @@
 <div class="row justify-content-center mb-4">
     <h2 class="col-5 offset-4">@Localizer["Schedule"]</h2>
 </div>
-@if(isOrganization && employeesList != null)
+@if (isOrganization && employeesList != null)
 {
     <div class="mb-3 col-5 offset-4">
-        <SfDropDownList ID="dropdown" TValue="string"  TItem="ShortEmployeeDto" Placeholder="Select a master" DataSource="@employeesList" @bind-Value="@selectedMaster.Id"  >
-        <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+        <SfDropDownList ID="dropdown" TValue="string" TItem="ShortEmployeeDto" Placeholder="Select a master" DataSource="@employeesList" @bind-Value="@selectedMaster.Id">
+            <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
             <DropDownListEvents TValue="string" TItem="ShortEmployeeDto" ValueChange="ChangeMaster"></DropDownListEvents>
-    </SfDropDownList>
+        </SfDropDownList>
     </div>
 }
 <div class="row">
     <_GoogleCalendar></_GoogleCalendar>
 </div>
-<SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" AllowOverlap="false" EnableAdaptiveUI="true" StartHour="6:00" ShowQuickInfo="false" EnableAllDayScroll="true" Height="700"
-            SelectedDateChanged="DateRangeChanged" >
+<SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" @ref="@ScheduleRef" AllowOverlap="false" EnableAdaptiveUI="true" StartHour="6:00" ShowQuickInfo="false" EnableAllDayScroll="true" Height="700"
+            SelectedDateChanged="DateRangeChanged">
     <ScheduleTemplates>
         <EditorTemplate>
-         
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <ValidationSummary></ValidationSummary>
             <table class="custom-event-editor" width="100%" cellpadding="5">
                 @{
                     var data = context as AppointmentData;
@@ -42,51 +44,83 @@
                 <tbody>
                     @if (String.IsNullOrEmpty(data.Type))
                     {
-                        <tr >
+                        <tr>
                             <td colspan="2" class="text-center">
                                 <SfButtonGroup Mode="Syncfusion.Blazor.SplitButtons.SelectionMode.Single">
-                                    <ButtonGroupButton @bind-Selected="@isRecord" >@Localizer["Record"]</ButtonGroupButton>
-                                    <ButtonGroupButton @bind-Selected="@isBreak" >@Localizer["Break"]</ButtonGroupButton>
+                                    <ButtonGroupButton @bind-Selected="@isRecord">@Localizer["Record"]</ButtonGroupButton>
+                                    <ButtonGroupButton @bind-Selected="@isBreak">@Localizer["Break"]</ButtonGroupButton>
                                 </SfButtonGroup>
-                              </td>
+                            </td>
                         </tr>
                     }
 
                     @if (data.Type == "Record" || isRecord)
                     {
-                        <tr class="text-end justify-content-end">
-                        @if(data.PetId != null)
-                        {
-                          <td colspan="2">
-                            <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnPet">
-                                <ContentTemplate>
-                                    <div id='democontent'>
-                                        <div class="ms-0 text-center green-blue-text">
-                                            <h6>@Localizer["Chosen pet"]</h6>
-                                            <p>@Localizer["Name"]: @Pet.Name</p>
-                                            <p>@Localizer["Breed"]: @Pet.Breed </p>
+                        <tr class="text-end">
+                            <td></td>
+                            <td>
+                                <div class="row justify-content-end">
+                                    @if (data.PetId != null)
+                                    {
+                                        <div class="col-5">
+                                        <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnPet">
+                                            <ContentTemplate>
+                                                <div id='democontent'>
+                                                    <div class="ms-0 text-center green-blue-text">
+                                                        <h6>@Localizer["Chosen pet"]</h6>
+                                                        <p>@Localizer["Name"]: @Pet.Name</p>
+                                                        <p>@Localizer["Breed"]: @Pet.Breed </p>
+                                                    </div>
+
+                                                </div>
+                                            </ContentTemplate>
+                                            <ChildContent>
+                                                <button class="btn btn-info m-0 p-1" style="font-size: 0.7rem" ID="btnPet" @onclick="() => GetPet(data.PetId.Value)">   @Localizer["Show pet"] </button>
+                                            </ChildContent>
+                                        </SfTooltip>
                                         </div>
-                                       
+                                    }
+
+                                    <div class="col-5">
+                                        <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnCustomer">
+                                            <ContentTemplate>
+                                                <div id='democontent'>
+                                                    <div class="ms-0 text-center green-blue-text">
+                                                        <h6>@Localizer["Contacts"]</h6>
+                                                        @if (customer.IsSuccess)
+                                                        {
+                                                            <p>@Localizer["Name"]: @customer.Data.Name</p>
+                                                            <p>@Localizer["Phone"]: @customer.Data.Phone </p>
+                                                        }
+                                                        else if (customer.ErrorMessage.Contains("master"))
+                                                        {
+                                                            <p>@Localizer["Created by master"]</p>
+                                                        }
+                                                    </div>
+
+                                                </div>
+                                            </ContentTemplate>
+                                            <ChildContent>
+                                                <button class="btn btn-info m-0 p-1" style="font-size: 0.7rem" ID="btnCustomer" @onclick="() => GetCustomer(data.Id)">   @Localizer["Show customer data"] </button>
+                                            </ChildContent>
+                                        </SfTooltip>
                                     </div>
-                                </ContentTemplate>
-                                <ChildContent>
-                                    <button class="btn btn-info m-0 p-1" style="font-size: 0.7rem" ID="btnPet" @onclick="() => GetPet(data.PetId.Value)">   @Localizer["Show pet"] </button>
-                                </ChildContent>
-                            </SfTooltip>
+                                </div>
                             </td>
-                        }
                         </tr>
                         <tr>
                             <td class="e-textlabel">@Localizer["Service Name"]</td>
-                        <td colspan="4">
-                            <SfDropDownList TValue="int" TItem="ServiceName" @bind-Value="@(data.ServiceId)" Placeholder="@Localizer["Select a service name"]" DataSource="@serviceNames">
-                                <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
-                                <DropDownListEvents TValue="int" TItem="ServiceName"></DropDownListEvents>
-                            </SfDropDownList>
-                        </td>
-                    </tr>
+                            <td colspan="4">
+                                <SfDropDownList TValue="int" TItem="ServiceName" @bind-Value="data.ServiceId" Placeholder="@Localizer["Select a service name"]"
+                                                DataSource="@serviceNames" @bind-Index="ddlIndex">
+                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="int" TItem="ServiceName"></DropDownListEvents>
+                                </SfDropDownList>
+                                <ValidationMessage For="@(() => data.ServiceId)" />
+                            </td>
+                        </tr>
                     }
-                    
+
                     <tr>
                         <td class="e-textlabel">@Localizer["From"]</td>
                         <td colspan="4">
@@ -103,19 +137,21 @@
                         <td class="e-textlabel">@Localizer["Description"]</td>
                         <td colspan="4">
                             <SfTextBox Multiline="true" @bind-Value="@(data.Description)"></SfTextBox>
+
                         </td>
                     </tr>
-                    @if (data.Type == "Break" || isBreak){
+                    @if (data.Type == "Break" || isBreak)
+                    {
                         <tr>
                             <td class="e-textlabel">@Localizer["Recurrence"]</td>
                             <td colspan="4">
-                                <SfRecurrenceEditor @bind-Value="@(data.RecurrenceRule)" Frequencies="@Repeats"  >
+                                <SfRecurrenceEditor @bind-Value="@(data.RecurrenceRule)" Frequencies="@Repeats">
 
                                 </SfRecurrenceEditor>
                             </td>
                         </tr>
                     }
-                    else
+                    else if (isRecord)
                     {
                         <tr>
                             <td class="e-textlabel">@Localizer["Status"]</td>
@@ -124,10 +160,14 @@
                                     @if (data.Status.Id == 3)
                                     {
                                         <h5 class="text-danger">@Localizer["Cancelled"]</h5>
-                                    }else{
-                                    <SfDropDownList TValue="int" TItem="Status" Placeholder="@Localizer["Change status"]" DataSource="@StatusData" @bind-Value="@data.Status.Id">
-                                        <DropDownListFieldSettings Value="Id" Text="Name" ></DropDownListFieldSettings>
-                                    </SfDropDownList>
+                                    }
+                                    else
+                                    {
+                                        <SfDropDownList TValue="int" TItem="Status" Placeholder="@Localizer["Change status"]"
+                                                        DataSource="@StatusData" @bind-Value="@data.Status.Id" @bind-Index="ddlIndex2">
+                                            <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                        <ValidationMessage For="@(() => data.Status)" />
                                     }
                                 </div>
                             </td>
@@ -138,20 +178,20 @@
         </EditorTemplate>
     </ScheduleTemplates>
 
-    <ScheduleEventSettings TValue="AppointmentData" DataSource="@events" >
-@*         <ScheduleField Id="Id">
-            <FieldSubject Name="ServiceName"></FieldSubject>
-            <FieldDescription Name="Description"></FieldDescription>
-            <FieldStartTime Name="StartTime"></FieldStartTime>
-            <FieldEndTime Name="EndTime"></FieldEndTime>
+    <ScheduleEventSettings TValue="AppointmentData" DataSource="@events">
+        @*         <ScheduleField Id="Id">
+        <FieldSubject Name="ServiceName"></FieldSubject>
+        <FieldDescription Name="Description"></FieldDescription>
+        <FieldStartTime Name="StartTime"></FieldStartTime>
+        <FieldEndTime Name="EndTime"></FieldEndTime>
         </ScheduleField>
 
 
- *@    
+        *@
 
     </ScheduleEventSettings>
 
-    <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen"  ActionCompleted="UpdateDataInDb"></ScheduleEvents>
+    <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen" OnEventDoubleClick="OnEventClick" OnEventClick="OnEventClick" ActionCompleted="UpdateDataInDb"></ScheduleEvents>
     <ScheduleViews>
         <ScheduleView Option="View.Day"></ScheduleView>
         <ScheduleView Option="View.Week"></ScheduleView>
@@ -183,6 +223,31 @@
     private bool isDisposed = false;
     private bool isCalendar = false;
     private PetDto Pet = new PetDto();
+    private Result<UserContactsDto> customer = new Result<UserContactsDto>() { Data = new UserContactsDto() };
+    SfSchedule<AppointmentData> ScheduleRef;
+    private int? ddlIndex { get; set; } = 0;
+    private int? ddlIndex2 { get; set; } = 0;
+
+
+    public async Task OnEventClick(EventClickArgs<AppointmentData> args)
+    {
+        if (args.Event.Type == "Break")
+        {
+            isRecord = false;
+            isBreak = true;
+            if (!String.IsNullOrEmpty(args.Event.RecurrenceRule))
+            {
+                args.Cancel = true;
+                await ScheduleRef.OpenEditorAsync(args.Event, CurrentAction.Save);
+
+            }
+        }
+        else
+        {
+            isRecord = true;
+            isBreak = false;
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -203,7 +268,8 @@
             await ChangeMaster();
         }
         var culture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-        if (localizeStatus.ContainsKey(culture)) {
+        if (localizeStatus.ContainsKey(culture))
+        {
             StatusData = localizeStatus[culture];
         }
     }
@@ -257,7 +323,7 @@
         foreach (var record in getRecords)
         {
             var same = events.FirstOrDefault(e => e.Id == record.Id);
-            if(same != null)
+            if (same != null)
             {
                 events.Remove(same);
             }
@@ -268,7 +334,7 @@
                     Subject = record.ServiceName,
                     StartTime = record.StartTime,
                     EndTime = record.EndTime,
-                Status = status == null ? new Status() { Id = 3, Name = "Cancelled" } : status,
+                    Status = status == null ? new Status() { Id = 3, Name = "Cancelled" } : status,
                     Description = record.Description,
                     Comment = record.Comment != null ? record.Comment : "",
                     ServiceId = record.ServiceId,
@@ -312,9 +378,9 @@
                     var created = GetWeeklyBreak(breaks[i], ids, rule);
 
                     events.Add(created);
-                    foreach(var item in sameDateTime)
+                    foreach (var item in sameDateTime)
                     {
-                        if(breaks.IndexOf(item) > i)
+                        if (breaks.IndexOf(item) > i)
                         {
                             breaks.Remove(item);
                         }
@@ -343,7 +409,7 @@
 
     private async void UpdateDataInDb(ActionEventArgs<AppointmentData> args)
     {
-        if(args.ActionType == ActionType.EventChange)
+        if (args.ActionType == ActionType.EventChange)
         {
             var changedEvents = new List<GetRecordDto>();
             var changedBreaks = new List<BreakDto>();
@@ -352,7 +418,8 @@
                 if (rec.Type == "Record")
                 {
                     changedEvents.Add(mapAppointment(rec));
-                }else if(rec.Type == "Break")
+                }
+                else if (rec.Type == "Break")
                 {
                     var added = args.AddedRecords.Where(x => x.RecurrenceID == rec.Id).FirstOrDefault();
                     if (added != null)
@@ -386,14 +453,16 @@
                 availableDates.Clear();
                 DateRangeChanged(changedEvents[0].StartTime);
             }
-        }else if(args.ActionType == ActionType.EventCreate)
+        }
+        else if (args.ActionType == ActionType.EventCreate)
         {
             if (args.AddedRecords.Count > 0)
             {
                 await AddNewRecords(args.AddedRecords);
                 await OnAfterRenderAsync(true);
             }
-        }else if(args.ActionType == ActionType.EventRemove)
+        }
+        else if (args.ActionType == ActionType.EventRemove)
         {
             if (args.DeletedRecords != null && args.DeletedRecords.Count > 0)
             {
@@ -425,9 +494,9 @@
     {
         List<GetRecordDto> recordsToAdd = new List<GetRecordDto>();
         List<BreakDto> breaksToAdd = new List<BreakDto>();
-        foreach(var item in records)
+        foreach (var item in records)
         {
-            if(item.Type == "Break" || isBreak)
+            if (item.Type == "Break" || isBreak)
             {
                 breaksToAdd.AddRange(await mapBreak(item, true));
             }
@@ -437,15 +506,15 @@
             }
         }
         string temp = "";
-        if(recordsToAdd.Count > 0)
+        if (recordsToAdd.Count > 0)
         {
 
-            foreach(var record in recordsToAdd)
+            foreach (var record in recordsToAdd)
             {
                 temp += await _userService.AddRecord(new RecordDto(record));
             }
         }
-        if(breaksToAdd.Count > 0)
+        if (breaksToAdd.Count > 0)
         {
             breaksToAdd.ForEach(x => x.Id = 0);
             temp += await _userService.UpsertBreaks(breaksToAdd, selectedMaster.Id);
@@ -458,7 +527,7 @@
         else
         {
             showToastr(temp);
-            foreach(var rec in records)
+            foreach (var rec in records)
             {
                 events.Remove(rec);
             }
@@ -471,7 +540,7 @@
         var names = await _userService.GetMasterServicesNames(selectedMaster.Id);
         if (names.IsSuccess)
         {
-            foreach(var item in names.Data)
+            foreach (var item in names.Data)
             {
                 if (serviceNames.Find(x => x.Id == item.Key) == null)
                 {
@@ -494,7 +563,9 @@
     {
         if (args.Type == PopupType.Editor)
         {
-            if (args.Data is AppointmentData appointment && (appointment.Status.Id == 3 || appointment.Status.Id == 0 || appointment.StartTime < DateTime.Now))
+            if (args.Data is AppointmentData appointment
+                && appointment.Type == "Record"
+                && (appointment.Status.Id == 3 || appointment.Status.Id == 0 || appointment.StartTime < DateTime.Now))
             {
                 await _JSRuntime.InvokeVoidAsync("hideDeleteButton");
             }
@@ -538,9 +609,9 @@
         if (String.IsNullOrEmpty(temp))
         {
             showToastr("", Localizer["Record was succesfully cancelled"]);
-            foreach(var item in records)
+            foreach (var item in records)
             {
-                if(item.Type == "Record")
+                if (item.Type == "Record")
                 {
                     item.CssClass = "e-red";
                     item.Status = new Status() { Id = 3, Name = "Cancelled" };
@@ -579,36 +650,38 @@
         var dayOfWeek = GetDaysOfWeek(data.RecurrenceRule);
 
         DateTime? endDate = data.EndTime.Date;
-        if (data.RecurrenceRule != null) {
+        if (data.RecurrenceRule != null)
+        {
             endDate = GetUntilDate(data.RecurrenceRule);
         }
 
         var id_ind = 0;
         var hasIds = data.breakIds != null && data.breakIds.Count == dayOfWeek.Count;
-        foreach (var dayOfWeekNum in dayOfWeek){
+        foreach (var dayOfWeekNum in dayOfWeek)
+        {
             var newBreak = new BreakDto
                 {
                     Id = hasIds ? data.breakIds[id_ind] : data.Id * -1,
                     StartTime = new TimeSpan(data.StartTime.Hour, data.StartTime.Minute, 0),
-                    EndTime = new TimeSpan(data.EndTime.Hour, data.EndTime.Minute, 0),       
+                    EndTime = new TimeSpan(data.EndTime.Hour, data.EndTime.Minute, 0),
                     StartDate = data.StartTime.Date,
                     EndDate = endDate,
                     DayOfWeek = dayOfWeekNum >= 0 ? dayOfWeekNum : null
-             };
+                };
             id_ind++;
             res.Add(newBreak);
         }
         if (res.Count > 0 && data.breakIds != null && res.Count != data.breakIds.Count)
         {
             var breaksToDelete = new List<int>();
-            foreach(var id in data.breakIds)
+            foreach (var id in data.breakIds)
             {
-                if(res.Where(e => e.Id == id).FirstOrDefault() == null)
+                if (res.Where(e => e.Id == id).FirstOrDefault() == null)
                 {
                     breaksToDelete.Add(id);
                 }
             }
-            if(await DeleteBreaks(breaksToDelete))
+            if (await DeleteBreaks(breaksToDelete))
             {
                 showToastr("", "Breaks were succefully deleted");
             }
@@ -673,9 +746,10 @@
                     }
                 }
             }
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
-            
+
         }
         return endDate;
     }
@@ -693,7 +767,7 @@
     public string GetRecurrenceForMultipleBreaks(List<BreakDto> breaks) //day when repeats
     {
         string rule = "";
-        foreach(var br in breaks)
+        foreach (var br in breaks)
         {
             var day = GetDayOfWeek(br.DayOfWeek);
             if (!String.IsNullOrEmpty(day))
@@ -701,7 +775,7 @@
                 rule = rule + day + ",";
             }
         }
-        if(rule.LastIndexOf(",") == rule.Length - 1)
+        if (rule.LastIndexOf(",") == rule.Length - 1)
         {
             rule = rule.Substring(0, rule.Length - 1);
         }
@@ -726,7 +800,7 @@
                 breakIds = ids
             };
 
-        if(breakDto.EndDate != null)
+        if (breakDto.EndDate != null)
         {
             res.RecurrenceRule += ";UNTIL=" + breakDto.EndDate.Value.ToString("yyyyMMdd'T'HHmmss'Z'", CultureInfo.InvariantCulture);
             //res.EndTime = breakDto.EndDate.Value + breakDto.EndTime;
@@ -737,25 +811,34 @@
     private async Task GetPet(int petId)
     {
         var res = await _userService.GetPetById(petId);
-        if(res != null)
+        if (res != null)
         {
             Pet = res;
             StateHasChanged();
         }
     }
 
+    private async Task GetCustomer(int recordId)
+    {
+        var res = await _userService.GetRecordOwner(recordId);
+        if (res != null)
+        {
+            customer = res;
+            StateHasChanged();
+        }
+    }
 
     private string GetDayOfWeek(int? dayOfWeek)
     {
         switch (dayOfWeek)
         {
-            case 0: return "SU"; 
-            case 1: return "MO"; 
-            case 2: return "TU"; 
-            case 3: return "WE"; 
+            case 0: return "SU";
+            case 1: return "MO";
+            case 2: return "TU";
+            case 3: return "WE";
             case 4: return "TH";
-            case 5: return "FR"; 
-            case 6: return "SA"; 
+            case 5: return "FR";
+            case 6: return "SA";
             default: return "";
         }
     }
@@ -829,12 +912,15 @@
         public string Location { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public string Description { get; set; }
+
+        public string Description { get; set; } = "";
         public string Comment { get; set; }
+        [Required]
         public Status Status { get; set; } = new Status();
         public bool IsAllDay { get; set; }
         public int? PetId { get; set; } = null;
         public string Type { get; set; }
+        [Required]
         public int ServiceId { get; set; }
         public string CssClass { get; set; } = "";
         public string RecurrenceRule { get; set; }
@@ -842,7 +928,7 @@
         public Nullable<int> RecurrenceID { get; set; }
         public List<int>? breakIds { get; set; } = null;
     }
-    
+
     List<RepeatType> Repeats = new List<RepeatType>()
     {
        RepeatType.None, RepeatType.Weekly
@@ -875,7 +961,7 @@
     }
 
 
-    .e-btn-group input:checked + label.e-btn{
+    .e-btn-group input:checked + label.e-btn {
         color: rgb(255, 255, 255);
         outline-offset: 0px;
         background: #023c57;
@@ -890,12 +976,12 @@
         transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .e-btn:hover {
-        color: #fff;
+        .e-btn:hover {
+            color: #fff;
             background: rgb(1, 77, 112);
             border-color: rgb(1, 77, 112);
-        transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
+            transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
     .e-footer-content .e-btn.e-primary.e-flat:not([disabled]) {
         color: rgb(255, 255, 255);
@@ -903,13 +989,13 @@
         border-color: rgb(var(--bs-primary-rgb));
     }
 
-    .e-footer-content .e-btn.e-primary.e-flat:not([disabled]):hover {
-        color: rgb(255, 255, 255);
-        background: rgb(3, 150, 113);
-        border-color: rgb(3, 150, 113);
-    }
+        .e-footer-content .e-btn.e-primary.e-flat:not([disabled]):hover {
+            color: rgb(255, 255, 255);
+            background: rgb(3, 150, 113);
+            border-color: rgb(3, 150, 113);
+        }
 
-    .custom-event-editor td{
+    .custom-event-editor td {
         padding: 7px;
         padding-right: 16px;
     }
@@ -929,7 +1015,7 @@
         }
 
 
-    .e-work-cells, .e-header-cells, .e-date-header, .e-resource-cells,  td {
+    .e-work-cells, .e-header-cells, .e-date-header, .e-resource-cells, td {
         color: var(--bs-secondary) !important;
         font-size: 1.1rem !important;
     }
@@ -947,21 +1033,21 @@
         border-top: 2px dotted #038c69 !important;
     }
 
-    .e-current-timeline{
+    .e-current-timeline {
         border-top: 2px solid #038c69 !important;
     }
 
-    .e-schedule .e-vertical-view .e-day-wrapper .e-appointment{
+    .e-schedule .e-vertical-view .e-day-wrapper .e-appointment {
         border-radius: 8px !important;
         font-weight: 400 !important;
-        color:#fff;
+        color: #fff;
     }
 
     .e-schedule .e-vertical-view .e-header-cells.e-current-day {
         color: var(--bs-primary) !important;
     }
 
-    .e-schedule .e-vertical-view .e-date-header-wrap{
+    .e-schedule .e-vertical-view .e-date-header-wrap {
         color: var(--bs-secondary) !important;
         font-size: 1.2rem !important;
     }
@@ -970,17 +1056,16 @@
         color: #023c57;
     }
 
-    .e-schedule .e-schedule-toolbar .e-toolbar-items .e-toolbar-item.e-date-range .e-tbar-btn .e-tbar-btn-text{
+    .e-schedule .e-schedule-toolbar .e-toolbar-items .e-toolbar-item.e-date-range .e-tbar-btn .e-tbar-btn-text {
         font-size: 1rem;
     }
 
     .e-calendar .e-content td.e-today.e-selected:hover span.e-day, .e-calendar .e-content td.e-selected:hover span.e-day, .e-calendar .e-content td.e-selected.e-focused-date span.e-day {
         background: var(--bs-primary);
         border: 1px solid var(--bs-primary);
-    
     }
 
-    .e-calendar .e-btn.e-today.e-flat.e-primary, .e-calendar .e-css.e-btn.e-today.e-flat.e-primary{
+    .e-calendar .e-btn.e-today.e-flat.e-primary, .e-calendar .e-css.e-btn.e-today.e-flat.e-primary {
         background: var(--bs-primary);
         border: 1px solid var(--bs-primary);
     }
@@ -990,10 +1075,10 @@
         color: #fff;
     }
 
-    .e-calendar .e-content td.e-today span.e-day, .e-calendar .e-content td.e-focused-date.e-today span.e-day:hover {
+        .e-calendar .e-content td.e-today span.e-day, .e-calendar .e-content td.e-focused-date.e-today span.e-day:hover {
             box-shadow: inset 2px 0 #038c69, inset 0 2px #038c69, inset -2px 0 #038c69, inset 0 -2px #038c69;
-        color: #fff;
-    }
+            color: #fff;
+        }
 
     .e-calendar .e-btn.e-today.e-flat.e-primary, .e-calendar .e-css.e-btn.e-today.e-flat.e-primary:hover {
         background: #038c69;
@@ -1006,12 +1091,13 @@
         box-shadow: inset 1px 0 var(--bs-primary), inset 0 1px var(--bs-primary), inset -1px 0 var(--bs-primary), inset 0 -1px var(--bs-primary);
         color: #fff;
     }
+
     .e-calendar .e-content td.e-today.e-selected:hover span.e-day, .e-calendar .e-content td.e-selected:hover span.e-day, .e-calendar .e-content td.e-selected.e-focused-date span.e-day:hover {
         background: #038c69;
         border: 1px solid #038c69;
     }
-    
-    .e-toolbar .e-toolbar-item .e-tbar-btn:hover{
+
+    .e-toolbar .e-toolbar-item .e-tbar-btn:hover {
         background: var(--bs-secondary);
         border-color: var(--bs-secondary);
         border-style: solid;
@@ -1043,7 +1129,7 @@
         box-shadow: inset 1px 1px var(--bs-secondary), inset -1px 0 var(--bs-secondary), inset 0 -1px var(--bs-secondary);
     }
 
-    .e-recurrenceeditor .e-recurrence-table{
+    .e-recurrenceeditor .e-recurrence-table {
         display: none;
     }
 
@@ -1079,7 +1165,7 @@
 
 </style>
 
-    <script>
+<script>
     window.hideDeleteButton = function () {
         setTimeout(() => {
             let deleteButton = document.querySelector('.e-event-delete');
@@ -1098,4 +1184,4 @@
         }, 100);
     };
 
-    </script>
+</script>

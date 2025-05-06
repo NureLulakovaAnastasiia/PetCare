@@ -1097,6 +1097,34 @@ namespace WebPetCare.Services
             }
             return null;
         }
+
+        public async Task<Result<UserContactsDto>> GetRecordOwner(int recordId)
+        {
+            var data = new Result<UserContactsDto>();
+            try
+            {
+                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                string fullUrl = $"{_apiUrl}/api/Master/getRecordOwner?recordId={recordId}";
+
+                HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    };
+                    data = JsonSerializer.Deserialize<Result<UserContactsDto>>(result, options);
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return data;
+        }
     }
     
 }

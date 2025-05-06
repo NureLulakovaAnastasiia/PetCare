@@ -14,7 +14,7 @@ namespace WebPetCare.IServices
         public Task<string> AcceptRequest(int requestId);
         public Task<string> RejectRequest(int requestId);
         public Task<Result<List<GetEmployeeDto>>> GetEmployees(int orgId);
-
+        public Task<Result<OrganizationInfo>> GetCurrentMasterOrganization();
         public Task<string> DismissEmployee(int employeeId);
 
         public Task<Result<List<OrganizationPortfolioDto>>> getOrganizationPortfolio(int orgId);

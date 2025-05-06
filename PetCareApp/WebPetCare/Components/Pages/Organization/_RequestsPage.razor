@@ -6,13 +6,36 @@
 @inject IStringLocalizer<Resources.EnumResources> EnumLocalizer
 
 
-<div class="d-flex justify-content-center">
+<div class="d-flex flex-column justify-content-center align-items-center">
+
+    @if (currentOrganization != null)
+    {
+
+        <div class="form-custom-border p-3 col-10 text-center mb-4">
+            <div class="row text-center">
+                <h3 class="col-8 offset-2"><b>@Localizer["Current Organization"]</b></h3>
+                <hr />
+            </div>
+            <div class="row align-items-center">
+                    <h4 class="green-blue-text">
+                    <NavLink @onclick="() => GoToOrgPage(currentOrganization.Id)" 
+                        class="nav-link nav-link-underline">@Localizer["Name"]: 
+                        <strong>@currentOrganization.Name</strong></NavLink>
+                    </h4>                
+            </div>
+        </div>
+    }
+
     <div class="col-lg-10 align-items-center text-center ">
         <div class="form-custom-border p-3 justify-content-center">
             <div class="row text-center">
                 <h3 class="col-8 offset-2"><b>@Localizer["Requests"]</b></h3>
                 <hr />
             </div>
+
+           
+
+
             @if (requests != null && requests.Count > 0)
             {
                 <div class="row justify-content-end">
@@ -88,7 +111,7 @@
     public string role { get; set; } = "Master";
     public List<GetRequestDto> requests { get; set; } = new List<GetRequestDto>();
     public List<GetRequestDto> filteredRequests { get; set; } = new List<GetRequestDto>();
-
+    public OrganizationInfo? currentOrganization { get; set; } = null;
     private SortOptions.SortDirection sortType = SortOptions.SortDirection.Newest;
     private SortOptions.FilterByRequestStatus filterType = SortOptions.FilterByRequestStatus.All;
 
@@ -122,6 +145,14 @@
                 requests = data;
                 FilterRequests();
                 SortRequests();
+                if(requests.Count != 0)
+                {
+                    var currentOrg = await orgService.GetCurrentMasterOrganization();
+                    if(currentOrg != null && currentOrg.IsSuccess)
+                    {
+                        currentOrganization = currentOrg.Data;
+                    }
+                }
 
             }
             else

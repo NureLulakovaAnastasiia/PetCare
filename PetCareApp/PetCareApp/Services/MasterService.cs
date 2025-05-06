@@ -1467,6 +1467,47 @@ namespace PetCareApp.Services
 
             return false;
         }
+
+        public async Task<Result<UserContactsDto>> GetRecordOwner(int recordId)
+        {
+            var res = new Result<UserContactsDto>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var record = _dbContext.Records
+                        .Where(x => x.Id == recordId)
+                        .Include(r => r.AppUser)
+                        .ThenInclude(u => u.Contacts)
+                        .Include(r => r.Service).FirstOrDefault();
+                    if (record != null && record.AppUser != null)
+                    {
+                        if(record.Service != null && record.AppUserId == record.Service.AppUserId)
+                        {
+                            res.ErrorMessage = "Created by master";
+                        }
+                        else
+                        {
+                            res.Data = new UserContactsDto
+                            {
+                                Name = record.AppUser.LastName + " " + record.AppUser.FirstName,
+                                Phone = record.AppUser.Contacts.Phone ?? "-"
+                            };
+                        }
+                    }
+                    else
+                    {
+                        res.ErrorMessage = "No record was found";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage += ex.Message;
+            }
+            return res;
+        }
     }   
 
 }

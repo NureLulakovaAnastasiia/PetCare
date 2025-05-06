@@ -346,22 +346,7 @@ namespace PetCareApp.Services
                 var user = await GetCurrentUserAsync();
                 if (user != null)
                 {
-                    var organization = _dbContext.Organizations.FirstOrDefault(o => o.AppUserId == user.Id);
-                    if (organization != null)
-                    {
-                        res.Data = new OrganizationInfo
-                        {
-                            Id = organization.Id,
-                            Name = organization.Name,
-                            AppUserId = organization.AppUserId,
-                            Photo = organization.Photo,
-                            Description = organization.Description
-                        };
-                    }
-                    else
-                    {
-                        res.Data = new OrganizationInfo();
-                    }
+                    res.Data = getOrgInfoByOwner(user.Id);
                 }
                 else
                 {
@@ -375,6 +360,25 @@ namespace PetCareApp.Services
 
             return res;
         }
+
+        private OrganizationInfo getOrgInfoByOwner(string orgIdOwner)
+        {
+            var organization = _dbContext.Organizations.FirstOrDefault(o => o.AppUserId == orgIdOwner);
+            if (organization != null)
+            {
+                var res = new OrganizationInfo
+                {
+                    Id = organization.Id,
+                    Name = organization.Name,
+                    AppUserId = organization.AppUserId,
+                    Photo = organization.Photo,
+                    Description = organization.Description
+                };
+                return res;
+            }
+            return new OrganizationInfo();
+        }
+
 
         public async Task<Result<OrganizationDetailsDto>> GetOrganizationDetails(int organizationId)
         {
@@ -782,6 +786,37 @@ namespace PetCareApp.Services
                     res.ErrorMessage = "No workers in this organization";
                 }
 
+            }
+            catch (Exception ex)
+            {
+                res.ErrorMessage = ex.Message;
+            }
+
+            return res;
+        }
+
+        public async Task<Result<OrganizationInfo>> GetCurrentMasterOrg()
+        {
+            var res = new Result<OrganizationInfo>();
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                if (user != null)
+                {
+                    var employee = _dbContext.OrganizationEmployees
+                        .Where(s => s.AppUserId == user.Id && s.DismissalDate == null)
+                        .Include(s => s.Organization)
+                        .FirstOrDefault();
+                    
+                    if (employee != null && employee.Organization != null)
+                    {
+                        res.Data = getOrgInfoByOwner(employee.Organization.AppUserId);
+                    }
+                }
+                else
+                {
+                    res.ErrorMessage = "User was not found";
+                }
             }
             catch (Exception ex)
             {

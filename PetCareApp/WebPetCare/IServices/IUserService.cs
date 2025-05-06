@@ -62,5 +62,7 @@ namespace WebPetCare.IServices
         public Task<string> UserRoleToMaster();
 
         public Task<Result<List<HistoryEvent>>> GetEventsHistory();
+
+        public Task<Result<UserContactsDto>> GetRecordOwner(int recordId);
     }
 }

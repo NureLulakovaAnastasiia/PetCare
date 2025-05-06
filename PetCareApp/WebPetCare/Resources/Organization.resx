@@ -144,6 +144,9 @@
   <data name="Choose" xml:space="preserve">
     <value>Choose</value>
   </data>
+  <data name="Current Organization" xml:space="preserve">
+    <value>Current Organization</value>
+  </data>
   <data name="Date" xml:space="preserve">
     <value>Date</value>
   </data>
@@ -177,6 +180,9 @@
   <data name="Finish" xml:space="preserve">
     <value>Finish</value>
   </data>
+  <data name="Fire" xml:space="preserve">
+    <value>Fire</value>
+  </data>
   <data name="Fire employee" xml:space="preserve">
     <value>Fire employee</value>
   </data>
@@ -191,6 +197,9 @@
   </data>
   <data name="My portfolio" xml:space="preserve">
     <value>My portfolio</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
   </data>
   <data name="New" xml:space="preserve">
     <value>New</value>

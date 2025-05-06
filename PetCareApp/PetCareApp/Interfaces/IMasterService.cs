@@ -50,5 +50,7 @@ namespace PetCareApp.Interfaces
         public Result<bool> UpdateMasterSchedule(List<ScheduleDto> schedule);
         public Task<Result<bool>> DeleteSchedule(int scheduleId);
         public Task<Result<bool>> AddMasterSchedule(ScheduleDto schedule);
+
+        public Task<Result<UserContactsDto>> GetRecordOwner(int recordId);
     } 
 }
