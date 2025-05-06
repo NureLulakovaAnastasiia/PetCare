@@ -1,4 +1,5 @@
 ﻿@using Google.Apis.Calendar.v3.Data
+@using Microsoft.AspNetCore.Components.Authorization
 @using WebPetCare.Services
 @using System.Net.Http;
 @using System.Net.Http.Json;
@@ -13,6 +14,7 @@
 @inject GoogleCalendarService calendarService
 @inject IServiceService service
 @inject IUserService _userService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="row justify-content-end m-3">
 @if (!isGoogleAuthorized)
@@ -60,6 +62,7 @@ else
     private bool isOptionsShown { get; set; } = false;
     private bool isBreaks { get; set; } = false;
     private bool isRecords { get; set; } = false;
+    private string? AuthMethod;
 
 
 
@@ -86,12 +89,17 @@ else
 
     private async Task CheckGoogleAuth()
     {
-        var response = await calendarService.GetAccessTokenAsync();
-        if (!String.IsNullOrEmpty(response))
-        {
-            isGoogleAuthorized = true;
-            isOptionsShown = false;
-        }
+        AuthMethod = await calendarService.GetAuthMethod();
+
+            var response = await calendarService.GetAccessTokenAsync();
+            if (!String.IsNullOrEmpty(response))
+            {
+                if (AuthMethod != null && AuthMethod == "google")
+                {
+                    isGoogleAuthorized = true;
+                    isOptionsShown = false;
+                }
+            }
     }
 
     private void OpenOptions()

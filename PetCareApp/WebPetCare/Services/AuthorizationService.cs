@@ -9,6 +9,8 @@ using WebPetCare.IServices;
 using PetCareApp.Models;
 using Microsoft.Extensions.Options;
 using static System.Net.WebRequestMethods;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace WebPetCare.Services
 {
@@ -47,8 +49,11 @@ namespace WebPetCare.Services
                     NewUserDto user = JsonSerializer.Deserialize<NewUserDto>(result, options);
                     if (user != null)
                     {
+                        Logout();
                         await SetStoreItemAsync(user.Token, "token");
                         await SetStoreItemAsync(user.Role, "role");
+                        await SetStoreItemAsync("local", "auth_method");
+
                     }
                 }
                 else
@@ -97,6 +102,7 @@ namespace WebPetCare.Services
                     {
                         await SetStoreItemAsync(user.Token, "token");
                         await SetStoreItemAsync(user.Role, "role");
+                        await SetStoreItemAsync("local", "auth_method");
 
                         result = await SendEmail(user.Email);
                     }
@@ -193,6 +199,7 @@ namespace WebPetCare.Services
             {
                 await DeleteStoreItemAsync("token");
                 await DeleteStoreItemAsync("role");
+                await DeleteStoreItemAsync("auth_method");
                 return string.Empty;
             }
             catch (Exception ex)
@@ -239,6 +246,7 @@ namespace WebPetCare.Services
                     {
                         await SetStoreItemAsync(user.Token, "token");
                         await SetStoreItemAsync(user.Role, "role");
+                        await SetStoreItemAsync("google", "auth_method");
                         res.Data = true;
                     }
                 }
@@ -286,6 +294,7 @@ namespace WebPetCare.Services
                     {
                         await SetStoreItemAsync(user.Token, "token");
                         await SetStoreItemAsync(user.Role, "role");
+                        await SetStoreItemAsync("google", "auth_method");
 
                         res.Data = true;
                     }

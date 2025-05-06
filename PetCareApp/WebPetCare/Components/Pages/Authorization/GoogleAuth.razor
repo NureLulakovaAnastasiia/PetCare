@@ -45,7 +45,7 @@ else
     private bool IsRole { get; set; } = false;
     public string role = "User";
     private AppUser userDto { get; set; }
-
+    private string? AuthMethod;
     // protected override async Task OnInitializedAsync()
     // {
 
@@ -53,16 +53,22 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        
+
         await CheckAuthorization();
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-
         var user = authState.User;
+        AuthMethod = await GetAuthMethod();
+
 
         if (user.Identity?.IsAuthenticated ?? false)
         {
+
             if (isAuthenticated)
             {
+                if(AuthMethod == "local")
+                {
+                    await SetAuthMethod("google");
+                }
                 Navigation.NavigateTo("/account");
                 return;
             }
@@ -171,6 +177,17 @@ else
     private async Task CheckAuthorization()
     {
         isAuthenticated = await JSRuntime.InvokeAsync<bool>("checkTokenInSessionStorage");
+
+    }
+
+    private async Task<string> GetAuthMethod()
+    {
+        return await JSRuntime.InvokeAsync<string>("sessionStorageGetItem", "auth_method");
+
+    }
+    private async Task<string> SetAuthMethod(string value)
+    {
+        return await JSRuntime.InvokeAsync<string>("sessionStorageSetItem", "auth_method", value);
 
     }
 }

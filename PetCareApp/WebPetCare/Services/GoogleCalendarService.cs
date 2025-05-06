@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Syncfusion.Blazor.Calendars;
 using PetCareApp.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
 
 namespace WebPetCare.Services
 {
@@ -17,12 +18,18 @@ namespace WebPetCare.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private string calendarId = "primary";
         private string AppName = "PetCareWeb";
-        public GoogleCalendarService(IHttpContextAccessor httpContextAccessor)
+        private readonly IJSRuntime _jsRuntime;
+        public GoogleCalendarService(IHttpContextAccessor httpContextAccessor, IJSRuntime jsRuntime)
         {
             _httpContextAccessor = httpContextAccessor;
+            _jsRuntime = jsRuntime;
         }
 
+        public async Task<string> GetAuthMethod()
+        {
+            return await _jsRuntime.InvokeAsync<string>("sessionStorageGetItem", "auth_method");
 
+        }
         public async Task<string?> GetAccessTokenAsync()
         {
             var context = _httpContextAccessor.HttpContext;
@@ -34,7 +41,7 @@ namespace WebPetCare.Services
             {
                 return null;
             }
-
+            
             return result.Properties?.GetTokenValue("access_token");
         }
 

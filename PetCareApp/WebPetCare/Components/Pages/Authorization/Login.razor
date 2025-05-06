@@ -153,6 +153,7 @@
 
     public async Task LoginFunc()
     {
+        
         var result = await authService.Login(LoginModel);
         if (!String.IsNullOrEmpty(result.Error))
         {

@@ -20,7 +20,7 @@ using Google.Apis.Calendar.v3.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1fe");
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -60,7 +60,7 @@ builder.Services.AddLocalization();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddScoped<SfDialogService>();
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSingleton<GoogleCalendarService>();
+builder.Services.AddScoped<GoogleCalendarService>();
 
 
 builder.Services.AddSession(options =>
