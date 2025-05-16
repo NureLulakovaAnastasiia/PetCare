@@ -44,9 +44,9 @@
                                             <div class="col-5">
                                                 <label class="form-check-label"> @Localizer["Answer"]</label>
                                                 <InputText @bind-Value="answer.Text" class="form-control" />
-                                                @if (image != null)
+                                                @if (!String.IsNullOrEmpty(image))
                                                 {
-                                                    <img src="@image" class="pb-2" alt="@Localizer["Answer image"]" style="max-width: 200px;" />
+                                                    <img src="@image" class="pb-2"  style="max-width: 200px;" />
                                                 }
                                                 <InputFile class="p-2 ms-2" OnChange="@(e => AddImage(e, answerInd, questionInd))" accept="image/*" />
                                             </div>

@@ -82,6 +82,8 @@
                                     }
 
                                     <div class="col-5">
+                                        @if (data.Id != 0)
+                                    {
                                         <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnCustomer">
                                             <ContentTemplate>
                                                 <div id='democontent'>
@@ -104,6 +106,7 @@
                                                 <button class="btn btn-info m-0 p-1" style="font-size: 0.7rem" ID="btnCustomer" @onclick="() => GetCustomer(data.Id)">   @Localizer["Show customer data"] </button>
                                             </ChildContent>
                                         </SfTooltip>
+                                        }
                                     </div>
                                 </div>
                             </td>

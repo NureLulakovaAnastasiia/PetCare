@@ -13,6 +13,7 @@ namespace PetCareApp.Mappings
                 Text = review.Text,
                 Photo = review.Photo,
                 Rate = review.Rate,
+                Date = review.Date,
                 AppUserId = review.AppUserId,
                 AppUserName = review.AppUser != null ? review.AppUser.FirstName + " " + review.AppUser.LastName : "",
                 ServiceId = review.ServiceId,

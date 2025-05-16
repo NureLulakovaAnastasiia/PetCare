@@ -216,7 +216,7 @@ namespace PetCareApp.Services
                 var localized = JsonSerializer.Deserialize<Dictionary<string, string>>(c.LocalizedName);
                 if (localized != null)
                 {
-                    dto.Name = localized.ContainsKey(localization) ? localized[localization] : localized["en"];
+                    dto.Name = localized.ContainsKey(localization) ? localized[localization] : localized.First().Value;
                 }
                 if (!String.IsNullOrEmpty(dto.Name))
                 {

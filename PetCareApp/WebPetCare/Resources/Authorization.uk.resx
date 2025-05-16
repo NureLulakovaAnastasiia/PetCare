@@ -120,6 +120,9 @@
   <data name="Account" xml:space="preserve">
     <value>Акаунт</value>
   </data>
+  <data name="Account was created" xml:space="preserve">
+    <value>Акаунт успішно стоврено</value>
+  </data>
   <data name="ChoseRole" xml:space="preserve">
     <value>Оберіть вашу роль</value>
   </data>
@@ -242,6 +245,9 @@
   </data>
   <data name="SuccesfulLogin" xml:space="preserve">
     <value>Ви успішно авторизувалися</value>
+  </data>
+  <data name="Successful email confirmation" xml:space="preserve">
+    <value>Пошту підтверджено</value>
   </data>
   <data name="SuccessPasswordChange" xml:space="preserve">
     <value>Пароль було успішно змінено</value>

@@ -902,6 +902,14 @@ namespace PetCareApp.Services
                         .FirstOrDefault();
                     if (userData != null)
                     {
+                        res.Pets = _mapper.Map<List<PetDto>>(userData.Pets);
+                        res.Services = _mapper.Map<List<GetServiceDto>>(userData.Services);
+                        res.FirstName = user.FirstName;
+                        res.LastName = user.LastName;
+                        res.Email = user.Email != null ? user.Email : "";
+                        res.Photo = user.Photo;
+
+
                         res.Contacts = ContactsMapping.MapContact(userData.Contacts);
                         if(res.Contacts.AppUserId == null)
                         {
@@ -913,15 +921,18 @@ namespace PetCareApp.Services
                             var localized = JsonSerializer.Deserialize<Dictionary<string, string>>(city.LocalizedName);
                             if (localized != null)
                             {
-                                res.Contacts.City = localized["en"] ?? string.Empty;
+                                if (localized.ContainsKey("en"))
+                                {
+                                    res.Contacts.City = localized["en"];
+                                }
+                                else
+                                {
+                                    res.Contacts.City = localized.ElementAt(0).Value;
+                                }
+                                
                             }
                         }
-                        res.Pets = _mapper.Map<List<PetDto>>(userData.Pets);
-                        res.Services = _mapper.Map<List<GetServiceDto>>(userData.Services);
-                        res.FirstName = user.FirstName;
-                        res.LastName = user.LastName;
-                        res.Email = user.Email != null ? user.Email : "";
-                        res.Photo = user.Photo;
+                       
                     }
                 }
             }

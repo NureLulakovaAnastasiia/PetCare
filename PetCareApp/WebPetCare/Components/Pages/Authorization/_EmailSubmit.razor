@@ -12,9 +12,9 @@
 
             <div class="col-8 form-group py-2 text-center">
                 <h5>@Localizer["NewPassword"]</h5>
-                <InputText typeof="password" class="form-control col-10" @bind-Value="passwordChange.NewPassword" DisplayName="Email" />
+                <InputText type="password" class="form-control col-10" @bind-Value="passwordChange.NewPassword" DisplayName="Email" />
             <h5>@Localizer["ConfirmNewPassword"]</h5>
-                <InputText typeof="password" class="form-control col-10" @bind-Value="passwordChange.NewPasswordSubmit" />
+                <InputText type="password" class="form-control col-10" @bind-Value="passwordChange.NewPasswordSubmit" />
             </div>
             <button type="submit" class="btn btn-primary col-4 mt-3" @onclick="ChangePassword">@Localizer["Submit"]</button>
     }
@@ -102,6 +102,7 @@
 
                 if (ToLoginPage.HasDelegate)
                 {
+                    showToastr(Localizer["Successful email confirmation"]);
                     await ToLoginPage.InvokeAsync();
                 }
             }

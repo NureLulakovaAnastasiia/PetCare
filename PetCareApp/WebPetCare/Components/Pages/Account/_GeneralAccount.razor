@@ -73,8 +73,7 @@
                                         <div class="row">
                                             <h4 class="offset-1 col-@(IsEdit ? "9" : "10") text-center" 
                                             style="color: var(--bs-green-blue);">
-                                                @(!String.IsNullOrEmpty(masterData.Contacts.Address) ? masterData.Contacts.City + ", "
-                                                    + masterData.Contacts.Address : "–")
+                                                @(!String.IsNullOrEmpty(masterData.Contacts.Address) ? masterData.Contacts.Address : "–")
                                             </h4>
                                             @if (IsEdit)
                                             {
@@ -276,4 +275,9 @@
         opacity: 0.6;
         z-index: 300 !important;
     }
+
+    .e-dlg-container {
+        z-index: 100 !important;
+    }
+
 </style>
