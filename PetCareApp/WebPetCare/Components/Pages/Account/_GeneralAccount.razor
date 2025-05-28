@@ -3,7 +3,7 @@
 @inject IStringLocalizer<Account> Localizer
 
 <div class="d-flex justify-content-center">
-    <div class="col-lg-10 align-items-center text-center ">
+    <div class="col-lg-10 m-3 m-lg-0 m-xl-0 col-10 align-items-center text-center ">
         <div class="form-custom-border p-3 ">
             @if (!IsEdit)
             {
@@ -34,12 +34,12 @@
 
                         }
                         <div class="row col-lg-12 m-3">
-                            <div class="col-3 text-center">
+                            <div class="col-lg-3 col-xl-3 col-12 text-center">
                                 <h4>@Localizer["Profile photo"]</h4>
                                 <label class="image-upload pb-4">
                                     <InputFile accept="image/*" OnChange="@HandleFileSelected" disabled="@(!IsEdit)" />
                                     <div class="image-container">
-                                        <img id="profile image" src="@UploadedImage" alt="@Localizer["No image available"]">
+                                        <img id="profile image" src="@UploadedImage" style="height:100%;" alt="@Localizer["No image available"]">
                                         @if (IsEdit)
                                         {
                                             <div class="placeholder">
@@ -52,16 +52,16 @@
 
 
                             </div>
-                            <div class="col-9">
+                            <div class="col-lg-9 col-xl-9 col-12">
                                 <div>
                                     <div class="row ms-3 text-center justify-content-around">
-                                        <div class="offset-1 col-5">
+                                        <div class="offset-xl-1 col-11 col-xl-5 col-md-5">
                                             <h4>@Localizer["Last Name"]</h4>
                                             <InputText @bind-Value="masterData.LastName" placeholder="@Localizer["Last Name"]"
                                                        class="input-text-style col-12" disabled="@(!IsEdit)" />
                                         </div>
 
-                                        <div class="col-5">
+                                        <div class="col-11 col-xl-5 col-md-5">
                                             <h4>@Localizer["First Name"]</h4>
                                             <InputText @bind-Value="masterData.FirstName" placeholder="@Localizer["First Name"]"
                                                        class="input-text-style col-12" disabled="@(!IsEdit)" />
@@ -99,18 +99,18 @@
                                        
                                     }
                                     <div class="row ms-3 text-center justify-content-around">
-                                        <div class="offset-1 col-5">
+                                        <div class="offset-lg-1 offset-xl-1 col-11 col-xl-5 col-md-5">
                                             <h4>@Localizer["Phone"]</h4>
                                             <InputText @bind-Value="masterData.Contacts.Phone"
                                                        placeholder="@(String.IsNullOrEmpty(masterData.Contacts.Phone) && !IsEdit ? "–" : masterData.Contacts.Phone)"
-                                                       class="input-text-style col-12" disabled="@(!IsEdit)" />
+                                                       class="input-text-style" disabled="@(!IsEdit)" />
                                         </div>
 
-                                        <div class="col-5">
+                                        <div class="col-11 col-xl-5 col-md-5">
                                             <h4>@Localizer["Email"]</h4>
                                             <InputTextArea @bind-Value="masterData.Email"
                                                        placeholder="Email" 
-                                                       class="input-text-style text-center" style="word-wrap:break-word; max-height: 100px;" disabled />
+                                                       class="input-text-style col-12" style="word-wrap:break-word; max-height: 100px;" disabled />
                                         </div>
                                     </div>
                                 </div>

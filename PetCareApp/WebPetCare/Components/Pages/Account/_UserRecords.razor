@@ -8,15 +8,15 @@
 
 
 <div class="d-flex justify-content-center  mt-3">
-    <div class="col-lg-10 align-items-center text-center">
+    <div class="col-10 m-3 m-lg-0 m-xl-0  align-items-center text-center">
         <div class="form-custom-border p-3 ">
             <h3 class=""><b>@Localizer["My records"]</b></h3>
             <hr />
            
             @if (records.Count > 0)
             {
-                <div class="row justify-content-end">
-                    <div class="col-3">
+                <div class="row justify-content-lg-end justify-content-xl-end justify-content-center">
+                    <div class="col-lg-3 col-xl-3 col-5">
                         <h6>@Localizer["Sort by start time"]</h6>
                         <SfDropDownList TValue="SortOptions.SortDirection" TItem="SelectListItem<SortOptions.SortDirection>"
                                         DataSource="SortTypes" @bind-Value="sortType">
@@ -25,7 +25,7 @@
                                                 ValueChange="SortRecords"></DropDownListEvents>
                         </SfDropDownList>
                     </div>
-                    <div class="col-3">
+                    <div class="col-lg-3 col-xl-3 col-5">
                         <h6>@Localizer["Filter by status"]</h6>
                         <SfDropDownList TValue="SortOptions.FilterByRecordStatus" TItem="SelectListItem<SortOptions.FilterByRecordStatus>"
                                         DataSource="FilterTypes" @bind-Value="filterType">
@@ -46,11 +46,11 @@
                         {
                             <_ServiceReview serviceName="@record.ServiceName" IsReview="IsReview"
                                             CancelReview="CancelReview" PageUpdate="ReloadData" serviceId="@(record.ServiceId ?? 0)"></_ServiceReview>
-                            <div class="card col-md-10 mb-4 offset-1 p-2">
+                            <div class="card col-md-10 mb-4 offset-lg-1 offset-xl-1 offset-md-1 p-2">
                                 <div class="card-header row align-items-center">
-                                    <h3 class="col-7"><strong>@record.ServiceName</strong></h3>
+                                    <h3 class="col-lg-7 col-xl-7 col-md-7 col-10"><strong>@record.ServiceName</strong></h3>
 
-                                    <div class="col-3 text-center text-primary">
+                                    <div class="col-lg-3 col-xl-3 col-md-3 col-9 text-center text-primary">
                                         @record.StartTime.ToString("D")
                                         <h3>@record.StartTime.ToString("HH:mm") - @record.EndTime.ToString("HH:mm")</h3>
                                     </div>
@@ -61,9 +61,9 @@
                                         </button>
                                         </div>
                                 </div>
-                                <div class="card-body row">
-                                    <div class="col-6">
-                                        <div class="ms-1 mb-2 align-items-center">
+                                <div class="card-body row ">
+                                    <div class="col-lg-6 col-xl-6 col-md-6">
+                                        <div class="ms-lg-1 ms-xl-1  mb-2 align-items-center">
                                             <h5 class="">@Localizer["Status"] : </h5>
                                             <h4 class="@(record.Status == "Created" || record.Status == "Finished" ? "text-primary" : "text-danger") col-8">@Localizer[record.Status]</h4>
                                         </div>
@@ -84,7 +84,7 @@
                                             }
                                         </div>
                                     </div>
-                                    <div class="col-6 mb-3">
+                                    <div class="col-lg-6 col-xl-6 col-md-6 mb-3">
                                         <h5 class="">@Localizer["Description"]:</h5>
                                         <div class="ps-2 green-blue-text" style="white-space: pre-line;">
                                             @(!String.IsNullOrEmpty(record.Description) ? record.Description : Localizer["No description available"])
@@ -98,7 +98,7 @@
                                         <div class="row">
                                             <div class="col-4">
                                             </div>
-                                            <div class="col-8">
+                                            <div class="col-10 col-lg-8 col-xl-8 col-md-8">
                                                 @if (record.Status == "Finished")
                                                 {
                                                     if (record.IsReviewed)

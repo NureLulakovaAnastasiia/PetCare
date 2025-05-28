@@ -249,6 +249,9 @@
   <data name="Description" xml:space="preserve">
     <value>Опис</value>
   </data>
+  <data name="Description is required" xml:space="preserve">
+    <value>Опис є обов'язковим</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Змінити</value>
   </data>
@@ -350,6 +353,9 @@
   </data>
   <data name="Name" xml:space="preserve">
     <value>Ім'я</value>
+  </data>
+  <data name="NameBreedRequired" xml:space="preserve">
+    <value>Ім'я та порода є обов'язковими для заповнення </value>
   </data>
   <data name="No data was found" xml:space="preserve">
     <value>Дані не знайдено</value>

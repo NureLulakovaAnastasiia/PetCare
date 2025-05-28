@@ -15,8 +15,8 @@
 @rendermode InteractiveAuto
 @inject IStringLocalizer<Account> Localizer
 
-<div class="row justify-content-center mb-4">
-    <h2 class="col-5 offset-4">@Localizer["Schedule"]</h2>
+<div class="row justify-content-center align-content-center mb-4">
+    <h2 class="col-lg-5 col-xl-5 col-md-5 offset-lg-4 offset-xl-4 offset-md-4 offset-3">@Localizer["Schedule"]</h2>
 </div>
 @if (isOrganization && employeesList != null)
 {
@@ -28,7 +28,7 @@
     </div>
 }
 <div class="row">
-    <_GoogleCalendar></_GoogleCalendar>
+    <_GoogleCalendar masterId="@selectedMaster.Id" date="@currentDate"></_GoogleCalendar>
 </div>
 <SfSchedule TValue="AppointmentData" FirstDayOfWeek="1" @ref="@ScheduleRef" AllowOverlap="false" EnableAdaptiveUI="true" StartHour="6:00" ShowQuickInfo="false" EnableAllDayScroll="true" Height="700"
             SelectedDateChanged="DateRangeChanged">
@@ -194,7 +194,7 @@
 
     </ScheduleEventSettings>
 
-    <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen" OnEventDoubleClick="OnEventClick" OnEventClick="OnEventClick" ActionCompleted="UpdateDataInDb"></ScheduleEvents>
+    <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen"  OnEventDoubleClick="OnEventClick" OnEventClick="OnEventClick" ActionCompleted="UpdateDataInDb"></ScheduleEvents>
     <ScheduleViews>
         <ScheduleView Option="View.Day"></ScheduleView>
         <ScheduleView Option="View.Week"></ScheduleView>
@@ -230,7 +230,8 @@
     SfSchedule<AppointmentData> ScheduleRef;
     private int? ddlIndex { get; set; } = 0;
     private int? ddlIndex2 { get; set; } = 0;
-
+    private DateTime currentDate = DateTime.Now;
+    @implements IDisposable
 
     public async Task OnEventClick(EventClickArgs<AppointmentData> args)
     {
@@ -270,6 +271,7 @@
             }
             await ChangeMaster();
         }
+        
         var culture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
         if (localizeStatus.ContainsKey(culture))
         {
@@ -294,30 +296,33 @@
         StateHasChanged();
 
     }
-
+   
     private async void DateRangeChanged(DateTime date)
     {
-        foreach (var avDate in availableDates)
-        {
-            if (avDate.Month == date.Month && avDate.Year == date.Year)
+        if (isDisposed) return;
+            currentDate = date;
+            foreach (var avDate in availableDates)
             {
-                return;
+                if (avDate.Month == date.Month && avDate.Year == date.Year)
+                {
+                    return;
+                }
             }
-        }
-        var recordsResult = await service.getMasterRecordForMonth(date, selectedMaster.Id);
-        if (recordsResult.IsSuccess)
-        {
+            var recordsResult = await service.getMasterRecordForMonth(date, selectedMaster.Id);
+            if (recordsResult.IsSuccess)
+            {
 
-            records.AddRange(recordsResult.Data);
-            availableDates.Add(date);
-            UpdateEvents(recordsResult.Data);
-            await showToastr("", Localizer["Records were succesfully gotten"]);
+                records.AddRange(recordsResult.Data);
+                availableDates.Add(date);
+                UpdateEvents(recordsResult.Data);
+                await showToastr("", Localizer["Records were succesfully gotten"]);
 
-        }
-        else
-        {
-            await showToastr(recordsResult.ErrorMessage);
-        }
+            }
+            else
+            {
+                await showToastr(recordsResult.ErrorMessage);
+            }
+        
         StateHasChanged();
     }
 
@@ -576,6 +581,7 @@
             {
                 await _JSRuntime.InvokeVoidAsync("showDeleteButton");
             }
+           await _JSRuntime.InvokeVoidAsync("hideCountRecurrency");
         }
     }
 
@@ -1166,6 +1172,13 @@
         background-color: #e3dccc;
     }
 
+
+    ul[role="listbox"] li[data-value="COUNT"] {
+        display: none !important;
+    }
+
+
+
 </style>
 
 <script>
@@ -1184,6 +1197,16 @@
             if (deleteButton) {
                 deleteButton.style.display = 'block';
             }
+        }, 100);
+    };
+
+    window.hideCountRecurrency = function () {
+        setTimeout(() => {
+            let button = document.querySelector('.e-content e-dropdownbase');
+            console.log(button);
+            button.addEventListener('click', function () {
+                console.log('Button clicked!');
+            });
         }, 100);
     };
 

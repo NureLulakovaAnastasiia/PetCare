@@ -10,7 +10,7 @@ namespace WebPetCare.Services
     public class ServiceService : BaseService, IServiceService
     {
         private HttpClient httpClient { get; set; }
-        private IJSRuntime jsRuntime;
+        private IJSRuntime jsRuntime { get; set; }
         public ServiceService(HttpClient httpClientbase, IConfiguration configuration, IJSRuntime runtime) :
             base(httpClientbase, configuration, runtime)
         {
@@ -22,7 +22,7 @@ namespace WebPetCare.Services
             var res = new Result<GetServiceDto>();
             try
             {
-                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                await HttpService.SetTokenToHttpClient(httpClient, jsRuntime);
                 string fullUrl = $"{_apiUrl}/api/Service/getServiceDetails?serviceId={serviceId}";
 
                 HttpResponseMessage response = await httpClient.GetAsync(fullUrl);
@@ -339,7 +339,7 @@ namespace WebPetCare.Services
             var res = new Result<List<GetRecordDto>>();
             try
             {
-                httpClient = await HttpService.GetHttpClient(httpClient, jsRuntime);
+                await HttpService.SetTokenToHttpClient(httpClient, jsRuntime);
                 var strToAdd = !String.IsNullOrEmpty(masterId) ? $"&masterId={masterId}" : "";
                 string fullUrl = $"{_apiUrl}/api/Master/getMasterRecordsForMonth?month={startDate.Month}&year={startDate.Year}{strToAdd}";
 

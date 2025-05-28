@@ -85,6 +85,10 @@
                             <div class="col col-6 p-2">
                                 <label for="description" class="p-2">@Localizer["Description"]</label>
                                 <textarea id="description" @bind="Description" class="form-control"></textarea>
+                                @if (isDescrReqiured)
+                                {
+                                    <p class="text-danger">@Localizer["Description is required"]</p>
+                                }
                             </div>
                             <div class="col-6 p-2 pt-0 text-center justify-content-start mb-4 pe-4">
                                 <label for="photo" class="d-block p-2 pt-3">@Localizer["Photo"]</label>
@@ -130,6 +134,7 @@
     private IBrowserFile SelectedFile;
     private string? UploadedImage;
     private const long MaxFileSize = 2 * 1024 * 1024;
+    private bool isDescrReqiured = false;
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
@@ -207,6 +212,11 @@
 
     private async Task AddPortfolio()
     {
+        if (String.IsNullOrEmpty(Description))
+        {
+            isDescrReqiured = true;
+            return;
+        }
         if (SelectedFile != null)
         {
             using var stream = new MemoryStream();
@@ -223,6 +233,7 @@
             var res = await _userService.UpsertPortfolio(list);
             if (res.IsSuccess)
             {
+                isDescrReqiured = false;
                 if (res.Data.Count > 0)
                 {
                     addPortfolio.Id = res.Data[0];

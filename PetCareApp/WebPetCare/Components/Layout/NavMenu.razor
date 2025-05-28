@@ -10,12 +10,12 @@
 
 <nav class="navbar bg-body d-flex ">
     <div class="flex-row">
-        <p class=" mx-5 brand-logo">PetCare</p>
+        <p class=" mx-2 mx-lg-5 mx-xxl-5 mx-sm-3 brand-logo">PetCare</p>
     </div>
-    <ul class="navbar-nav  flex-row-reverse align-content-center">
+    <ul class="navbar-nav flex-row-reverse align-content-center">
         @if (isLogged)
         {
-            <li class="nav-item p-0 mx-4">
+            <li class="nav-item p-0 mx-2 mx-lg-4 mx-sm-2">
                 <button class="nav-link nav-link-big bell-btn"  @onclick="ToggleHistory">
                     <i class="bi bi-bell-fill"></i>
                     @if (eventsHistory.Count > 0)
@@ -32,27 +32,27 @@
         }
       
         
-        <li class="nav-item p-0 mx-4">
+        <li class="nav-item p-0 mx-2 mx-lg-4 mx-sm-2">
             <a class="nav-link nav-link-big" href="" Match="NavLinkMatch.All">
                 @Localizer["Home"]
             </a>
         </li>
 
-        <li class="nav-item  p-0  mx-4">
+        <li class="nav-item  p-0  mx-2 mx-lg-4 mx-sm-2 ">
             <a class="nav-link nav-link-big" href="search">
                 @Localizer["Search"]
             </a>
         </li>
         @if (!isLogged)
         {
-            <li class="nav-item  p-0 mx-4">
+            <li class="nav-item  p-0 mx-2 mx-lg-4 mx-sm-2">
                 <a class="nav-link nav-link-big" href="login">
                 @Localizer["Login"]
             </a>
         </li>
         }else{
 
-            <li class="nav-item  p-1 mx-3">
+            <li class="nav-item  p-1 mx-2 mx-lg-4 mx-sm-2 ">
             @* <a class="nav-link" href="account">
                 Account
             </a> *@
@@ -66,7 +66,7 @@
             </SfDropDownButton>
         </li>
         }
-        <li class="nav-item p-0 mx-4 mt-3">
+        <li class="nav-item p-0 mx-0 mx-lg-4 mx-sm-2 mt-3">
             <div>
                 <select @bind="Culture" class="custom-option">
                     <option value="en">Eng</option>

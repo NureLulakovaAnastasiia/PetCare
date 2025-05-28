@@ -109,6 +109,11 @@ builder.Services.AddAuthorization(options =>
        policy.RequireRole("Organization"));
 }
 );
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxConcurrentConnections = 1500;
+    options.Limits.MaxConcurrentUpgradedConnections = 1500;
+});
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 

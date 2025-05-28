@@ -50,6 +50,8 @@ window.hideDeleteButton = function () {
     }, 100);
 };
 
+
+
 window.showDeleteButton = function () {
     setTimeout(() => {
         let deleteButton = document.querySelector('.e-event-delete');

@@ -249,6 +249,9 @@
   <data name="Description" xml:space="preserve">
     <value>Description</value>
   </data>
+  <data name="Description is required" xml:space="preserve">
+    <value>Description is required</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
@@ -350,6 +353,9 @@
   </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
+  </data>
+  <data name="NameBreedRequired" xml:space="preserve">
+    <value>Name and breed are required fields</value>
   </data>
   <data name="No data was found" xml:space="preserve">
     <value>No data was found</value>

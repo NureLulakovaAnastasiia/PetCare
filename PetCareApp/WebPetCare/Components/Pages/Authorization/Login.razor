@@ -12,12 +12,15 @@
 
 
 <div class="row text-center justify-content-center mt-5">
-    <div class="col-8 offset-4">
+    <div class="col-lg-8 col-xl-8 offset-1 col-11 offset-lg-4 offset-md-4 offset-xl-4">
         @if (IsLogin)
         {
-            <div class="col-7">
+            <div class="col-10 col-lg-7 col-xl-7 col-md-8">
                 <h1>@Localizer["WithReturning"]</h1>
-                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="LoginFunc" class="">
+                <EditForm Model="LoginModel" FormName="LoginForm" OnValidSubmit="LoginFunc" class="">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
                     <div class="form-group py-2 text-center">
                         <h5>@Localizer["Email"]</h5>
                         <InputText class="form-control" @bind-Value="LoginModel.Email" DisplayName="Email" />
@@ -50,7 +53,9 @@
         {
             <div class="col-7">
                 <h1>@Localizer["NewAccount"]</h1>
-                <EditForm Model="LoginModel" FormName="LoginForm" OnSubmit="RegisterFunc" class="">
+                <EditForm Model="RegisterModel" FormName="LoginForm" OnValidSubmit="RegisterFunc" class="">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
                     <div class="form-group py-2 text-center">
                         <div class="row justify-content-between mb-3">
                             <div class="col-6">

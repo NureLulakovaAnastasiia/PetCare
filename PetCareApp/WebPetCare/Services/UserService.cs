@@ -659,6 +659,10 @@ namespace WebPetCare.Services
                     {
                         res.Data = data;
                     }
+                }else if(response.StatusCode == HttpStatusCode.InternalServerError)
+                {
+                    res.Data = new QuestionaryAnalisysDto();
+                    res.Data.Slots = new List<TimeSlot>();
                 }
                 else
                 {

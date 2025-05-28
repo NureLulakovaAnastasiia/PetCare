@@ -10,26 +10,26 @@
 
 
 
-<div class="justify-content-center offset-2">
-    <div class="col-lg-10 align-items-center text-center ">
-        <div class="form-custom-border p-3 ">
-            <div class="row">
-                <div class="col-3">
+<div class="justify-content-center offset-lg-2 offset-xl-2 offset-1">
+    <div class=" col-11 col-lg-10 col-xl-10 col-md-11 align-items-center text-center ">
+        <div class="form-custom-border p-3">
+            <div class="row align-content-center">
+                <div class="col-lg-3 col-10 offset-1 offset-lg-0 offset-xl-0">
                     <SfDropDownList TValue="int" TItem="CityDropdownItem" Placeholder="@Localizer["Select a city"]" AllowFiltering="true" DataSource="@CityList" CssClass="e-outline" FloatLabelType="FloatLabelType.Always">
                         <DropDownListFieldSettings Text="NameFormatted" Value="GeonameId"></DropDownListFieldSettings>
                         <DropDownListEvents TValue="int" TItem="CityDropdownItem" ValueChange="OnValueChange"></DropDownListEvents>
                     </SfDropDownList>
                 </div>
 
-                <div class=" row col-6">
+                <div class=" row col col-lg-6 col-md-7 col-12 pt-3 pt-lg-0 pt-xl-0">
                     <div class="row col-4 m-0 p-0 text-center justify-content-center">
                         <div class="m-0">
-                            <SfTooltip CssClass="e-tooltip-css" OpensOn="Focus" Target="#btnFiter">
+                            <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnFiter">
                                 <ContentTemplate>
                                     <div id='democontent'>
                                         <div class="ms-0 text-center">
                                             <h4>@Localizer["Rate"]</h4>
-                                            <SfRating @bind-Value=Rate ShowLabel=true LabelPosition="LabelPosition.Left">
+                                            <SfRating @bind-Value=Rate ShowLabel=true LabelPosition="LabelPosition.Left" ShowTooltip=false>
                                                 <FullTemplate>
                                                     <img src=@fullTemplateImage widht="30" height="30" />
                                                 </FullTemplate>
@@ -50,7 +50,7 @@
                                         </div>
                                         <hr />
                                         <div class="row justify-content-center">
-                                            <button class="btn col-6 btn-danger p-1">@Localizer["Clear filters"]</button>
+                                            <button class="btn col-6 btn-danger p-1" @onclick="ClearFilters">@Localizer["Clear filters"]</button>
                                         </div>
                                     </div>
                                 </ContentTemplate>
@@ -60,9 +60,9 @@
                             </SfTooltip>
                         </div>
                     </div>
-                    <div class=" col-4  m-0 p-0 text-center justify-content-center">
-                        <div class=" ">
-                            <SfTooltip CssClass="e-tooltip-css" Width="700" OpensOn="Focus" Target="#btnSort">
+                    <div class="row col-4   m-0 p-0 text-center justify-content-center">
+                        <div class="m-0 ">
+                            <SfTooltip CssClass="e-tooltip-css" Width="700" OpensOn="Click" Target="#btnSort">
                                 <ContentTemplate>
                                     <div id='democontent' class="row">
                                         <div class="ms-0 text-center col-4 ">
@@ -109,7 +109,7 @@
                             </SfTooltip>
                         </div>
                     </div>
-                    <div class="row col-4 m-0 p-0 text-center justify-content-center">
+                    <div class="row col-4  m-0 p-0 text-center justify-content-center">
                         <SfTooltip CssClass="e-tooltip-css" OpensOn="Click" Target="#btnTags">
                             <ContentTemplate>
                                 <div id='democontent'>
@@ -123,12 +123,12 @@
                     </div>
                 </div>
 
-                <div class=" row col-3">
-                    <div class="col-10 align-content-center">
+                <div class=" row col-xl-3 col-lg-3 col-md-5 col-10 mt-sm-2">
+                    <div class="col-10 col-md-9 align-content-center">
                         <label>@Localizer["Search"]</label>
                         <InputText @bind-Value="search" DisplayName="@Localizer["Search"]" class="input-textarea-style col-11"></InputText>
                     </div>
-                    <div class="col-1 m-0">
+                    <div class="col-1 m-0 mt-1">
                         <button class="btn btn-primary" @onclick="GetFilteredData"><i class="bi bi-search"></i></button>
                     </div>
                 </div>
@@ -137,15 +137,15 @@
 
         </div>
     </div>
-    <div class="col-lg-10 align-items-center text-center mt-3">
+    <div class="col-11 col-lg-10 col-xl-10 col-md-11 align-items-center text-center mt-3">
         <div class="form-custom-border p-3 ">
-            <div class="row">
+            <div class="row align-content-center">
                 @if (filteredServices.Count > 0)
                 {
-                    <div class="col-6">
+                    <div class="col-lg-6 col-xl-6 col-12">
                         <_Map @ref="mapComponent" services="@filteredServices" @key="@string.Join(",", filteredServices.Select(x => x.ServiceDto.Id))"></_Map>
                     </div>
-                    <div class="col-6">
+                    <div class="col-lg-6 col-xl-6 col-12">
                         <div style="max-height: 500px; overflow-y: auto;">
                             @foreach (var item in filteredServices)
                             {
@@ -169,7 +169,7 @@
                                         </div>
                                     </div>
                                     <div class="col-2 m-0 p-0 align-content-end">
-                                        <button class="btn-fill" @onclick="() => GoToService(item.ServiceDto.Id)"><h5 class="text-white">@Localizer["Details"]<br /><i class="bi bi-arrow-right-circle"></i> </h5></button>
+                                        <button class="btn-fill ps-1" @onclick="() => GoToService(item.ServiceDto.Id)"><h5 class="text-white" style="word-wrap:break-word">@Localizer["Details"]<br /><i class="bi bi-arrow-right-circle"></i> </h5></button>
 
                                     </div>
 
@@ -392,6 +392,16 @@
         StateHasChanged();
     }
 
+    private void ClearFilters()
+    {
+        Rate = 0;
+        filters.Rate = 0;
+        filters.MinPrice = minValue;
+        filters.MaxPrice = maxValue;
+        RangeValue[0] = minValue;
+        RangeValue[1] = maxValue;
+        StateHasChanged();
+    }
 
     public void GoToService(int serviceId)
     {
@@ -480,6 +490,7 @@
 
         return 1;
     }
+    
 }
 
 
@@ -502,12 +513,20 @@
         border-right: 8px solid rgba(0, 0, 0, 0);
     }
 
+    
     .e-tooltip-wrap {
         background-color: #e3dccc;
     }
 
+
     .e-rating-container .e-rating-label.e-label-right, .e-rating-container .e-rating-label.e-label-left {
         min-width: 0px;
+    }
+
+    .e-rating-item-container .e-rating-tooltip {
+        display: none;
+        opacity: 0;
+        
     }
 
     .e-rating-container .e-rating-label.e-label-left {

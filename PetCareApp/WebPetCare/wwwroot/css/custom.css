@@ -3264,7 +3264,7 @@ textarea.form-control-lg {
     --bs-btn-padding-x: 1.5rem;
     --bs-btn-padding-y: 1rem;
     --bs-btn-font-family: 1rem;
-    --bs-btn-font-size: 1.4rem;
+    --bs-btn-font-size: 1.3rem;
     --bs-btn-font-weight: 600;
     --bs-btn-line-height: 1.5;
     --bs-btn-color: var(--bs-body-color);
@@ -4225,7 +4225,7 @@ textarea.form-control-lg {
 
 .brand-logo {
     font-weight: 700;
-    font-size: 50px;
+    font-size: 3.5em;
     
 }
 

@@ -16,13 +16,13 @@
     {
 
         <div class="col-1"></div>
-        <div class="row col-8 offset-3 mb-3">
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.General ? "-active" : "")" @onclick="() => ChangePage(menuOptions.General)">@Localizer["General"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Calendar ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Calendar)">@Localizer["Calendar"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Services ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Services)">@Localizer["My services"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Reviews ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Reviews)">@Localizer["Reviews"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Portfolio ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Portfolio)">@Localizer["Portfolio"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(options == menuOptions.Requests ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Requests)">@Localizer["My requests"]</button>
+        <div class="row col-lg-8 col-xl-8 offset-lg-3 offset-xl-3 offset-md-2 offset-1 col-10 align-content-center mb-3">
+            <button class="btn col-lg-3 col-md-5 col-xl-3 mb-3 me-3 btn-nav@(options == menuOptions.General ? "-active" : "")" @onclick="() => ChangePage(menuOptions.General)">@Localizer["General"]</button>
+            <button class="btn col-lg-3 col-md-5 col-xl-3 mb-3 me-3 btn-nav@(options == menuOptions.Calendar ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Calendar)">@Localizer["Calendar"]</button>
+            <button class="btn col-lg-3 col-md-5 col-xl-3 mb-3 me-3 btn-nav@(options == menuOptions.Services ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Services)">@Localizer["My services"]</button>
+            <button class="btn col-lg-3 col-md-5 col-xl-3 mb-3 me-3 btn-nav@(options == menuOptions.Reviews ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Reviews)">@Localizer["Reviews"]</button>
+            <button class="btn col-lg-3 col-md-5 col-xl-3 mb-3 me-3 btn-nav@(options == menuOptions.Portfolio ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Portfolio)">@Localizer["Portfolio"]</button>
+            <button class="btn col-lg-3 col-md-5 col-xl-3 mb-3 me-3 btn-nav@(options == menuOptions.Requests ? "-active" : "")" @onclick="() => ChangePage(menuOptions.Requests)">@Localizer["My requests"]</button>
         </div>
 
         @switch (options)
@@ -63,13 +63,13 @@
         </div>
     }else if(role == "Organization")
     {
-        <div class="row col-8 offset-3 mb-3 ">
-            <button class="btn col-lg-3 mb-3 me-3  btn-nav@(orgOptions == organizationOptions.General ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.General)">@Localizer["General"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Requests ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Requests)">@Localizer["Requests"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Services ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Services)">@Localizer["Services"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Calendar ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Calendar)">@Localizer["Calendar"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Portfolio ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Portfolio)">@Localizer["Portfolio"]</button>
-            <button class="btn col-lg-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Employees ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Employees)">@Localizer["Employees"]</button>
+        <div class="row col-lg-8 col-xl-8 offset-lg-3 offset-xl-3 mb-3 mb-3 ">
+            <button class="btn col-lg-3 col-xl-3 mb-3 me-3  btn-nav@(orgOptions == organizationOptions.General ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.General)">@Localizer["General"]</button>
+            <button class="btn col-lg-3 col-xl-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Requests ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Requests)">@Localizer["Requests"]</button>
+            <button class="btn col-lg-3 col-xl-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Services ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Services)">@Localizer["Services"]</button>
+            <button class="btn col-lg-3 col-xl-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Calendar ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Calendar)">@Localizer["Calendar"]</button>
+            <button class="btn col-lg-3 col-xl-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Portfolio ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Portfolio)">@Localizer["Portfolio"]</button>
+            <button class="btn col-lg-3 col-xl-3 mb-3 me-3 btn-nav@(orgOptions == organizationOptions.Employees ? "-active" : "")" @onclick="() => ChangeOrgPage(organizationOptions.Employees)">@Localizer["Employees"]</button>
         </div>
         @switch (orgOptions)
         {
