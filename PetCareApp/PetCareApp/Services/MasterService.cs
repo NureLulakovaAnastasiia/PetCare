@@ -661,8 +661,8 @@ namespace PetCareApp.Services
                     continue;
                 }
                 var startTime = slot.StartTime;
-                var difference = slot.EndTime - startTime;
-                if(difference.Minutes > service.MinimumTime)
+                var difference = (slot.EndTime - startTime).TotalMinutes - time * 1.0;
+                if(difference > service.MinimumTime)
                 {
                     continue;
                 }
@@ -977,12 +977,24 @@ namespace PetCareApp.Services
 
         private int findCity(Location location, string city)
         {
-            var searchedCity = _dbContext.Cities
-            .FirstOrDefault(c => c.LocalizedName.Contains(city));
-
-            return searchedCity == null ? 0 : searchedCity.Id ;
+            return _dbContext.Cities
+                .AsEnumerable()
+                .Where(c => IsExactCityMatch(c.LocalizedName, city))
+                .Select(c => c.Id)
+                .FirstOrDefault();
         }
-
+        private bool IsExactCityMatch(string localizedNameJson, string city)
+        {
+            try
+            {
+                var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(localizedNameJson);
+                return dict != null && dict.Values.Any(name => string.Equals(name, city, StringComparison.OrdinalIgnoreCase));
+            }
+            catch
+            {
+                return false;
+            }
+        }
         private double DegToRad(double deg) => deg * (Math.PI / 180);
 
         public async Task<List<UpdateQuestionDto>> GetQuestionary(int serviceId)

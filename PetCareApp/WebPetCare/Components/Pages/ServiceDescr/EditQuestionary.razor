@@ -94,7 +94,7 @@
                                                                     </div>
                                                                 }
                                                                 <div class="col-4 text-center">
-                                                                    <label class="form-check-label"> @Localizer["Time"] @((fixedQuestionNum == questionInd || fixedQuestionNum == -1) ? Localizer["(fixed)"] : Localizer["(+/- format)"])</label>
+                                                                    <label class="form-check-label"> @Localizer["Time"]  @((fixedQuestionNum == questionInd) ? Localizer["(fixed)"] : Localizer["(+/- format)"])</label>
                                                                     <InputNumber @bind-Value="answer.Time" class="form-control-number offset-2" />
                                                                 </div>
                                                                 <div class="col-1 mt-3 text-center">
